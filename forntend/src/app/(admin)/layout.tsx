@@ -1,10 +1,12 @@
 "use client";
 
+import { useAuth } from "@/context/AuthContext";
 import { useSidebar } from "@/context/SidebarContext";
 import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
-import React from "react";
+import { useRouter } from 'next/navigation';
+import React, { useEffect } from "react";
 
 export default function AdminLayout({
   children,
@@ -19,7 +21,25 @@ export default function AdminLayout({
     : isExpanded || isHovered
     ? "lg:ml-[290px]"
     : "lg:ml-[90px]";
+ const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
 
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace('/auth/login');
+    }
+  }, [isAuthenticated, loading, router]);
+
+  // Return null while checking authentication or if not authenticated
+  // The loading state is handled in the wrapper
+  if (loading || !isAuthenticated) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
+        {/* <Preloader /> */}
+        <>hello</>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen xl:flex">
       {/* Sidebar and Backdrop */}
