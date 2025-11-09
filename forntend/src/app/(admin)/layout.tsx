@@ -7,6 +7,7 @@ import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from "react";
+import Spinner from "@/components/ui/spinner/Spinner";
 
 export default function AdminLayout({
   children,
@@ -35,8 +36,7 @@ export default function AdminLayout({
   if (loading || !isAuthenticated) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
-        {/* <Preloader /> */}
-        <>hello</>
+        <Spinner />
       </div>
     );
   }
