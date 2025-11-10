@@ -1,16 +1,37 @@
+"use client";
 import GridShape from "@/components/common/GridShape";
 import ThemeTogglerTwo from "@/components/common/ThemeTogglerTwo";
+import { useAuth } from "@/context/AuthContext";
 
 import { ThemeProvider } from "@/context/ThemeContext";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
+import Spinner from "@/components/ui/spinner/Spinner";
+
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+    const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/"); // redirect to dashboard
+    }
+  }, [isAuthenticated, router]);
+  if (loading || isAuthenticated) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
+        <Spinner />
+      </div>
+    );
+  }
   return (
     <div className="relative p-6 bg-white z-1 dark:bg-gray-900 sm:p-0">
       <ThemeProvider>
