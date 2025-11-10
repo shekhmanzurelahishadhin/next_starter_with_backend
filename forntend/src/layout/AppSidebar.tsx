@@ -16,6 +16,7 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  FiUser
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
 
@@ -55,6 +56,15 @@ const navItems: NavItem[] = [
           { name: "Products", path: "/ecommerce/products" },
         ]
       },
+    ],
+  },
+  {
+    icon: <FiUser />,
+    name: "User Roles",
+    subItems: [
+      { name: "Role", path: "/ecommerce/analytics" },
+      { name: "Permission", path: "/ecommerce/sales" },
+      { name: "User", path: "/ecommerce/products" },
     ],
   },
   {
