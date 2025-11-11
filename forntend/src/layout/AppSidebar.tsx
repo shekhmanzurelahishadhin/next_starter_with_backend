@@ -18,8 +18,8 @@ import {
   UserCircleIcon,
   FiUser
 } from "../icons/index";
-import SidebarWidget from "./SidebarWidget";
 
+// Types
 type SubSubItem = {
   name: string;
   path: string;
