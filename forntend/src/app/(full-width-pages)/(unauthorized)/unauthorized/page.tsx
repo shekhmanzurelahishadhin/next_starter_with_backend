@@ -19,7 +19,7 @@ export default function Error401() {
           UNAUTHORIZED
         </h1>
 
-        <Image
+        {/* <Image
           src="/images/error/401.svg"
           alt="401"
           className="dark:hidden"
@@ -32,7 +32,7 @@ export default function Error401() {
           className="hidden dark:block"
           width={472}
           height={152}
-        />
+        /> */}
 
         <p className="mt-10 mb-6 text-base text-gray-700 dark:text-gray-400 sm:text-lg">
           You don't have permission to access this page!
@@ -44,12 +44,6 @@ export default function Error401() {
             className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
           >
             Back to Home Page
-          </Link>
-          <Link
-            href="/signin"
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-3.5 text-sm font-medium text-white shadow-theme-xs hover:bg-primary-dark dark:shadow-theme-xs"
-          >
-            Sign In
           </Link>
         </div>
       </div>
