@@ -11,6 +11,7 @@ import { Modal } from "@/components/ui/modal";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
+import AccessRoute from "@/routes/AccessRoute";
 interface Order {
   id: number;
   user: {
@@ -271,6 +272,7 @@ export default function TablesPage() {
   };
 
   return (
+    <AccessRoute requiredPermissions={["view_data_tables"]}>
     <div>
       <PageBreadcrumb pageTitle="Data Table with Column Filters" />
       <div className="space-y-6">
@@ -336,5 +338,6 @@ export default function TablesPage() {
         </Modal>
       </div>
     </div>
+    </AccessRoute>
   );
 }
