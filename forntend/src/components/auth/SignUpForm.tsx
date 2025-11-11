@@ -144,9 +144,8 @@ export default function SignUpForm() {
                 </span>
               </div>
             </div>
-
             {errorMessage && (
-              <div className="mb-4 text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg p-3">
+              <div className="mb-4 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">
                 {errorMessage}
               </div>
             )}
