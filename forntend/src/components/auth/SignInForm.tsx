@@ -111,7 +111,7 @@ export default function SignInForm() {
             </div>
              {/* 🔴 Error message */}
           {errorMessage && (
-            <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="mb-4 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">
               {errorMessage}
             </div>
           )}
