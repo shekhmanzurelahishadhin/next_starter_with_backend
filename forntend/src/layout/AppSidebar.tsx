@@ -24,7 +24,6 @@ import { useAuth } from "@/context/AuthContext";
 type SubSubItem = {
   name: string;
   path: string;
-  pro?: boolean;
   new?: boolean;
   requiredRoles?: string[];
   requiredPermissions?: string[];
@@ -33,7 +32,6 @@ type SubSubItem = {
 type SubItem = {
   name: string;
   path?: string;
-  pro?: boolean;
   new?: boolean;
   subSubItems?: SubSubItem[];
   requiredRoles?: string[];
@@ -126,8 +124,8 @@ const navItems: NavItem[] = [
     name: "Pages",
     icon: <PageIcon />,
     subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
+      { name: "Blank Page", path: "/blank"},
+      { name: "404 Error", path: "/error-404"},
     ],
   },
 ];
@@ -142,7 +140,7 @@ const othersItems: NavItem[] = [
         path: "/line-chart",
         subSubItems: [
           { name: "Basic", path: "/line-chart/basic" },
-          { name: "Advanced", path: "/line-chart/advanced", pro: true },
+          { name: "Advanced", path: "/line-chart/advanced"},
         ]
       },
     ],
@@ -159,16 +157,16 @@ const othersItems: NavItem[] = [
           { name: "Dismissible", path: "/alerts/dismissible" },
         ]
       },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Modals", path: "/modals", pro: false },
+      { name: "Avatar", path: "/avatars"},
+      { name: "Modals", path: "/modals"},
     ],
   },
   {
     icon: <PlugInIcon />,
     name: "Authentication",
     subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
+      { name: "Sign In", path: "/signin"},
+      { name: "Sign Up", path: "/signup"},
     ],
   },
 ];
@@ -443,19 +441,6 @@ const AppSidebar: React.FC = () => {
                                 new
                               </span>
                             )}
-                            {subItem.pro && (
-                              <span
-                                className={`ml-auto ${
-                                  openSubSubmenu?.type === menuType &&
-                                  openSubSubmenu?.parentIndex === index &&
-                                  openSubSubmenu?.subIndex === subIndex
-                                    ? "menu-dropdown-badge-active"
-                                    : "menu-dropdown-badge-inactive"
-                                } menu-dropdown-badge `}
-                              >
-                                pro
-                              </span>
-                            )}
                             <ChevronDownIcon
                               className={`w-4 h-4 transition-transform duration-200  ${
                                 openSubSubmenu?.type === menuType &&
@@ -504,17 +489,6 @@ const AppSidebar: React.FC = () => {
                                         new
                                       </span>
                                     )}
-                                    {subSubItem.pro && (
-                                      <span
-                                        className={`ml-auto ${
-                                          isActive(subSubItem.path)
-                                            ? "menu-dropdown-badge-active"
-                                            : "menu-dropdown-badge-inactive"
-                                        } menu-dropdown-badge `}
-                                      >
-                                        pro
-                                      </span>
-                                    )}
                                   </span>
                                 </Link>
                               </li>
@@ -542,17 +516,6 @@ const AppSidebar: React.FC = () => {
                               } menu-dropdown-badge `}
                             >
                               new
-                            </span>
-                          )}
-                          {subItem.pro && (
-                            <span
-                              className={`ml-auto ${
-                                isActive(subItem.path!)
-                                  ? "menu-dropdown-badge-active"
-                                  : "menu-dropdown-badge-inactive"
-                              } menu-dropdown-badge `}
-                            >
-                              pro
                             </span>
                           )}
                         </span>
