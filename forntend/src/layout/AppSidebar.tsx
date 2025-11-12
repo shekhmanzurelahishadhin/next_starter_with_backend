@@ -25,6 +25,8 @@ type SubSubItem = {
   path: string;
   pro?: boolean;
   new?: boolean;
+  requiredRoles?: string[];
+  requiredPermissions?: string[];
 };
 
 type SubItem = {
@@ -33,6 +35,8 @@ type SubItem = {
   pro?: boolean;
   new?: boolean;
   subSubItems?: SubSubItem[];
+  requiredRoles?: string[];
+  requiredPermissions?: string[];
 };
 
 type NavItem = {
@@ -40,6 +44,8 @@ type NavItem = {
   icon: React.ReactNode;
   path?: string;
   subItems?: SubItem[];
+  requiredRoles?: string[];
+  requiredPermissions?: string[];
 };
 
 const navItems: NavItem[] = [
