@@ -43,9 +43,7 @@ export default function AccessRoute({
   // Show loader while checking access
   if (loading || !accessChecked) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-50 dark:bg-gray-900 z-99999">
-        <Spinner />
-      </div>
+        <Spinner mode="content" />
     );
   }
 
