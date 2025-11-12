@@ -18,6 +18,7 @@ import {
   UserCircleIcon,
   FiUser
 } from "../icons/index";
+import { useAuth } from "@/context/AuthContext";
 
 // Types
 type SubSubItem = {
@@ -52,12 +53,21 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
+    requiredPermissions: ["dashboard.view","role.edit"],
+    // requiredRoles: ["admin", "Manager"],
     subItems: [
       { 
         name: "Ecommerce", 
         path: "/ecommerce",
+        requiredPermissions: ["user.delete"],
+        // requiredRoles: ["admin", "Manager"],
         subSubItems: [
-          { name: "Analytics", path: "/ecommerce/analytics" },
+          { 
+            name: "Analytics", 
+            path: "/ecommerce/analytics",
+            requiredPermissions: ["user.delete"],
+            // requiredRoles: ["admin", "manager"], 
+          },
           { name: "Sales", path: "/ecommerce/sales", new: true },
           { name: "Products", path: "/ecommerce/products" },
         ]
@@ -166,6 +176,7 @@ const othersItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const { loading, hasRole, hasPermission } = useAuth();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main" | "others";
@@ -262,6 +273,71 @@ const AppSidebar: React.FC = () => {
       return { type: menuType, parentIndex, subIndex };
     });
   };
+  
+    // Helper function to check if user has access to menu item
+  const hasAccess = useCallback((item: {
+    requiredRoles?: string[];
+    requiredPermissions?: string[];
+  }) => {
+    // If no restrictions, allow access
+    if (!item.requiredRoles && !item.requiredPermissions) {
+      return true;
+    }
+
+    // Check roles
+    if (item.requiredRoles && item.requiredRoles.length > 0) {
+      const hasRequiredRole = item.requiredRoles.some(role => hasRole(role));
+      if (!hasRequiredRole) return false;
+    }
+
+    // Check permissions
+    if (item.requiredPermissions && item.requiredPermissions.length > 0) {
+      const hasRequiredPermission = item.requiredPermissions.some(permission => 
+        hasPermission(permission)
+      );
+      if (!hasRequiredPermission) return false;
+    }
+
+    return true;
+  }, [hasRole, hasPermission]);
+
+  // Filter navigation items based on access
+  const filterNavItems = useCallback((items: NavItem[]): NavItem[] => {
+    return items
+      .filter(item => hasAccess(item))
+      .map(item => {
+        if (item.subItems) {
+          const filteredSubItems = item.subItems
+            .filter(subItem => hasAccess(subItem))
+            .map(subItem => {
+              if (subItem.subSubItems) {
+                const filteredSubSubItems = subItem.subSubItems.filter(
+                  subSubItem => hasAccess(subSubItem)
+                );
+                return { ...subItem, subSubItems: filteredSubSubItems };
+              }
+              return subItem;
+            })
+            .filter(subItem => 
+              // Keep subItem if it has path or has filtered subSubItems
+              subItem.path || (subItem.subSubItems && subItem.subSubItems.length > 0)
+            );
+
+          return { ...item, subItems: filteredSubItems };
+        }
+        return item;
+      })
+      .filter(item => 
+        // Keep item if it has path or has filtered subItems
+        item.path || (item.subItems && item.subItems.length > 0)
+      );
+  }, [hasAccess]);
+
+  // Filtered navigation items
+  const filteredNavItems = filterNavItems(navItems);
+  const filteredOthersItems = filterNavItems(othersItems);
+
+
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -557,7 +633,8 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {/* Use filteredNavItems instead of navItems */}
+            {filteredNavItems.length > 0 && renderMenuItems(filteredNavItems, "main")}
             </div>
 
             <div className="">
@@ -574,7 +651,8 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(othersItems, "others")}
+              {/* Use filteredOthersItems instead of othersItems */}
+            {filteredOthersItems.length > 0 && renderMenuItems(filteredOthersItems, "others")}
             </div>
           </div>
         </nav>
