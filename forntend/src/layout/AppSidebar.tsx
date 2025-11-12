@@ -348,7 +348,7 @@ const AppSidebar: React.FC = () => {
         <li key={nav.name}>
           {nav.subItems ? (
             <button
-              onClick={() => handleSubmenuToggle(index, menuType)}
+              onClick={() => handleSubmenuToggle(index, menuType)} // Toggle submenu on click
               className={`menu-item group  ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
                   ? "menu-item-active"
@@ -460,7 +460,7 @@ const AppSidebar: React.FC = () => {
                               className={`w-4 h-4 transition-transform duration-200  ${
                                 openSubSubmenu?.type === menuType &&
                                 openSubSubmenu?.parentIndex === index &&
-                                openSubSubmenu?.subIndex === subIndex
+                                openSubSubmenu?.subIndex === subIndex // Check if this submenu is open
                                   ? "rotate-180 text-brand-500"
                                   : ""
                               }`}
