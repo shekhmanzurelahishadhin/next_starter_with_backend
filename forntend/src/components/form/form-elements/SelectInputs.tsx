@@ -6,6 +6,7 @@ import Select from "../Select";
 import MultiSelect from "../MultiSelect";
 import { ChevronDownIcon } from "@/icons";
 import ReactSelect from "../ReactSelect";
+import ReactMultiSelect from "../ReactMultiselect";
 
 export default function SelectInputs() {
   const options = [
@@ -15,6 +16,7 @@ export default function SelectInputs() {
   ];
 
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
+  const [selectedMulti, setSelectedMulti] = useState<string[]>([]);
 
   const handleSelectChange = (value: string) => {
     console.log("Selected value:", value);
@@ -45,10 +47,10 @@ export default function SelectInputs() {
             </span>
           </div>
         </div>
-        <div className="relative">
-          <div className="relative">
+        <div>
+          <Label>React Select Input</Label>
+           <div className="relative">
             <ReactSelect
-              label="Select Department"
               options={[
                 { value: "marketing", label: "Marketing" },
                 { value: "template", label: "Template" },
@@ -57,9 +59,20 @@ export default function SelectInputs() {
               value={selectedValues}
               onChange={(value) => setSelectedValues(value)}
             />
-
-          </div>
         </div>
+        </div>
+
+          <div>
+          <Label>React Multi Select Input</Label>
+           <div className="relative">
+            <ReactMultiSelect
+            options={options}
+            value={selectedMulti}
+            onChange={(values) => setSelectedMulti(values)}
+          />
+        </div>
+        </div>
+       
       </div>
     </ComponentCard>
   );

@@ -8,7 +8,6 @@ interface Option {
 }
 
 interface ReactSelectProps {
-  label?: string;
   options: Option[];
   value?: string | number | null;
   onChange: (value: string | number | null) => void;
@@ -23,7 +22,6 @@ interface ReactSelectProps {
 }
 
 const ReactSelect: React.FC<ReactSelectProps> = ({
-  label,
   options,
   value = null,
   onChange,
@@ -44,12 +42,7 @@ const ReactSelect: React.FC<ReactSelectProps> = ({
 
   return (
     <div className={`w-full ${className}`}>
-      {label && (
-        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          {label}
-        </label>
-      )}
-
+     
       <Select
         unstyled
         classNamePrefix="select"
