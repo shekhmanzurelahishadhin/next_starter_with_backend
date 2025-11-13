@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "Data table page for TailAdmin",
   keywords: ["data table", "dashboard", "tailwind"],
   authors: [{ name: "Your Name", url: "https://example.com" }],
-  openGraph: {
+  openGraph: { // Open Graph metadata used for social media sharing
     title: "Next.js Data Table", 
     description: "Interactive data table",
     url: "https://example.com/data-table",
