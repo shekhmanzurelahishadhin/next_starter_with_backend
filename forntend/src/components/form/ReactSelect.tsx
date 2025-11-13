@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Select, { SingleValue, StylesConfig } from "react-select";
+import Select, { SingleValue } from "react-select";
 
 interface Option {
   value: string | number;
@@ -42,65 +42,6 @@ const ReactSelect: React.FC<ReactSelectProps> = ({
     onChange(selected ? selected.value : null);
   };
 
-  // 🎨 React Select style configuration matching your theme input
-  const customStyles: StylesConfig<Option, false> = {
-    control: (provided, state) => ({
-      ...provided,
-      height: "42px",
-      borderRadius: "0.5rem",
-      borderColor: state.isFocused ? "rgb(147 197 253)" : "rgb(209 213 219)", // border-gray-300 → focus:border-brand-300
-      boxShadow: state.isFocused
-        ? "0 0 0 3px rgba(59, 130, 246, 0.2)" // focus:ring-brand-500/10
-        : "none",
-      backgroundColor: "var(--color-bg)",
-      color: "var(--color-text, #111827)",
-      paddingLeft: "0.5rem",
-      paddingRight: "0.5rem",
-      fontSize: "0.875rem",
-      appearance: "none",
-      transition: "all 0.2s ease-in-out",
-      "&:hover": {
-        borderColor: "rgb(147 197 253)",
-      },
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: "rgb(17 24 39)", // text-gray-800
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      color: "rgb(156 163 175)", // text-gray-400
-    }),
-    dropdownIndicator: (provided) => ({
-      ...provided,
-      color: "rgb(156 163 175)",
-      paddingRight: "0.5rem",
-      transition: "color 0.2s",
-      "&:hover": { color: "rgb(107 114 128)" },
-    }),
-    indicatorSeparator: () => ({ display: "none" }),
-    menu: (provided) => ({
-      ...provided,
-      borderRadius: "0.5rem",
-      marginTop: 4,
-      backgroundColor: "white",
-      boxShadow:
-        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
-      zIndex: 20,
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected
-        ? "rgb(59 130 246 / 0.1)" // brand-100
-        : state.isFocused
-        ? "rgb(243 244 246)" // gray-100
-        : "transparent",
-      color: state.isSelected ? "rgb(37 99 235)" : "rgb(31 41 55)",
-      cursor: "pointer",
-      fontSize: "0.875rem",
-    }),
-  };
-
   return (
     <div className={`w-full ${className}`}>
       {label && (
@@ -110,7 +51,7 @@ const ReactSelect: React.FC<ReactSelectProps> = ({
       )}
 
       <Select
-        className="theme-react-select"
+        unstyled
         classNamePrefix="select"
         value={selectedOption}
         onChange={handleChange}
@@ -122,7 +63,45 @@ const ReactSelect: React.FC<ReactSelectProps> = ({
         name={name}
         options={options}
         placeholder={placeholder}
-        styles={customStyles}
+        classNames={{
+          control: ({ isFocused, isDisabled }) =>
+            [
+              "flex h-11 w-full items-center justify-between rounded-lg border px-3 py-1.5 text-sm",
+              "transition-all duration-200 appearance-none shadow-theme-xs",
+              isFocused
+                ? "border-brand-300 ring-3 ring-brand-500/10"
+                : "border-gray-300 dark:border-gray-700",
+              isDisabled
+                ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed opacity-70"
+                : "bg-white dark:bg-gray-900 cursor-pointer",
+              "text-gray-800 dark:text-white/90 placeholder:text-gray-400 dark:placeholder:text-white/30",
+              "focus:outline-hidden",
+            ].join(" "),
+          valueContainer: () => "flex-1 truncate",
+          placeholder: () =>
+            "text-gray-400 dark:text-white/30 text-sm select-none",
+          input: () => "text-gray-800 dark:text-white/90",
+          singleValue: () => "text-gray-800 dark:text-white/90",
+          indicatorsContainer: () =>
+            "flex items-center pr-2 text-gray-400 dark:text-gray-500",
+          dropdownIndicator: ({ isFocused }) =>
+            `transition-colors ${isFocused ? "text-brand-500" : "hover:text-gray-500"}`,
+          indicatorSeparator: () => "hidden",
+          menu: () =>
+            "mt-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg z-50",
+          option: ({ isFocused, isSelected }) =>
+            [
+              "px-3 py-2 text-sm cursor-pointer select-none",
+              isSelected
+                ? "bg-brand-100 dark:bg-brand-800 text-brand-700 dark:text-white"
+                : "text-gray-800 dark:text-gray-200",
+              isFocused && !isSelected
+                ? "bg-gray-100 dark:bg-gray-800"
+                : "hover:bg-gray-100 dark:hover:bg-gray-800",
+            ].join(" "),
+          noOptionsMessage: () =>
+            "text-gray-500 dark:text-gray-400 px-3 py-2 text-sm",
+        }}
       />
     </div>
   );
