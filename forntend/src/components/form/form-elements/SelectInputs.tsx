@@ -5,6 +5,7 @@ import Label from "../Label";
 import Select from "../Select";
 import MultiSelect from "../MultiSelect";
 import { ChevronDownIcon } from "@/icons";
+import ReactSelect from "../ReactSelect";
 
 export default function SelectInputs() {
   const options = [
@@ -32,28 +33,32 @@ export default function SelectInputs() {
       <div className="space-y-6">
         <div>
           <Label>Select Input</Label>
-         <div className="relative">
-           <Select
-            options={options}
-            placeholder="Select Option"
-            onChange={handleSelectChange}
-            className="dark:bg-dark-900"
-          />
-          <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-              <ChevronDownIcon/>
+          <div className="relative">
+            <Select
+              options={options}
+              placeholder="Select Option"
+              onChange={handleSelectChange}
+              className="dark:bg-dark-900"
+            />
+            <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+              <ChevronDownIcon />
             </span>
-         </div>
+          </div>
         </div>
         <div className="relative">
-          <MultiSelect
-            label="Multiple Select Options"
-            options={multiOptions}
-            defaultSelected={["1", "3"]}
-            onChange={(values) => setSelectedValues(values)}
-          />
-          <p className="sr-only">
-            Selected Values: {selectedValues.join(", ")}
-          </p>
+          <div className="relative">
+            <ReactSelect
+              label="Select Department"
+              options={[
+                { value: "marketing", label: "Marketing" },
+                { value: "template", label: "Template" },
+                { value: "development", label: "Development" },
+              ]}
+              value={selectedValues}
+              onChange={(value) => setSelectedValues(value)}
+            />
+
+          </div>
         </div>
       </div>
     </ComponentCard>

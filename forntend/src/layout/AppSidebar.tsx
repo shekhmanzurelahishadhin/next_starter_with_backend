@@ -66,19 +66,6 @@ const navItems: NavItem[] = [
           { name: "Products", path: "/ecommerce/products" },
         ]
       },
-      { 
-        name: "Ecommerce", 
-        path: "/ecommerce",
-        subSubItems: [
-          { 
-            name: "Analytics", 
-            path: "/ecommerce/analytics",
-            requiredPermissions: ["role.vieww"],
-          },
-          // { name: "Sales", path: "/ecommerce/sales", new: true },
-          // { name: "Products", path: "/ecommerce/products" },
-        ]
-      },
     ],
   },
   {
