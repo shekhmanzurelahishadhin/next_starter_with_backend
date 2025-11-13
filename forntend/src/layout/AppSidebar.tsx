@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState,useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -52,22 +52,31 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Dashboard",
     requiredPermissions: ["dashboard.view","role.edit"],
-    // requiredRoles: ["admin", "Manager"],
     subItems: [
       { 
         name: "Ecommerce", 
         path: "/ecommerce",
-        requiredPermissions: ["user.delete"],
-        // requiredRoles: ["admin", "Manager"],
         subSubItems: [
           { 
             name: "Analytics", 
             path: "/ecommerce/analytics",
-            requiredPermissions: ["user.delete"],
-            // requiredRoles: ["admin", "manager"], 
+            requiredPermissions: ["role.vieww"],
           },
-          { name: "Sales", path: "/ecommerce/sales", new: true },
+          // { name: "Sales", path: "/ecommerce/sales", new: true },
           { name: "Products", path: "/ecommerce/products" },
+        ]
+      },
+      { 
+        name: "Ecommerce", 
+        path: "/ecommerce",
+        subSubItems: [
+          { 
+            name: "Analytics", 
+            path: "/ecommerce/analytics",
+            requiredPermissions: ["role.vieww"],
+          },
+          // { name: "Sales", path: "/ecommerce/sales", new: true },
+          // { name: "Products", path: "/ecommerce/products" },
         ]
       },
     ],
@@ -91,7 +100,6 @@ const navItems: NavItem[] = [
     name: "User Profile",
     path: "/profile",
   },
-
   {
     name: "Forms",
     icon: <ListIcon />,
@@ -189,90 +197,7 @@ const AppSidebar: React.FC = () => {
 
   const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
-  // Set initial active menu based on current path
-  useEffect(() => {
-    let submenuMatched = false;
-    let subSubmenuMatched = false;
-
-    ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
-      items.forEach((nav, parentIndex) => {
-        if (nav.subItems) {
-          nav.subItems.forEach((subItem, subIndex) => {
-            // Check if current path matches subItem path
-            if (subItem.path && isActive(subItem.path)) {
-              setOpenSubmenu({
-                type: menuType as "main" | "others",
-                index: parentIndex,
-              });
-              submenuMatched = true;
-            }
-
-            // Check if current path matches any subSubItem path
-            if (subItem.subSubItems) {
-              subItem.subSubItems.forEach((subSubItem) => {
-                if (isActive(subSubItem.path)) {
-                  setOpenSubmenu({
-                    type: menuType as "main" | "others",
-                    index: parentIndex,
-                  });
-                  setOpenSubSubmenu({
-                    type: menuType as "main" | "others",
-                    parentIndex,
-                    subIndex,
-                  });
-                  submenuMatched = true;
-                  subSubmenuMatched = true;
-                }
-              });
-            }
-          });
-        }
-      });
-    });
-
-    if (!submenuMatched) {
-      setOpenSubmenu(null);
-    }
-    if (!subSubmenuMatched) {
-      setOpenSubSubmenu(null);
-    }
-  }, [pathname, isActive]);
-
-  const handleSubmenuToggle = (index: number, menuType: "main" | "others") => {
-    setOpenSubmenu((prevOpenSubmenu) => {
-      if (
-        prevOpenSubmenu &&
-        prevOpenSubmenu.type === menuType &&
-        prevOpenSubmenu.index === index
-      ) {
-        return null;
-      }
-      return { type: menuType, index };
-    });
-    // Close any open sub-submenu when closing parent submenu
-    setOpenSubSubmenu(null);
-  };
-
-  const handleSubSubmenuToggle = (
-    parentIndex: number,
-    subIndex: number,
-    menuType: "main" | "others"
-  ) => {
-    setOpenSubSubmenu((prevOpenSubSubmenu) => {
-      if (
-        prevOpenSubSubmenu &&
-        prevOpenSubSubmenu.type === menuType &&
-        prevOpenSubSubmenu.parentIndex === parentIndex &&
-        prevOpenSubSubmenu.subIndex === subIndex
-      ) {
-        return null;
-      }
-      return { type: menuType, parentIndex, subIndex };
-    });
-  };
-  
-    // Helper function to check if user has access to menu item
+  // Helper function to check if user has access to menu item
   const hasAccess = useCallback((item: {
     requiredRoles?: string[];
     requiredPermissions?: string[];
@@ -299,43 +224,175 @@ const AppSidebar: React.FC = () => {
     return true;
   }, [hasRole, hasPermission]);
 
-  // Filter navigation items based on access
-  const filterNavItems = useCallback((items: NavItem[]): NavItem[] => {
+  // Fixed recursive filtering function
+  const filterNavItemsRecursive = useCallback((items: NavItem[]): NavItem[] => {
     return items
-      .filter(item => hasAccess(item))
       .map(item => {
+        // Check if item itself has access
+        if (!hasAccess(item)) {
+          return null;
+        }
+
+        let filteredSubItems: SubItem[] = [];
+
+        // Process subItems if they exist
         if (item.subItems) {
-          const filteredSubItems = item.subItems
-            .filter(subItem => hasAccess(subItem))
+          filteredSubItems = item.subItems
             .map(subItem => {
+              // Check if subItem itself has access
+              if (!hasAccess(subItem)) {
+                return null;
+              }
+
+              let filteredSubSubItems: SubSubItem[] = [];
+
+              // Process subSubItems if they exist
               if (subItem.subSubItems) {
-                const filteredSubSubItems = subItem.subSubItems.filter(
+                filteredSubSubItems = subItem.subSubItems.filter(
                   subSubItem => hasAccess(subSubItem)
                 );
-                return { ...subItem, subSubItems: filteredSubSubItems };
               }
-              return subItem;
-            })
-            .filter(subItem => 
-              // Keep subItem if it has path or has filtered subSubItems
-              subItem.path || (subItem.subSubItems && subItem.subSubItems.length > 0)
-            );
 
-          return { ...item, subItems: filteredSubItems };
+              // FIXED LOGIC: Keep subItem only if:
+              // 1. It has its own path AND no subSubItems (direct link), OR
+              // 2. It has visible subSubItems (has children to show)
+              const shouldKeepSubItem = 
+                (subItem.path && (!subItem.subSubItems || subItem.subSubItems.length === 0)) || // Direct link with no children
+                (filteredSubSubItems.length > 0); // Has visible children
+
+              if (shouldKeepSubItem) {
+                return {
+                  ...subItem,
+                  ...(subItem.subSubItems && { subSubItems: filteredSubSubItems })
+                };
+              }
+
+              // Otherwise, filter out this subItem
+              return null;
+            })
+            .filter(Boolean) as SubItem[];
         }
-        return item;
+
+        // Keep item if:
+        // 1. It has its own path, OR
+        // 2. It has visible subItems
+        const shouldKeepItem = item.path || filteredSubItems.length > 0;
+        
+        return shouldKeepItem ? {
+          ...item,
+          ...(item.subItems && { subItems: filteredSubItems })
+        } : null;
       })
-      .filter(item => 
-        // Keep item if it has path or has filtered subItems
-        item.path || (item.subItems && item.subItems.length > 0)
-      );
+      .filter(Boolean) as NavItem[];
   }, [hasAccess]);
 
   // Filtered navigation items
-  const filteredNavItems = filterNavItems(navItems);
-  const filteredOthersItems = filterNavItems(othersItems);
+  const filteredNavItems = useMemo(() => filterNavItemsRecursive(navItems), [filterNavItemsRecursive]);
+  const filteredOthersItems = useMemo(() => filterNavItemsRecursive(othersItems), [filterNavItemsRecursive]);
 
+  // Debug: Log filtered items to see the result
+  useEffect(() => {
+    console.log('Filtered Nav Items:', filteredNavItems);
+    console.log('Filtered Others Items:', filteredOthersItems);
+  }, [filteredNavItems, filteredOthersItems]);
 
+  // Find path in filtered items to get correct indexes
+  const findPathInFilteredItems = useCallback((path: string) => {
+    let result: { type: "main" | "others"; parentIndex: number; subIndex?: number; subSubIndex?: number } | null = null;
+
+    ["main", "others"].forEach((menuType) => {
+      const items = menuType === "main" ? filteredNavItems : filteredOthersItems;
+      
+      items.forEach((nav, parentIndex) => {
+        // Check if this is a direct match
+        if (nav.path === path) {
+          result = { type: menuType as "main" | "others", parentIndex };
+          return;
+        }
+
+        // Check subItems
+        if (nav.subItems) {
+          nav.subItems.forEach((subItem, subIndex) => {
+            if (subItem.path === path) {
+              result = { type: menuType as "main" | "others", parentIndex, subIndex };
+              return;
+            }
+
+            // Check subSubItems
+            if (subItem.subSubItems) {
+              subItem.subSubItems.forEach((subSubItem, subSubIndex) => {
+                if (subSubItem.path === path) {
+                  result = { type: menuType as "main" | "others", parentIndex, subIndex, subSubIndex };
+                  return;
+                }
+              });
+            }
+          });
+        }
+      });
+    });
+
+    return result;
+  }, [filteredNavItems, filteredOthersItems]);
+
+  // Set initial active menu based on current path - USING FILTERED ITEMS
+  useEffect(() => {
+    if (loading) return; // Wait for auth to load
+
+    const pathMatch = findPathInFilteredItems(pathname);
+    
+    if (pathMatch) {
+      setOpenSubmenu({
+        type: pathMatch.type,
+        index: pathMatch.parentIndex,
+      });
+
+      if (pathMatch.subIndex !== undefined) {
+        setOpenSubSubmenu({
+          type: pathMatch.type,
+          parentIndex: pathMatch.parentIndex,
+          subIndex: pathMatch.subIndex,
+        });
+      } else {
+        setOpenSubSubmenu(null);
+      }
+    } else {
+      setOpenSubmenu(null);
+      setOpenSubSubmenu(null);
+    }
+  }, [pathname, loading, findPathInFilteredItems]);
+
+  const handleSubmenuToggle = (index: number, menuType: "main" | "others") => {
+    setOpenSubmenu((prevOpenSubmenu) => {
+      if (
+        prevOpenSubmenu &&
+        prevOpenSubmenu.type === menuType &&
+        prevOpenSubmenu.index === index
+      ) {
+        return null;
+      }
+      return { type: menuType, index };
+    });
+    setOpenSubSubmenu(null);
+  };
+
+  const handleSubSubmenuToggle = (
+    parentIndex: number,
+    subIndex: number,
+    menuType: "main" | "others"
+  ) => {
+    setOpenSubSubmenu((prevOpenSubSubmenu) => {
+      if (
+        prevOpenSubSubmenu &&
+        prevOpenSubSubmenu.type === menuType &&
+        prevOpenSubSubmenu.parentIndex === parentIndex &&
+        prevOpenSubSubmenu.subIndex === subIndex
+      ) {
+        return null;
+      }
+      return { type: menuType, parentIndex, subIndex };
+    });
+  };
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -346,7 +403,7 @@ const AppSidebar: React.FC = () => {
         <li key={nav.name}>
           {nav.subItems ? (
             <button
-              onClick={() => handleSubmenuToggle(index, menuType)} // Toggle submenu on click
+              onClick={() => handleSubmenuToggle(index, menuType)}
               className={`menu-item group  ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
                   ? "menu-item-active"
@@ -414,7 +471,7 @@ const AppSidebar: React.FC = () => {
               <ul className="mt-2 space-y-1 ml-9">
                 {nav.subItems.map((subItem, subIndex) => (
                   <li key={subItem.name}>
-                    {subItem.subSubItems ? (
+                    {subItem.subSubItems && subItem.subSubItems.length > 0 ? (
                       <>
                         <button
                           onClick={() => handleSubSubmenuToggle(index, subIndex, menuType)}
@@ -445,7 +502,7 @@ const AppSidebar: React.FC = () => {
                               className={`w-4 h-4 transition-transform duration-200  ${
                                 openSubSubmenu?.type === menuType &&
                                 openSubSubmenu?.parentIndex === index &&
-                                openSubSubmenu?.subIndex === subIndex // Check if this submenu is open
+                                openSubSubmenu?.subIndex === subIndex
                                   ? "rotate-180 text-brand-500"
                                   : ""
                               }`}
@@ -531,6 +588,21 @@ const AppSidebar: React.FC = () => {
     </ul>
   );
 
+  // Show loading state while checking permissions
+  if (loading) {
+    return (
+      <aside className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+        ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
+        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+        lg:translate-x-0`}
+      >
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">Loading...</div>
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
@@ -596,8 +668,11 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {/* Use filteredNavItems instead of navItems */}
-            {filteredNavItems.length > 0 && renderMenuItems(filteredNavItems, "main")}
+              {filteredNavItems.length > 0 ? (
+                renderMenuItems(filteredNavItems, "main")
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-2">No menu items available</p>
+              )}
             </div>
 
             <div className="">
@@ -614,8 +689,11 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {/* Use filteredOthersItems instead of othersItems */}
-            {filteredOthersItems.length > 0 && renderMenuItems(filteredOthersItems, "others")}
+              {filteredOthersItems.length > 0 ? (
+                renderMenuItems(filteredOthersItems, "others")
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-2">No other items available</p>
+              )}
             </div>
           </div>
         </nav>

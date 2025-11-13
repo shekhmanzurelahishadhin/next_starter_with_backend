@@ -274,7 +274,7 @@ export default function TablesPage() {
 
   return (
     <AccessRoute 
-    requiredPermissions={["role.edit"]} // Specify the required permissions
+    requiredPermissions={["role.editr"]} // Specify the required permissions
     >
     <div>
       <PageBreadcrumb pageTitle="Data Table with Column Filters" />
