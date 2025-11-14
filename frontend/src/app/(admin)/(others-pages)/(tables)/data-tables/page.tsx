@@ -1,10 +1,18 @@
 import { Metadata } from "next";
 import DataTableComponent from "./DataTableComponent";
 export const metadata: Metadata = {
-  title: "Next.js Data Table | TailAdmin - Next.js Dashboard Template",
-  description:
-    "This is Next.js Data Table  page for TailAdmin  Tailwind CSS Admin Dashboard Template",
-  // other metadata
+  title: "Next.js Data Table | TailAdmin",
+  description: "Data table page for TailAdmin",
+  keywords: ["data table", "dashboard", "tailwind"],
+  authors: [{ name: "Your Name", url: "https://example.com" }],
+  openGraph: {
+    title: "Next.js Data Table", 
+    description: "Interactive data table",
+    url: "https://example.com/data-table",
+    siteName: "TailAdmin",
+    images: [{ url: "https://example.com/og-image.png" }],
+  },
+  robots: { index: true, follow: true },
 };
 export default function TablesPage() {
  
