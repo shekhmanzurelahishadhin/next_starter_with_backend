@@ -35,6 +35,21 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         heading: {
           levels: [1, 2, 3, 4, 5, 6],
         },
+        bulletList: {
+          HTMLAttributes: {
+            class: 'list-disc list-outside ml-4',
+          },
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: 'list-decimal list-outside ml-4',
+          },
+        },
+        blockquote: {
+          HTMLAttributes: {
+            class: 'border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic',
+          },
+        },
       }),
       Image.configure({
         HTMLAttributes: {
@@ -48,8 +63,16 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         },
       }),
       TableRow,
-      TableCell,
-      TableHeader,
+      TableCell.configure({
+        HTMLAttributes: {
+          class: 'border border-gray-300 dark:border-gray-600 px-2 py-1',
+        },
+      }),
+      TableHeader.configure({
+        HTMLAttributes: {
+          class: 'border border-gray-300 dark:border-gray-600 px-2 py-1 bg-gray-100 dark:bg-gray-700',
+        },
+      }),
       TextAlign.configure({
         types: ['heading', 'paragraph', 'image'],
       }),
@@ -209,7 +232,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                   editor.chain().focus().setParagraph().run();
                 } else {
                   const level = parseInt(value.replace('h', '')) as 1 | 2 | 3 | 4 | 5 | 6;
-                  editor.chain().focus().toggleHeading({ level }).run();
+                  editor.chain().focus().setHeading({ level }).run();
                 }
               }}
               className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 text-sm"
@@ -257,7 +280,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             </ToolbarButton>
           </div>
 
-          {/* Lists */}
+          {/* Lists & Blockquote */}
           <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-2">
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -437,8 +460,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         {/* Bubble Menu (appears when selecting text) */}
         {editor && (
           <BubbleMenu 
-            editor={editor} 
-            tippyOptions={{ duration: 100 }}
+            editor={editor}
             className="flex gap-1 p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
           >
             <ToolbarButton
