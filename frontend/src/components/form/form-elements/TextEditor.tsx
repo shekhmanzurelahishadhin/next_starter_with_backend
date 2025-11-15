@@ -47,9 +47,9 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
           class: 'border-collapse border border-gray-300 dark:border-gray-600 w-full',
         },
       }),
-      TableRow, // Add this
-      TableCell, // Add this
-      TableHeader, // Add this
+      TableRow,
+      TableCell,
+      TableHeader,
       TextAlign.configure({
         types: ['heading', 'paragraph', 'image'],
       }),
