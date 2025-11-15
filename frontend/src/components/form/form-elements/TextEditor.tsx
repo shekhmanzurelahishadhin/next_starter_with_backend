@@ -12,7 +12,7 @@ import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import Color from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface TiptapEditorProps {
     onChange?: (content: string) => void;
@@ -28,6 +28,9 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
+    const [headingValue, setHeadingValue] = useState('p');
+
+
 
     const editor = useEditor({
         extensions: [
@@ -100,6 +103,30 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         },
     });
 
+    useEffect(() => {
+        if (!editor) return;
+
+        const updateHeadingValue = () => {
+            const { state } = editor;
+            const { $from } = state.selection;
+            const node = $from.parent;
+
+            if (node.type.name === 'heading') {
+                setHeadingValue(`h${node.attrs.level}`);
+            } else {
+                setHeadingValue('p');
+            }
+        };
+
+        editor.on('selectionUpdate', updateHeadingValue);
+        editor.on('transaction', updateHeadingValue);
+
+        return () => {
+            editor.off('selectionUpdate', updateHeadingValue);
+            editor.off('transaction', updateHeadingValue);
+        };
+    }, [editor]);
+
     // Image handling
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -159,10 +186,10 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             title={title}
             disabled={disabled}
             className={`p-2 rounded-lg transition-colors ${disabled
-                    ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600'
-                    : isActive
-                        ? 'bg-brand-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600'
+                : isActive
+                    ? 'bg-brand-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
         >
             {children}
@@ -218,16 +245,11 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                     {/* Headings */}
                     <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-2">
                         <select
-                            value={
-                                editor.isActive('heading', { level: 1 }) ? 'h1' :
-                                    editor.isActive('heading', { level: 2 }) ? 'h2' :
-                                        editor.isActive('heading', { level: 3 }) ? 'h3' :
-                                            editor.isActive('heading', { level: 4 }) ? 'h4' :
-                                                editor.isActive('heading', { level: 5 }) ? 'h5' :
-                                                    editor.isActive('heading', { level: 6 }) ? 'h6' : 'p'
-                            }
+                            value={headingValue}
                             onChange={(e) => {
                                 const value = e.target.value;
+                                setHeadingValue(value);
+
                                 if (value === 'p') {
                                     editor.chain().focus().setParagraph().run();
                                 } else {
@@ -494,8 +516,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
                 {/* Editor Content */}
                 <div className="editor-container">
-  <EditorContent editor={editor} />
-</div>
+                    <EditorContent editor={editor} />
+                </div>
 
 
                 {/* Link Modal */}
