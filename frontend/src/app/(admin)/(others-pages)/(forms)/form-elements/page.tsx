@@ -1,3 +1,4 @@
+// "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import CheckboxComponents from "@/components/form/form-elements/CheckboxComponents";
 import DefaultInputs from "@/components/form/form-elements/DefaultInputs";
@@ -8,9 +9,9 @@ import InputStates from "@/components/form/form-elements/InputStates";
 import RadioButtons from "@/components/form/form-elements/RadioButtons";
 import SelectInputs from "@/components/form/form-elements/SelectInputs";
 import TextAreaInput from "@/components/form/form-elements/TextAreaInput";
+import TextEditor from "@/components/form/form-elements/TextEditor";
 import ToggleSwitch from "@/components/form/form-elements/ToggleSwitch";
 import { Metadata } from "next";
-import React from "react";
 
 export const metadata: Metadata = {
   title: "Next.js Form Elements | TailAdmin - Next.js Dashboard Template",
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
 };
 
 export default function FormElements() {
+  //  const [content, setContent] = useState('');
   return (
     <div>
       <PageBreadcrumb pageTitle="From Elements" />
@@ -28,6 +30,11 @@ export default function FormElements() {
           <SelectInputs />
           <TextAreaInput />
           <InputStates />
+          <TextEditor
+        // onChange={setContent}
+        initialContent="<p>Start writing your content here...</p>"
+        label="Rich Text Editor"
+      />
         </div>
         <div className="space-y-6">
           <InputGroup />
