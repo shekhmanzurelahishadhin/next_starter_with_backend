@@ -11,6 +11,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import Color from '@tiptap/extension-color';
+import Highlight from '@tiptap/extension-highlight';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { useState, useRef, useEffect } from 'react';
 
@@ -29,6 +30,9 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
     const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
     const [headingValue, setHeadingValue] = useState('p');
+    const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+    const [textColor, setTextColor] = useState('#000000');
+    const [highlightColor, setHighlightColor] = useState('#FFFF00');
 
 
     // create editor instance 
@@ -88,6 +92,10 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             }),
             TextStyle,
             Color,
+            Highlight.configure({
+  multicolor: true,
+}),
+
         ],
         immediatelyRender: false,
         content: initialContent,
@@ -157,6 +165,38 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         editor?.chain().focus().unsetLink().run();
         setIsLinkModalOpen(false);
     };
+
+    // Color handling
+    const applyTextColor = (color: string) => {
+        editor?.chain().focus().setColor(color).run();
+        setTextColor(color);
+        setIsColorPickerOpen(false);
+    };
+
+   const applyHighlightColor = (color: string) => {
+  editor?.chain().focus().setHighlight({ color }).run();
+  setHighlightColor(color);
+  setIsColorPickerOpen(false);
+};
+
+    const resetTextColor = () => {
+        editor?.chain().focus().unsetColor().run();
+        setTextColor('#000000');
+        setIsColorPickerOpen(false);
+    };
+
+    const resetHighlightColor = () => {
+        editor?.chain().focus().unsetHighlight().run();
+        setHighlightColor('#FFFF00');
+        setIsColorPickerOpen(false);
+    };
+
+    // Predefined color palette
+    const colorPalette = [
+        '#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', 
+        '#FFFF00', '#00FFFF', '#FF00FF', '#FFA500', '#800080',
+        '#008000', '#800000', '#008080', '#000080', '#A52A2A'
+    ];
 
     if (!editor) {
         return (
@@ -240,6 +280,101 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                         >
                             <span className="line-through text-sm">S</span>
                         </ToolbarButton>
+                    </div>
+
+                    {/* Color Picker */}
+                    <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-2 relative">
+                        <ToolbarButton
+                            onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
+                            isActive={editor.isActive('textStyle') || editor.isActive('highlight')}
+                            title="Text Color & Highlight"
+                        >
+                            <div className="flex items-center gap-1">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                                    <path d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8zm-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7z"/>
+                                </svg>
+                                <div 
+                                    className="w-3 h-1 rounded-sm border border-gray-300"
+                                    style={{ backgroundColor: textColor }}
+                                />
+                                <div 
+                                    className="w-3 h-1 rounded-sm border border-gray-300"
+                                    style={{ backgroundColor: highlightColor }}
+                                />
+                            </div>
+                        </ToolbarButton>
+
+                        {/* Color Picker Dropdown */}
+                        {isColorPickerOpen && (
+                            <div className="absolute top-12 left-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl z-10 p-3 min-w-64">
+                                {/* Text Color Section */}
+                                <div className="mb-3">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Text Color
+                                        </span>
+                                        <button
+                                            onClick={resetTextColor}
+                                            className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                        >
+                                            Reset
+                                        </button>
+                                    </div>
+                                    <div className="flex gap-1 mb-2">
+                                        <input
+                                            type="color"
+                                            value={textColor}
+                                            onChange={(e) => applyTextColor(e.target.value)}
+                                            className="w-8 h-8 cursor-pointer rounded border border-gray-300"
+                                            title="Custom color"
+                                        />
+                                        {colorPalette.map((color) => (
+                                            <button
+                                                key={color}
+                                                onClick={() => applyTextColor(color)}
+                                                className="w-6 h-6 rounded border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform"
+                                                style={{ backgroundColor: color }}
+                                                title={color}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Highlight Color Section */}
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Highlight Color
+                                        </span>
+                                        <button
+                                            onClick={resetHighlightColor}
+                                            className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                        >
+                                            Reset
+                                        </button>
+                                    </div>
+                                    <div className="flex gap-1">
+                                        <input
+                                            type="color"
+                                            value={highlightColor}
+                                            onChange={(e) => applyHighlightColor(e.target.value)}
+                                            className="w-8 h-8 cursor-pointer rounded border border-gray-300"
+                                            title="Custom highlight color"
+                                        />
+                                        {colorPalette.map((color) => (
+                                            <button
+                                                key={color}
+                                                onClick={() => applyHighlightColor(color)}
+                                                className="w-6 h-6 rounded border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform"
+                                                style={{ backgroundColor: color }}
+                                                title={color}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Headings */}
@@ -511,6 +646,20 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                                 <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z" />
                             </svg>
                         </ToolbarButton>
+
+                        {/* Color picker in bubble menu */}
+                        <div className="relative">
+                            <ToolbarButton
+                                onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
+                                isActive={editor.isActive('textStyle') || editor.isActive('highlight')}
+                                title="Text Color & Highlight"
+                            >
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                                    <path d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8zm-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7z"/>
+                                </svg>
+                            </ToolbarButton>
+                        </div>
                     </BubbleMenu>
                 )}
 
@@ -518,7 +667,6 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                 <div className="editor-container">
                     <EditorContent editor={editor} />
                 </div>
-
 
                 {/* Link Modal */}
                 {isLinkModalOpen && (

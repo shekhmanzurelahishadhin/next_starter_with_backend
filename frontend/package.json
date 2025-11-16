@@ -21,6 +21,7 @@
     "@tailwindcss/postcss": "^4.0.9",
     "@tanstack/react-table": "^8.21.3",
     "@tiptap/extension-color": "^3.10.7",
+    "@tiptap/extension-highlight": "^3.10.7",
     "@tiptap/extension-image": "^3.10.7",
     "@tiptap/extension-link": "^3.10.7",
     "@tiptap/extension-table": "^3.10.7",
