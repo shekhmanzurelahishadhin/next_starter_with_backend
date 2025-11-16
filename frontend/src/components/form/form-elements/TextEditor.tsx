@@ -31,7 +31,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
     const [headingValue, setHeadingValue] = useState('p');
 
 
-
+    // create editor instance 
     const editor = useEditor({
         extensions: [
             StarterKit.configure({

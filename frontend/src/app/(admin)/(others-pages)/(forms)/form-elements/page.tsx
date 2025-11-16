@@ -31,10 +31,9 @@ export default function FormElements() {
           <TextAreaInput />
           <InputStates />
           <TextEditor
-        // onChange={setContent}
-        initialContent="<p>Start writing your content here...</p>"
-        label="Rich Text Editor"
-      />
+            initialContent="<p>Start writing your content here...</p>"
+            label="Rich Text Editor"
+          />
         </div>
         <div className="space-y-6">
           <InputGroup />
