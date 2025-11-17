@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
                   {table.getHeaderGroups()[0].headers.map((header) => {
                     const canSort = header.column.getCanSort();
                     const isSorted = header.column.getIsSorted();
-                    
+
                     return (
                       <TableCell
                         key={header.id}
@@ -85,9 +85,8 @@ export function DataTable<TData, TValue>({
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
                         <div
-                          className={`flex items-center space-x-2 ${
-                            canSort ? "cursor-pointer select-none group" : ""
-                          }`}
+                          className={`flex items-center space-x-2 ${canSort ? "cursor-pointer select-none group" : ""
+                            }`}
                           onClick={
                             canSort
                               ? header.column.getToggleSortingHandler()
@@ -101,22 +100,38 @@ export function DataTable<TData, TValue>({
                             )}
                           </span>
                           {canSort && (
-                           <span className="flex flex-col gap-0.1">
-                            <FaCaretUp
-                              className={`h-2 w-2 transition-colors ${
-                                isSorted === "asc"
-                                  ? "text-primary dark:text-primary"
-                                  : "text-gray-500 dark:text-gray-400"
-                              }`}
-                            />
-                            <FaCaretDown
-                              className={`h-2 w-2 transition-colors ${
-                                isSorted === "desc"
-                                  ? "text-primary dark:text-primary"
-                                  : "text-gray-300 dark:text-gray-400/50"
-                              }`}
-                            />
-                          </span>
+                            <span className="flex flex-col gap-0.1">
+                              <svg
+                                className={`h-2 w-2 transition-colors ${isSorted === "asc"
+                                    ? "text-primary dark:text-primary"
+                                    : "text-gray-500 dark:text-gray-400"
+                                  }`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="8"
+                                height="5"
+                                fill="none"
+                              >
+                                <path
+                                  fill="currentColor"
+                                  d="M4.41.585a.5.5 0 0 0-.82 0L1.05 4.213A.5.5 0 0 0 1.46 5h5.08a.5.5 0 0 0 .41-.787z"
+                                />
+                              </svg>
+                              <svg
+                                className={`h-2 w-2 transition-colors ${isSorted === "desc"
+                                    ? "text-primary dark:text-primary"
+                                    : "text-gray-300 dark:text-gray-400/50"
+                                  }`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="8"
+                                height="5"
+                                fill="none"
+                              >
+                                <path
+                                  fill="currentColor"
+                                  d="M4.41 4.415a.5.5 0 0 1-.82 0L1.05.787A.5.5 0 0 1 1.46 0h5.08a.5.5 0 0 1 .41.787z"
+                                />
+                              </svg>
+                            </span>
                           )}
                         </div>
                       </TableCell>
@@ -130,28 +145,28 @@ export function DataTable<TData, TValue>({
                   const { filterVariant } = header.column.columnDef.meta ?? {};
                   return canFilter && filterVariant !== "none";
                 })) && (
-                  <TableRow>
-                    {table.getHeaderGroups()[0].headers.map((header) => {
-                      const canFilter = header.column.getCanFilter();
-                      const { filterVariant } = header.column.columnDef.meta ?? {};
-                      const showFilter = canFilter && filterVariant !== "none";
-                      
-                      return (
-                        <TableCell
-                          key={header.id}
-                          isHeader
-                          className="text-start px-5 py-2"
-                        >
-                          {showFilter ? (
-                            <Filter column={header.column} />
-                          ) : (
-                            <div className="h-7"></div> // Empty space for alignment
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                )}
+                    <TableRow>
+                      {table.getHeaderGroups()[0].headers.map((header) => {
+                        const canFilter = header.column.getCanFilter();
+                        const { filterVariant } = header.column.columnDef.meta ?? {};
+                        const showFilter = canFilter && filterVariant !== "none";
+
+                        return (
+                          <TableCell
+                            key={header.id}
+                            isHeader
+                            className="text-start px-5 py-2"
+                          >
+                            {showFilter ? (
+                              <Filter column={header.column} />
+                            ) : (
+                              <div className="h-7"></div> // Empty space for alignment
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  )}
               </TableHeader>
 
               {/* Table Body */}
@@ -160,8 +175,8 @@ export function DataTable<TData, TValue>({
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell 
-                          key={cell.id} 
+                        <TableCell
+                          key={cell.id}
                           className="px-5 py-4 text-start text-theme-sm text-gray-500 dark:text-gray-400"
                         >
                           {flexRender(
@@ -221,7 +236,7 @@ function Filter({ column }: { column: Column<any, unknown> }) {
 
   if (filterVariant === "select") {
     const uniqueValues = getUniqueValues();
-    
+
     return (
       <select
         value={value as string}
