@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar } from "./DataTableToolbar";
-import { FaCaretUp, FaCaretDown } from 'react-icons/fa';
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -82,10 +81,17 @@ export function DataTable<TData, TValue>({
                       <TableCell
                         key={header.id}
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                         className={`px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 ${
+    // Check if header content has "text-center" class
+    String(header.column.columnDef.header).includes('text-center') ? 'text-center' : 'text-start'
+  }`}
                       >
                         <div
-                          className={`flex items-center space-x-2 ${canSort ? "cursor-pointer select-none group" : ""
+                          className={` ${
+      String(header.column.columnDef.header).includes('text-center') 
+        ? 'flex justify-center' 
+        : 'flex items-center space-x-2'
+    } ${canSort ? "cursor-pointer select-none group" : ""
                             }`}
                           onClick={
                             canSort

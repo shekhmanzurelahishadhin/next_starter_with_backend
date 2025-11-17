@@ -262,126 +262,126 @@ const columns: ColumnDef<FlattenedOrder>[] = [
     },
   },
   {
-  id: "actions",
-  header: "Actions",
-  enableSorting: false,
-  meta: {
-    filterVariant: "none",
-  },
-  cell: ({ row }) => {
-    const order = row.original;
-    
-    return (
-      <div className="flex items-center gap-2">
-        {/* View Eye Icon */}
-        <button
-          className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-green-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-green-400 dark:hover:bg-gray-800"
-          onClick={() => console.log('View order:', order)}
-          title="View"
-        >
-          <FiEye className="w-4 h-4" />
-        </button>
+    id: "Actions",
+    header: () => <div className="">Actions</div>, // className should be text-center for text centering
+    enableSorting: false,
+    meta: {
+      filterVariant: "none",
+    },
+    cell: ({ row }) => {
+      const order = row.original;
 
-        {/* Edit Icon */}
-        <button
-          className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-blue-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-gray-800"
-          onClick={() => console.log('Edit order:', order)}
-          title="Edit"
-        >
-          <FiEdit className="w-4 h-4" />
-        </button>
+      return (
+        <div className="flex items-center gap-2">
+          {/* View Eye Icon */}
+          <button
+            className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-green-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-green-400 dark:hover:bg-gray-800"
+            onClick={() => console.log('View order:', order)}
+            title="View"
+          >
+            <FiEye className="w-4 h-4" />
+          </button>
 
-        {/* Delete Icon */}
-        <button
-          className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-red-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-gray-800"
-          onClick={() => console.log('Delete order:', order)}
-          title="Delete"
-        >
-          <FiTrash className="w-4 h-4" />
-        </button>
-      </div>
-    );
+          {/* Edit Icon */}
+          <button
+            className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-blue-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-gray-800"
+            onClick={() => console.log('Edit order:', order)}
+            title="Edit"
+          >
+            <FiEdit className="w-4 h-4" />
+          </button>
+
+          {/* Delete Icon */}
+          <button
+            className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-red-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-gray-800"
+            onClick={() => console.log('Delete order:', order)}
+            title="Delete"
+          >
+            <FiTrash className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    },
   },
-},
 ];
 
 
 export default function DataTableComponent() {
-     const { isOpen, openModal, closeModal } = useModal();
+  const { isOpen, openModal, closeModal } = useModal();
   const handleSave = () => {
     // Handle save logic here
     console.log("Saving changes...");
     closeModal();
   };
   return (
-     <AccessRoute 
-    requiredPermissions={["role.editr"]} // Specify the required permissions
+    <AccessRoute
+      requiredPermissions={["role.editr"]} // Specify the required permissions
     >
-    <div>
-      <PageBreadcrumb pageTitle="Data Table with Column Filters" />
-      <div className="space-y-6">
-        <ComponentCard
-          title="Advanced Data Table with Column Filters"
-          desc="Advance Data Table with Column Filters"
-          showAddButton={true} // Show the "Add New" button
-          buttonLabel="Add New"
-          openModal={openModal} // Function to open the modal
-        >
-          <DataTable
-            columns={columns}
-            data={flattenedData}
-            searchKey="userName"
-          />
-        </ComponentCard>
-        <Modal
-          isOpen={isOpen}
-          onClose={closeModal} // Function to close the modal
-          className="max-w-[584px] p-5 lg:p-10"
-        >
-          <form className="">
-            <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">
-              Personal Information
-            </h4>
+      <div>
+        <PageBreadcrumb pageTitle="Data Table with Column Filters" />
+        <div className="space-y-6">
+          <ComponentCard
+            title="Advanced Data Table with Column Filters"
+            desc="Advance Data Table with Column Filters"
+            showAddButton={true} // Show the "Add New" button
+            buttonLabel="Add New"
+            openModal={openModal} // Function to open the modal
+          >
+            <DataTable
+              columns={columns}
+              data={flattenedData}
+              searchKey="userName"
+            />
+          </ComponentCard>
+          <Modal
+            isOpen={isOpen}
+            onClose={closeModal} // Function to close the modal
+            className="max-w-[584px] p-5 lg:p-10"
+          >
+            <form className="">
+              <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">
+                Personal Information
+              </h4>
 
-            <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-              <div className="col-span-1">
-                <Label>First Name</Label>
-                <Input type="text" placeholder="Emirhan" />
+              <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                <div className="col-span-1">
+                  <Label>First Name</Label>
+                  <Input type="text" placeholder="Emirhan" />
+                </div>
+
+                <div className="col-span-1">
+                  <Label>Last Name</Label>
+                  <Input type="text" placeholder="Boruch" />
+                </div>
+
+                <div className="col-span-1">
+                  <Label>Last Name</Label>
+                  <Input type="email" placeholder="emirhanboruch55@gmail.com" />
+                </div>
+
+                <div className="col-span-1">
+                  <Label>Phone</Label>
+                  <Input type="text" placeholder="+09 363 398 46" />
+                </div>
+
+                <div className="col-span-1 sm:col-span-2">
+                  <Label>Bio</Label>
+                  <Input type="text" placeholder="Team Manager" />
+                </div>
               </div>
 
-              <div className="col-span-1">
-                <Label>Last Name</Label>
-                <Input type="text" placeholder="Boruch" />
+              <div className="flex items-center justify-end w-full gap-3 mt-6">
+                <Button size="sm" variant="outline" onClick={closeModal}>
+                  Close
+                </Button>
+                <Button size="sm" onClick={handleSave}>
+                  Save Changes
+                </Button>
               </div>
-
-              <div className="col-span-1">
-                <Label>Last Name</Label>
-                <Input type="email" placeholder="emirhanboruch55@gmail.com" />
-              </div>
-
-              <div className="col-span-1">
-                <Label>Phone</Label>
-                <Input type="text" placeholder="+09 363 398 46" />
-              </div>
-
-              <div className="col-span-1 sm:col-span-2">
-                <Label>Bio</Label>
-                <Input type="text" placeholder="Team Manager" />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end w-full gap-3 mt-6">
-              <Button size="sm" variant="outline" onClick={closeModal}>
-                Close
-              </Button>
-              <Button size="sm" onClick={handleSave}>
-                Save Changes
-              </Button>
-            </div>
-          </form>
-        </Modal>
+            </form>
+          </Modal>
+        </div>
       </div>
-    </div>
     </AccessRoute>
   )
 }
