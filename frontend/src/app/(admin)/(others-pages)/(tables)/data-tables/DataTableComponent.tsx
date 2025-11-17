@@ -11,6 +11,7 @@ import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
 import AccessRoute from "@/routes/AccessRoute";
+import { FiEye, FiEdit, FiTrash } from "@/icons/index";
 interface Order {
   id: number;
   user: {
@@ -260,6 +261,48 @@ const columns: ColumnDef<FlattenedOrder>[] = [
       );
     },
   },
+  {
+  id: "actions",
+  header: "Actions",
+  enableSorting: false,
+  meta: {
+    filterVariant: "none",
+  },
+  cell: ({ row }) => {
+    const order = row.original;
+    
+    return (
+      <div className="flex items-center gap-2">
+        {/* View Eye Icon */}
+        <button
+          className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-green-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-green-400 dark:hover:bg-gray-800"
+          onClick={() => console.log('View order:', order)}
+          title="View"
+        >
+          <FiEye className="w-4 h-4" />
+        </button>
+
+        {/* Edit Icon */}
+        <button
+          className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-blue-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-gray-800"
+          onClick={() => console.log('Edit order:', order)}
+          title="Edit"
+        >
+          <FiEdit className="w-4 h-4" />
+        </button>
+
+        {/* Delete Icon */}
+        <button
+          className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-red-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-gray-800"
+          onClick={() => console.log('Delete order:', order)}
+          title="Delete"
+        >
+          <FiTrash className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  },
+},
 ];
 
 
