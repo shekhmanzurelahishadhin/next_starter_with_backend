@@ -478,7 +478,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                             title="Inline Code"
                         >
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M4.708 5.578L2.061 8.224l2.647 2.646-.708.708-3-3V7.87l3-3 .708.708zm7-.708L11 5.578l2.647 2.646L11 10.87l.708.708 3-3V7.87l-3-3zM4.908 13v-1H4v.5a.5.5 0 0 1-.5.5H2v.5h1.5A1.5 1.5 0 0 0 4.908 13z" />
+                                <path d="M4 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H4zm0 1h8v6H4V5z" />
+                                <path d="M6 6.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z" />
                             </svg>
                         </ToolbarButton>
 
