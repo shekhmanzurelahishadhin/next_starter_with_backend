@@ -1,4 +1,5 @@
 "use client";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import { useState } from "react";
 
 interface FormItem {
@@ -32,7 +33,7 @@ function GridForm() {
   };
 
   const updateItem = (id: number, field: keyof FormItem, value: string) => {
-    setItems(items.map(item => 
+    setItems(items.map(item =>
       item.id === id ? { ...item, [field]: value } : item
     ));
   };
@@ -44,7 +45,7 @@ function GridForm() {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Editable Grid Form</h3>
-      
+
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 items-end mb-8">
         <div className="flex-1">
@@ -61,7 +62,7 @@ function GridForm() {
             required
           />
         </div>
-        
+
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Email
@@ -90,7 +91,7 @@ function GridForm() {
             placeholder="Additional Value"
           />
         </div>
-        
+
         <div>
           <button
             type="submit"
@@ -110,8 +111,8 @@ function GridForm() {
             <div className="col-span-4 p-4 font-semibold text-gray-900 dark:text-white">Value</div>
             <div className="col-span-2 p-4 font-semibold text-gray-900 dark:text-white">Actions</div>
           </div>
-          
-          {items.map((item) => (
+
+          {/* {items.map((item) => (
             <div key={item.id} className="grid grid-cols-12 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
               <div className="col-span-3 p-4">
                 <input
@@ -146,9 +147,48 @@ function GridForm() {
                 </button>
               </div>
             </div>
-          ))}
+          ))} */}
+
         </div>
       )}
+      <Table className="table-fixed">
+        <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+          <TableRow>
+            <TableCell
+              isHeader
+              className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+            >Sl</TableCell>
+            <TableCell
+              isHeader
+              className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Email</TableCell>
+            <TableCell
+              isHeader
+              className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Value</TableCell>
+            <TableCell
+              isHeader
+              className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Actions</TableCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+
+          <TableRow>
+            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+              1
+            </TableCell>
+            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+              shadhin@18gmail.com
+            </TableCell>
+            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+              55
+            </TableCell>
+            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+              X
+            </TableCell>
+
+          </TableRow>
+
+        </TableBody>
+      </Table>
     </div>
   );
 }

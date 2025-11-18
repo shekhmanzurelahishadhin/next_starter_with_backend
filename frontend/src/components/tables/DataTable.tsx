@@ -81,17 +81,16 @@ export function DataTable<TData, TValue>({
                       <TableCell
                         key={header.id}
                         isHeader
-                         className={`px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 ${
-    // Check if header content has "text-center" class
-    String(header.column.columnDef.header).includes('text-center') ? 'text-center' : 'text-start'
-  }`}
+                        className={`px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 ${
+                          // Check if header content has "text-center" class
+                          String(header.column.columnDef.header).includes('text-center') ? 'text-center' : 'text-start'
+                          }`}
                       >
                         <div
-                          className={` ${
-      String(header.column.columnDef.header).includes('text-center') 
-        ? 'flex justify-center' 
-        : 'flex items-center space-x-2'
-    } ${canSort ? "cursor-pointer select-none group" : ""
+                          className={` ${String(header.column.columnDef.header).includes('text-center')
+                              ? 'flex justify-center'
+                              : 'flex items-center space-x-2'
+                            } ${canSort ? "cursor-pointer select-none group" : ""
                             }`}
                           onClick={
                             canSort
@@ -109,8 +108,8 @@ export function DataTable<TData, TValue>({
                             <span className="flex flex-col gap-0.1">
                               <svg
                                 className={`h-2 w-2 transition-colors ${isSorted === "asc"
-                                    ? "text-primary dark:text-primary"
-                                    : "text-gray-500 dark:text-gray-400"
+                                  ? "text-primary dark:text-primary"
+                                  : "text-gray-500 dark:text-gray-400"
                                   }`}
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="8"
@@ -124,8 +123,8 @@ export function DataTable<TData, TValue>({
                               </svg>
                               <svg
                                 className={`h-2 w-2 transition-colors ${isSorted === "desc"
-                                    ? "text-primary dark:text-primary"
-                                    : "text-gray-300 dark:text-gray-400/50"
+                                  ? "text-primary dark:text-primary"
+                                  : "text-gray-300 dark:text-gray-400/50"
                                   }`}
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="8"
