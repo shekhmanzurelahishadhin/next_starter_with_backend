@@ -1,8 +1,10 @@
 "use client";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
+import Button from "@/components/ui/button/Button";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import { useState } from "react";
+import { FiTrash, FiPlus } from "@/icons/index";
 
 interface FormItem {
   id: number;
@@ -52,26 +54,23 @@ function GridForm() {
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 items-end mb-8">
         <div className="flex-1">
           <Label>Name</Label>
-          <Input type="text" name="name" value={formData.name}  placeholder="Your Name" required onChange={handleChange} />
+          <Input type="text" name="name" value={formData.name} placeholder="Your Name" required onChange={handleChange} />
         </div>
 
         <div className="flex-1">
           <Label>Email</Label>
-          <Input type="email" name="email" value={formData.email}  placeholder="Your Email" required onChange={handleChange} />
+          <Input type="email" name="email" value={formData.email} placeholder="Your Email" required onChange={handleChange} />
         </div>
 
         <div className="flex-1">
           <Label>Value</Label>
-          <Input type="text" name="value" value={formData.value}  placeholder="Enter Value" onChange={handleChange} />
+          <Input type="text" name="value" value={formData.value} placeholder="Enter Value" onChange={handleChange} />
         </div>
 
         <div>
-          <button
-            type="submit"
-            className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors whitespace-nowrap"
-          >
-            Add Row
-          </button>
+          <Button type="submit" size="sm">
+           <FiPlus className="w-4 h-4" /> Add New
+          </Button>
         </div>
       </form>
 
@@ -83,7 +82,7 @@ function GridForm() {
             <TableCell
               isHeader
               className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Sl</TableCell>
-               <TableCell
+            <TableCell
               isHeader
               className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Name</TableCell>
             <TableCell
@@ -130,9 +129,9 @@ function GridForm() {
               <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                 <button
                   onClick={() => removeItem(item.id)}
-                  className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                  className="px-2 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
                 >
-                  Remove
+                  <FiTrash className="w-4 h-4" />
                 </button>
               </TableCell>
 
