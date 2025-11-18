@@ -1,4 +1,6 @@
 "use client";
+import Input from "@/components/form/input/InputField";
+import Label from "@/components/form/Label";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import { useState } from "react";
 
@@ -49,18 +51,8 @@ function GridForm() {
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 items-end mb-8">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Name
-          </label>
-          <input
-            name="name"
-            type="text"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            placeholder="Your Name"
-            required
-          />
+          <Label>Name</Label>
+          <Input type="text" name="name" value={formData.name}  placeholder="Your Name" onChange={handleChange} />
         </div>
 
         <div className="flex-1">
@@ -103,61 +95,16 @@ function GridForm() {
       </form>
 
       {/* Grid Display */}
-      {items.length > 0 && (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-          <div className="grid grid-cols-12 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-            <div className="col-span-3 p-4 font-semibold text-gray-900 dark:text-white">Name</div>
-            <div className="col-span-3 p-4 font-semibold text-gray-900 dark:text-white">Email</div>
-            <div className="col-span-4 p-4 font-semibold text-gray-900 dark:text-white">Value</div>
-            <div className="col-span-2 p-4 font-semibold text-gray-900 dark:text-white">Actions</div>
-          </div>
 
-          {/* {items.map((item) => (
-            <div key={item.id} className="grid grid-cols-12 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
-              <div className="col-span-3 p-4">
-                <input
-                  type="text"
-                  value={item.name}
-                  onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                  className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-              <div className="col-span-3 p-4">
-                <input
-                  type="email"
-                  value={item.email}
-                  onChange={(e) => updateItem(item.id, 'email', e.target.value)}
-                  className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-              <div className="col-span-4 p-4">
-                <input
-                  type="text"
-                  value={item.value}
-                  onChange={(e) => updateItem(item.id, 'value', e.target.value)}
-                  className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-              <div className="col-span-2 p-4">
-                <button
-                  onClick={() => removeItem(item.id)}
-                  className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))} */}
-
-        </div>
-      )}
       <Table className="table-fixed">
         <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
           <TableRow>
             <TableCell
               isHeader
-              className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-            >Sl</TableCell>
+              className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Sl</TableCell>
+               <TableCell
+              isHeader
+              className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Name</TableCell>
             <TableCell
               isHeader
               className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Email</TableCell>
@@ -170,23 +117,46 @@ function GridForm() {
           </TableRow>
         </TableHeader>
         <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+          {items.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                {1 + items.indexOf(item)}
+              </TableCell>
+              <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                <input
+                  type="text"
+                  value={item.name}
+                  onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                  className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                />
+              </TableCell>
+              <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                <input
+                  type="email"
+                  value={item.email}
+                  onChange={(e) => updateItem(item.id, 'email', e.target.value)}
+                  className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                />
+              </TableCell>
+              <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                <input
+                  type="text"
+                  value={item.value}
+                  onChange={(e) => updateItem(item.id, 'value', e.target.value)}
+                  className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                />
+              </TableCell>
+              <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                <button
+                  onClick={() => removeItem(item.id)}
+                  className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                >
+                  Remove
+                </button>
+              </TableCell>
 
-          <TableRow>
-            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-              1
-            </TableCell>
-            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-              shadhin@18gmail.com
-            </TableCell>
-            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-              55
-            </TableCell>
-            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-              X
-            </TableCell>
-
-          </TableRow>
-
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>
