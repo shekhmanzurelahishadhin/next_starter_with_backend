@@ -52,36 +52,17 @@ function GridForm() {
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 items-end mb-8">
         <div className="flex-1">
           <Label>Name</Label>
-          <Input type="text" name="name" value={formData.name}  placeholder="Your Name" onChange={handleChange} />
+          <Input type="text" name="name" value={formData.name}  placeholder="Your Name" required onChange={handleChange} />
         </div>
 
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Email
-          </label>
-          <input
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            placeholder="Your Email"
-            required
-          />
+          <Label>Email</Label>
+          <Input type="email" name="email" value={formData.email}  placeholder="Your Email" required onChange={handleChange} />
         </div>
 
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Value
-          </label>
-          <input
-            name="value"
-            type="text"
-            value={formData.value}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            placeholder="Additional Value"
-          />
+          <Label>Value</Label>
+          <Input type="text" name="value" value={formData.value}  placeholder="Enter Value" onChange={handleChange} />
         </div>
 
         <div>
