@@ -72,9 +72,9 @@ const navItems: NavItem[] = [
     icon: <FiUser />,
     name: "User Roles",
     subItems: [
-      { name: "Role", path: "/ecommerce/analytics" },
-      { name: "Permission", path: "/ecommerce/sales" },
-      { name: "User", path: "/ecommerce/products" },
+      { name: "Roles", path: "/roles" },
+      { name: "Permissions", path: "/ecommerce/sales" },
+      { name: "Users", path: "/ecommerce/products" },
     ],
   },
   {
