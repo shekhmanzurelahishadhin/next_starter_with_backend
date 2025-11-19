@@ -310,7 +310,7 @@ const createColumns = (hasPermission: (permission: string) => boolean): ColumnDe
   },
 ];
 
-export default function DataTableComponent() {
+export default function Roles() {
   const { isOpen, openModal, closeModal } = useModal();
   const { hasPermission } = useAuth(); // Access control
 
