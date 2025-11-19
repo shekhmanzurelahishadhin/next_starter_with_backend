@@ -12,6 +12,9 @@ import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
 import AccessRoute from "@/routes/AccessRoute";
 import { FiEye, FiEdit, FiTrash } from "@/icons/index";
+import ActionButtons from "@/components/ui/button/ActionButton";
+import { useAuth } from "@/context/AuthContext";
+
 interface Order {
   id: number;
   user: {
@@ -127,7 +130,8 @@ const flattenedData: FlattenedOrder[] = tableData.map(order => ({
   userImage: order.user.image,
 }));
 
-const columns: ColumnDef<FlattenedOrder>[] = [
+// Create columns inside the component to access hooks
+const createColumns = (hasPermission: (permission: string) => boolean): ColumnDef<FlattenedOrder>[] => [
   {
     accessorKey: "userName",
     header: "User",
@@ -272,50 +276,56 @@ const columns: ColumnDef<FlattenedOrder>[] = [
       const order = row.original;
 
       return (
-        <div className="flex items-center gap-2">
-          {/* View Eye Icon */}
-          <button
-            className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-green-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-green-400 dark:hover:bg-gray-800"
-            onClick={() => console.log('View order:', order)}
-            title="View"
-          >
-            <FiEye className="w-4 h-4" />
-          </button>
-
-          {/* Edit Icon */}
-          <button
-            className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-blue-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-gray-800"
-            onClick={() => console.log('Edit order:', order)}
-            title="Edit"
-          >
-            <FiEdit className="w-4 h-4" />
-          </button>
-
-          {/* Delete Icon */}
-          <button
-            className="flex items-center justify-center w-8 h-8 text-gray-500 transition-colors rounded hover:text-red-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-gray-800"
-            onClick={() => console.log('Delete order:', order)}
-            title="Delete"
-          >
-            <FiTrash className="w-4 h-4" />
-          </button>
-        </div>
+        <ActionButtons
+          row={order}
+          buttons={[
+            {
+              icon: FiEye,
+              onClick: (row) => console.log('View order:', row),
+              variant: "success",
+              size: "sm",
+              tooltip: "View",
+              show: (row) => hasPermission("role.view"),
+            },
+            {
+              icon: FiEdit,
+              onClick: (row) => console.log('Edit order:', row),
+              variant: "primary",
+              size: "sm", 
+              tooltip: "Edit",
+              show: (row) => hasPermission("role.edit"),
+            },
+            {
+              icon: FiTrash,
+              onClick: (row) => console.log('Delete order:', row),
+              variant: "danger",
+              size: "sm",
+              tooltip: "Delete",
+              show: (row) => hasPermission("role.delete"),
+            },
+          ]}
+        />
       );
     },
   },
 ];
 
-
 export default function DataTableComponent() {
   const { isOpen, openModal, closeModal } = useModal();
+  const { hasPermission } = useAuth(); // Access control
+
+  // Create columns with the hasPermission function
+  const columns = createColumns(hasPermission);
+
   const handleSave = () => {
     // Handle save logic here
     console.log("Saving changes...");
     closeModal();
   };
+
   return (
     <AccessRoute
-      requiredPermissions={["role.editr"]} // Specify the required permissions
+      requiredPermissions={["role.view"]} // Specify the required permissions
     >
       <div>
         <PageBreadcrumb pageTitle="Data Table with Column Filters" />
@@ -355,7 +365,7 @@ export default function DataTableComponent() {
                 </div>
 
                 <div className="col-span-1">
-                  <Label>Last Name</Label>
+                  <Label>Email</Label>
                   <Input type="email" placeholder="emirhanboruch55@gmail.com" />
                 </div>
 
@@ -383,5 +393,5 @@ export default function DataTableComponent() {
         </div>
       </div>
     </AccessRoute>
-  )
+  );
 }
