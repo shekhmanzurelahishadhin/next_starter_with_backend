@@ -50,7 +50,7 @@ const ActionButtons: React.FC<Props> = ({ row, buttons }) => {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       {buttons.map((btn, index) => {
         if (btn.show && !btn.show(row)) return null;
 

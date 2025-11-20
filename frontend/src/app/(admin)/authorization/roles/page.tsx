@@ -292,9 +292,9 @@ export default function RolesDataTable() {
             showAddButton={hasPermission("role.create")}
             buttonLabel="Add New Role"
             openModal={handleAddNew}
-          showRefreshButton={true}
-          onRefresh={loadRoles}
-          isLoading={loading}
+          // showRefreshButton={true}
+          // onRefresh={loadRoles}
+          // isLoading={loading}
           >
             <DataTable
               columns={columns}
