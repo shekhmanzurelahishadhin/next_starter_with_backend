@@ -17,153 +17,191 @@ import { useState, useEffect } from "react";
 import { roleService, Role } from "@/services/roleService";
 import Spinner from "@/components/ui/spinner/Spinner";
 
+// Extend ColumnMeta to include custom export properties
+declare module '@tanstack/react-table' {
+  interface ColumnMeta<TData, TValue> {
+    filterVariant?: 'text' | 'select' | 'none';
+    exportable?: boolean;
+    exportHeader?: string;
+    exportValue?: (row: TData, index?: number) => string | number;
+  }
+}
+
 // Create columns inside the component to access hooks
 const createColumns = (
   hasPermission: (permission: string) => boolean,
   handleEdit: (role: Role) => void,
   handleDelete: (id: number) => void
 ): ColumnDef<Role>[] => [
-    {
-      id: "sl",
-      header: "SL",
-      enableSorting: false,
-      meta: {
-        filterVariant: "none",
-      },
-      cell: ({ row }) => {
-        return (
-          <span className="text-gray-600 dark:text-gray-400">
-            {row.index + 1}
+  {
+    id: "sl",
+    header: "SL",
+    enableSorting: false,
+    meta: {
+      filterVariant: "none",
+      exportable: true, // This column will be exported
+      exportHeader: "SL",
+      exportValue: (row, index) => (index ?? 0) + 1
+    },
+    cell: ({ row }) => {
+      return (
+        <span className="text-gray-600 dark:text-gray-400">
+          {row.index + 1}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "name",
+    header: "Role Name",
+    enableSorting: true,
+    meta: {
+      filterVariant: "text",
+      exportable: true, // This column will be exported
+      exportHeader: "Role Name",
+      exportValue: (row) => row.name
+    },
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center gap-2">
+          <FiShield className="w-4 h-4 text-blue-500" />
+          <span className="font-medium text-gray-800 dark:text-white/90">
+            {row.getValue("name")}
           </span>
-        );
-      },
+        </div>
+      );
     },
-    {
-      accessorKey: "name",
-      header: "Role Name",
-      enableSorting: true,
-      meta: {
-        filterVariant: "text",
-      },
-      cell: ({ row }) => {
-        return (
-          <div className="flex items-center gap-2">
-            <FiShield className="w-4 h-4 text-blue-500" />
-            <span className="font-medium text-gray-800 dark:text-white/90">
-              {row.getValue("name")}
-            </span>
-          </div>
-        );
-      },
+  },
+  {
+    accessorKey: "guard_name",
+    header: "Guard Name",
+    enableSorting: true,
+    meta: {
+      filterVariant: "select",
+      exportable: true, // This column will be exported
+      exportHeader: "Guard Name",
+      exportValue: (row) => row.guard_name
     },
-    {
-      accessorKey: "guard_name",
-      header: "Guard Name",
-      enableSorting: true,
-      meta: {
-        filterVariant: "select",
-      },
-      cell: ({ row }) => {
-        const guardName = row.getValue("guard_name") as string;
-        return (
-          <Badge
-            size="sm"
-            color={
-              guardName === "web"
-                ? "primary"
-                : guardName === "api"
-                  ? "success"
-                  : "warning"
-            }
-            variant="light"
-          >
-            {guardName}
-          </Badge>
-        );
-      },
+    cell: ({ row }) => {
+      const guardName = row.getValue("guard_name") as string;
+      return (
+        <Badge
+          size="sm"
+          color={
+            guardName === "web"
+              ? "primary"
+              : guardName === "api"
+                ? "success"
+                : "warning"
+          }
+          variant="light"
+        >
+          {guardName}
+        </Badge>
+      );
     },
-    {
-      accessorKey: "created_at",
-      header: "Created At",
-      enableSorting: true,
-      cell: ({ row }) => {
-        const createdAt = row.getValue("created_at");
+  },
+  {
+    accessorKey: "created_at",
+    header: "Created At",
+    enableSorting: true,
+    meta: {
+      exportable: true, // This column will be exported
+      exportHeader: "Created At",
+      exportValue: (row) => {
+        if (!row.created_at) return '-';
+        const date = new Date(row.created_at);
+        return isNaN(date.getTime()) ? '-' : date.toLocaleDateString();
+      }
+    },
+    cell: ({ row }) => {
+      const createdAt = row.getValue("created_at");
 
-        if (!createdAt) {
-          return <span className="text-gray-400 dark:text-gray-500">-</span>;
-        }
+      if (!createdAt) {
+        return <span className="text-gray-400 dark:text-gray-500">-</span>;
+      }
 
-        const date = new Date(createdAt as string);
-        return (
-          <span className="text-gray-600 dark:text-gray-400">
-            {isNaN(date.getTime()) ? '-' : date.toLocaleDateString()}
-          </span>
-        );
-      },
+      const date = new Date(createdAt as string);
+      return (
+        <span className="text-gray-600 dark:text-gray-400">
+          {isNaN(date.getTime()) ? '-' : date.toLocaleDateString()}
+        </span>
+      );
     },
-    {
-      accessorKey: "updated_at",
-      header: "Updated At",
-      enableSorting: true,
-      cell: ({ row }) => {
-        const updatedAt = row.getValue("updated_at");
-
-        if (!updatedAt) {
-          return <span className="text-gray-400 dark:text-gray-500">-</span>;
-        }
-
-        const date = new Date(updatedAt as string);
-        return (
-          <span className="text-gray-600 dark:text-gray-400">
-            {isNaN(date.getTime()) ? '-' : date.toLocaleDateString()}
-          </span>
-        );
-      },
+  },
+  {
+    accessorKey: "updated_at",
+    header: "Updated At",
+    enableSorting: true,
+    meta: {
+      exportable: true, // This column will be exported
+      exportHeader: "Updated At",
+      exportValue: (row) => {
+        if (!row.updated_at) return '-';
+        const date = new Date(row.updated_at);
+        return isNaN(date.getTime()) ? '-' : date.toLocaleDateString();
+      }
     },
-    {
-      id: "Actions",
-      header: () => <div className="text-center">Actions</div>,
-      enableSorting: false,
-      meta: {
-        filterVariant: "none",
-      },
-      cell: ({ row }) => {
-        const role = row.original;
+    cell: ({ row }) => {
+      const updatedAt = row.getValue("updated_at");
 
-        return (
-          <ActionButtons
-            row={role}
-            buttons={[
-              {
-                icon: FiEye,
-                onClick: (row) => console.log('View role:', row),
-                variant: "success",
-                size: "sm",
-                tooltip: "View",
-                show: () => hasPermission("role.view"),
-              },
-              {
-                icon: FiEdit,
-                onClick: (row) => handleEdit(row as Role),
-                variant: "primary",
-                size: "sm",
-                tooltip: "Edit",
-                show: () => hasPermission("role.edit"),
-              },
-              {
-                icon: FiTrash,
-                onClick: (row) => handleDelete((row as Role).id),
-                variant: "danger",
-                size: "sm",
-                tooltip: "Delete",
-                show: () => hasPermission("role.delete"),
-              },
-            ]}
-          />
-        );
-      },
+      if (!updatedAt) {
+        return <span className="text-gray-400 dark:text-gray-500">-</span>;
+      }
+
+      const date = new Date(updatedAt as string);
+      return (
+        <span className="text-gray-600 dark:text-gray-400">
+          {isNaN(date.getTime()) ? '-' : date.toLocaleDateString()}
+        </span>
+      );
     },
-  ];
+  },
+  {
+    id: "Actions",
+    header: () => <div className="">Actions</div>,
+    enableSorting: false,
+    meta: {
+      filterVariant: "none",
+      exportable: false, // ❌ This column will NOT be exported
+    },
+    cell: ({ row }) => {
+      const role = row.original;
+
+      return (
+        <ActionButtons
+          row={role}
+          buttons={[
+            {
+              icon: FiEye,
+              onClick: (row) => console.log('View role:', row),
+              variant: "success",
+              size: "sm",
+              tooltip: "View",
+              show: () => hasPermission("role.view"),
+            },
+            {
+              icon: FiEdit,
+              onClick: (row) => handleEdit(row as Role),
+              variant: "primary",
+              size: "sm",
+              tooltip: "Edit",
+              show: () => hasPermission("role.edit"),
+            },
+            {
+              icon: FiTrash,
+              onClick: (row) => handleDelete((row as Role).id),
+              variant: "danger",
+              size: "sm",
+              tooltip: "Delete",
+              show: () => hasPermission("role.delete"),
+            },
+          ]}
+        />
+      );
+    },
+  },
+];
 export default function RolesDataTable() {
   const { isOpen, openModal, closeModal } = useModal();
   const { hasPermission } = useAuth();

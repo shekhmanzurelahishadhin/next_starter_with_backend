@@ -21,25 +21,55 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
 
   // Helper: Get visible headers and row data
-  const getVisibleData = () => {
-    const headers = table
-      .getAllColumns()
-      .filter((col) => col.getIsVisible())
-      .map((col) => col.columnDef.header as string);
+ // Helper: Get visible headers and row data for export
+const getVisibleData = () => {
+  const visibleColumns = table
+    .getAllColumns()
+    .filter((col) => {
+      const meta = col.columnDef.meta as any;
+      return col.getIsVisible() && (meta?.exportable !== false);
+    });
 
-    const data = table.getRowModel().rows.map((row) =>
-      table
-        .getAllColumns()
-        .filter((col) => col.getIsVisible())
-        .map((col) => row.getValue(col.id))
-    );
+  const headers = visibleColumns.map((col) => {
+    const meta = col.columnDef.meta as any;
+    return meta?.exportHeader || 
+           (typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id);
+  });
 
-    return { headers, data };
-  };
+  const data = table.getRowModel().rows.map((row) =>
+    visibleColumns.map((col) => {
+      const meta = col.columnDef.meta as any;
+      
+      // Use exportValue function if provided
+      if (meta?.exportValue) {
+        return meta.exportValue(row.original, row.index);
+      }
+      
+      // Fallback to raw value
+      const value = row.getValue(col.id);
+      
+      // Handle React elements
+      if (value && typeof value === 'object' && 'props' in value) {
+        return ''; // Skip React components without exportValue
+      }
+      
+      // Handle dates
+      if (col.id.includes('_at') && value) {
+        const date = new Date(value as string);
+        return isNaN(date.getTime()) ? '-' : date.toLocaleDateString();
+      }
+      
+      return value ?? '-';
+    })
+  );
+
+  return { headers, data };
+};
 
   // Copy
   const handleCopy = async () => {
     const { headers, data } = getVisibleData();
+    console.log(headers, data);
     const text = [headers.join("\t"), ...data.map((r) => r.join("\t"))].join("\n");
     try {
       await navigator.clipboard.writeText(text);
