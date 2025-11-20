@@ -15,6 +15,7 @@ import ActionButtons from "@/components/ui/button/ActionButton";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import { roleService, Role } from "@/services/roleService";
+import Spinner from "@/components/ui/spinner/Spinner";
 
 // Create columns inside the component to access hooks
 const createColumns = (
@@ -263,9 +264,7 @@ export default function RolesDataTable() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Loading roles...</div>
-      </div>
+      <Spinner mode="content" />
     );
   }
 
