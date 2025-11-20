@@ -85,7 +85,9 @@ import {
   FiCheckCircle,
   FiAlertCircle,
   FiInfo,
-  FiPlus
+  FiPlus,
+  FiShield,
+  FiRefreshCw
 } from 'react-icons/fi';
 
 import {
@@ -194,6 +196,8 @@ export {
   FiAlertCircle,
   FiInfo,
   FiPlus,
+  FiShield,
+  FiRefreshCw,
   
   // React Icons - Font Awesome
   FaRegCircle,

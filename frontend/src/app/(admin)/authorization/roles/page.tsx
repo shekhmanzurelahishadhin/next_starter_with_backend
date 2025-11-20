@@ -2,7 +2,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/tables/DataTable";
 import Badge from "@/components/ui/badge/Badge";
-import Image from "next/image";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import { useModal } from "@/hooks/useModal";
@@ -11,297 +10,140 @@ import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
 import AccessRoute from "@/routes/AccessRoute";
-import { FiEye, FiEdit, FiTrash } from "@/icons/index";
+import { FiEye, FiEdit, FiTrash, FiRefreshCw, FiShield } from "@/icons/index";
 import ActionButtons from "@/components/ui/button/ActionButton";
 import { useAuth } from "@/context/AuthContext";
-
-interface Order {
-  id: number;
-  user: {
-    image: string;
-    name: string;
-    role: string;
-  };
-  projectName: string;
-  team: {
-    images: string[];
-  };
-  status: string;
-  budget: string;
-}
-
-// Flatten the data for easier searching
-interface FlattenedOrder extends Order {
-  userName: string;
-  userRole: string;
-  userImage: string;
-}
-
-const tableData: Order[] = [
-  {
-    id: 1,
-    user: {
-      image: "/images/user/user-17.jpg",
-      name: "Lindsey Curtis",
-      role: "Web Designer",
-    },
-    projectName: "Agency Website",
-    team: {
-      images: [
-        "/images/user/user-22.jpg",
-        "/images/user/user-23.jpg",
-        "/images/user/user-24.jpg",
-      ],
-    },
-    budget: "3.9K",
-    status: "Active",
-  },
-  {
-    id: 2,
-    user: {
-      image: "/images/user/user-18.jpg",
-      name: "Kaiya George",
-      role: "Project Manager",
-    },
-    projectName: "Technology",
-    team: {
-      images: ["/images/user/user-25.jpg", "/images/user/user-26.jpg"],
-    },
-    budget: "24.9K",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    user: {
-      image: "/images/user/user-17.jpg",
-      name: "Zain Geidt",
-      role: "Content Writing",
-    },
-    projectName: "Blog Writing",
-    team: {
-      images: ["/images/user/user-27.jpg"],
-    },
-    budget: "12.7K",
-    status: "Active",
-  },
-  {
-    id: 4,
-    user: {
-      image: "/images/user/user-20.jpg",
-      name: "Abram Schleifer",
-      role: "Digital Marketer",
-    },
-    projectName: "Social Media",
-    team: {
-      images: [
-        "/images/user/user-28.jpg",
-        "/images/user/user-29.jpg",
-        "/images/user/user-30.jpg",
-      ],
-    },
-    budget: "2.8K",
-    status: "Cancel",
-  },
-  {
-    id: 5,
-    user: {
-      image: "/images/user/user-21.jpg",
-      name: "Carla George",
-      role: "Front-end Developer",
-    },
-    projectName: "Website",
-    team: {
-      images: [
-        "/images/user/user-31.jpg",
-        "/images/user/user-32.jpg",
-        "/images/user/user-33.jpg",
-      ],
-    },
-    budget: "4.5K",
-    status: "Active",
-  },
-];
-
-// Flatten the data
-const flattenedData: FlattenedOrder[] = tableData.map(order => ({
-  ...order,
-  userName: order.user.name,
-  userRole: order.user.role,
-  userImage: order.user.image,
-}));
+import { useState, useEffect } from "react";
+import { roleService, Role } from "@/services/roleService";
 
 // Create columns inside the component to access hooks
-const createColumns = (hasPermission: (permission: string) => boolean): ColumnDef<FlattenedOrder>[] => [
+const createColumns = (
+  hasPermission: (permission: string) => boolean,
+  handleEdit: (role: Role) => void,
+  handleDelete: (id: number) => void
+): ColumnDef<Role>[] => [
   {
-    accessorKey: "userName",
-    header: "User",
-    enableSorting: true,
+    id: "sl",
+    header: "SL",
+    enableSorting: false,
     meta: {
-      filterVariant: "text", // Text input filter
-    },
-    cell: ({ row }) => {
-      const user = row.original.user;
-      return (
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 overflow-hidden rounded-full">
-            <Image
-              width={40}
-              height={40}
-              src={user.image}
-              alt={user.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div>
-            <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-              {user.name}
-            </span>
-            <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-              {user.role}
-            </span>
-          </div>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "projectName",
-    header: "Project Name",
-    enableSorting: true,
-    meta: {
-      filterVariant: "select", // Select dropdown filter
-    },
-    cell: ({ row }) => {
-      return (
-        <span className="text-gray-800 dark:text-white/90">
-          {row.getValue("projectName")}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: "userRole",
-    header: "Role",
-    enableSorting: true,
-    meta: {
-      filterVariant: "text", // Select dropdown filter
+      filterVariant: "none",
     },
     cell: ({ row }) => {
       return (
         <span className="text-gray-600 dark:text-gray-400">
-          {row.getValue("userRole")}
+          {row.index + 1}
         </span>
       );
     },
   },
   {
-    accessorKey: "team",
-    header: "Team",
-    enableSorting: false,
-    // No meta.filterVariant - this column won't have a filter
+    accessorKey: "name",
+    header: "Role Name",
+    enableSorting: true,
     meta: {
-      filterVariant: "none", // No filter
+      filterVariant: "text",
     },
     cell: ({ row }) => {
-      const team = row.original.team;
       return (
-        <div className="flex -space-x-2">
-          {team.images.map((teamImage, index) => (
-            <div
-              key={index} // Use index as key since images might not be unique
-              className="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900"
-            >
-              <Image
-                width={24}
-                height={24}
-                src={teamImage}
-                alt={`Team member ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
+        <div className="flex items-center gap-2">
+          <FiShield className="w-4 h-4 text-blue-500" />
+          <span className="font-medium text-gray-800 dark:text-white/90">
+            {row.getValue("name")}
+          </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "guard_name",
+    header: "Guard Name",
     enableSorting: true,
     meta: {
-      filterVariant: "select", // Select dropdown filter
+      filterVariant: "select",
     },
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
+      const guardName = row.getValue("guard_name") as string;
       return (
         <Badge
           size="sm"
           color={
-            status === "Active"
+            guardName === "web"
+              ? "primary"
+              : guardName === "api"
               ? "success"
-              : status === "Pending"
-                ? "warning"
-                : "error"
+              : "warning"
           }
           variant="light"
         >
-          {status}
+          {guardName}
         </Badge>
       );
     },
   },
   {
-    accessorKey: "budget",
-    header: "Budget",
+    accessorKey: "created_at",
+    header: "Created At",
     enableSorting: true,
-    meta: {
-      filterVariant: "text", // Text input filter
-    },
     cell: ({ row }) => {
+      const date = new Date(row.getValue("created_at"));
       return (
-        <span className="font-medium text-gray-800 dark:text-white/90">
-          {row.getValue("budget")}
+        <span className="text-gray-600 dark:text-gray-400">
+          {date.toLocaleDateString()}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "updated_at",
+    header: "Updated At",
+    enableSorting: true,
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("updated_at"));
+      return (
+        <span className="text-gray-600 dark:text-gray-400">
+          {date.toLocaleDateString()}
         </span>
       );
     },
   },
   {
     id: "Actions",
-    header: () => <div className="">Actions</div>, // className should be text-center for text centering
+    header: () => <div className="text-center">Actions</div>,
     enableSorting: false,
     meta: {
       filterVariant: "none",
     },
     cell: ({ row }) => {
-      const order = row.original;
+      const role = row.original;
 
       return (
         <ActionButtons
-          row={order}
+          row={role}
           buttons={[
             {
               icon: FiEye,
-              onClick: (row) => console.log('View order:', row),
+              onClick: (row) => console.log('View role:', row),
               variant: "success",
               size: "sm",
               tooltip: "View",
-              show: (row) => hasPermission("role.view"),
+              show: () => hasPermission("role.view"),
             },
             {
               icon: FiEdit,
-              onClick: (row) => console.log('Edit order:', row),
+              onClick: (row) => handleEdit(row as Role),
               variant: "primary",
               size: "sm", 
               tooltip: "Edit",
-              show: (row) => hasPermission("role.edit"),
+              show: () => hasPermission("role.edit"),
             },
             {
               icon: FiTrash,
-              onClick: (row) => console.log('Delete order:', row),
+              onClick: (row) => handleDelete((row as Role).id),
               variant: "danger",
               size: "sm",
               tooltip: "Delete",
-              show: (row) => hasPermission("role.delete"),
+              show: () => hasPermission("role.delete"),
             },
           ]}
         />
@@ -309,83 +151,192 @@ const createColumns = (hasPermission: (permission: string) => boolean): ColumnDe
     },
   },
 ];
-
-export default function DataTableComponent() {
+export default function RolesDataTable() {
   const { isOpen, openModal, closeModal } = useModal();
-  const { hasPermission } = useAuth(); // Access control
+  const { hasPermission } = useAuth();
+  
+  // State for data and loading
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  // Create columns with the hasPermission function
-  const columns = createColumns(hasPermission);
+  // Fetch data on component mount
+  useEffect(() => {
+    loadRoles();
+  }, []);
 
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+  const loadRoles = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await roleService.getRoles();
+      setRoles(data);
+    } catch (err) {
+      setError('Failed to load roles');
+      console.error('Error loading roles:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleEdit = (role: Role) => {
+    setSelectedRole(role);
+    setIsEditMode(true);
+    openModal();
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this role?')) {
+      try {
+        await roleService.deleteRole(id);
+        // Remove from local state
+        setRoles(prev => prev.filter(role => role.id !== id));
+      } catch (err) {
+        console.error('Error deleting role:', err);
+        alert('Failed to delete role');
+      }
+    }
+  };
+
+  const handleAddNew = () => {
+    setSelectedRole(null);
+    setIsEditMode(false);
+    openModal();
+  };
+
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.currentTarget);
+    const roleData = {
+      name: formData.get('name') as string,
+      guard_name: formData.get('guard_name') as string,
+    };
+
+    try {
+      setSaving(true);
+      
+      if (isEditMode && selectedRole) {
+        // Update existing role
+        const updatedRole = await roleService.updateRole(selectedRole.id, roleData);
+        setRoles(prev => prev.map(role => 
+          role.id === selectedRole.id ? updatedRole : role
+        ));
+      } else {
+        // Create new role
+        const newRole = await roleService.createRole(roleData);
+        setRoles(prev => [...prev, newRole]);
+      }
+      
+      closeModal();
+      resetForm();
+    } catch (err) {
+      console.error('Error saving role:', err);
+      alert(`Failed to ${isEditMode ? 'update' : 'create'} role`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const resetForm = () => {
+    setSelectedRole(null);
+    setIsEditMode(false);
+  };
+
+  // Create columns with the required functions
+  const columns = createColumns(hasPermission, handleEdit, handleDelete);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg">Loading roles...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <div className="text-lg text-red-600">{error}</div>
+        <Button onClick={loadRoles} className="mt-4">
+          <FiRefreshCw className="mr-2" />
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <AccessRoute
-      requiredPermissions={["role.view"]} // Specify the required permissions
-    >
+    <AccessRoute requiredPermissions={["role.view"]}>
       <div>
-        <PageBreadcrumb pageTitle="Data Table with Column Filters" />
+        <PageBreadcrumb pageTitle="Roles Management" />
         <div className="space-y-6">
           <ComponentCard
-            title="Advanced Data Table with Column Filters"
-            desc="Advance Data Table with Column Filters"
-            showAddButton={true} // Show the "Add New" button
-            buttonLabel="Add New"
-            openModal={openModal} // Function to open the modal
+            title="Roles Management"
+            desc="Manage user roles in the system"
+            showAddButton={hasPermission("role.create")}
+            buttonLabel="Add New Role"
+            openModal={handleAddNew}
+            // showRefreshButton={true}
+            // onRefresh={loadRoles}
+            // isLoading={loading}
           >
             <DataTable
               columns={columns}
-              data={flattenedData}
-              searchKey="userName"
+              data={roles}
+              searchKey="name"
             />
           </ComponentCard>
+
+          {/* Add/Edit Role Modal */}
           <Modal
             isOpen={isOpen}
-            onClose={closeModal} // Function to close the modal
-            className="max-w-[584px] p-5 lg:p-10"
+            onClose={() => {
+              closeModal();
+              resetForm();
+            }}
+            className="max-w-md p-5 lg:p-10"
           >
-            <form className="">
+            <form onSubmit={handleSave}>
               <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">
-                Personal Information
+                {isEditMode ? 'Edit Role' : 'Add New Role'}
               </h4>
 
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-                <div className="col-span-1">
-                  <Label>First Name</Label>
-                  <Input type="text" placeholder="Emirhan" />
-                </div>
-
-                <div className="col-span-1">
-                  <Label>Last Name</Label>
-                  <Input type="text" placeholder="Boruch" />
-                </div>
-
-                <div className="col-span-1">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="emirhanboruch55@gmail.com" />
-                </div>
-
-                <div className="col-span-1">
-                  <Label>Phone</Label>
-                  <Input type="text" placeholder="+09 363 398 46" />
-                </div>
-
-                <div className="col-span-1 sm:col-span-2">
-                  <Label>Bio</Label>
-                  <Input type="text" placeholder="Team Manager" />
+              <div className="space-y-5">
+                <div>
+                  <Label>Role Name *</Label>
+                  <Input 
+                    type="text" 
+                    name="name"
+                    placeholder="admin, user, manager, etc."
+                    defaultValue={selectedRole?.name || ''}
+                    required
+                  />
                 </div>
               </div>
 
               <div className="flex items-center justify-end w-full gap-3 mt-6">
-                <Button size="sm" variant="outline" onClick={closeModal}>
-                  Close
+                <Button 
+                  type="button"
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => {
+                    closeModal();
+                    resetForm();
+                  }}
+                  disabled={saving}
+                >
+                  Cancel
                 </Button>
-                <Button size="sm" onClick={handleSave}>
-                  Save Changes
+                <Button 
+                  type="submit"
+                  size="sm" 
+                  disabled={saving}
+                >
+                  {saving ? 'Saving...' : (isEditMode ? 'Update Role' : 'Create Role')}
                 </Button>
               </div>
             </form>
