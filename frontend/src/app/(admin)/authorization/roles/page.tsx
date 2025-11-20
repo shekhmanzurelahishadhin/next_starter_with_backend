@@ -22,139 +22,151 @@ const createColumns = (
   handleEdit: (role: Role) => void,
   handleDelete: (id: number) => void
 ): ColumnDef<Role>[] => [
-  {
-    id: "sl",
-    header: "SL",
-    enableSorting: false,
-    meta: {
-      filterVariant: "none",
-    },
-    cell: ({ row }) => {
-      return (
-        <span className="text-gray-600 dark:text-gray-400">
-          {row.index + 1}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: "name",
-    header: "Role Name",
-    enableSorting: true,
-    meta: {
-      filterVariant: "text",
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-2">
-          <FiShield className="w-4 h-4 text-blue-500" />
-          <span className="font-medium text-gray-800 dark:text-white/90">
-            {row.getValue("name")}
+    {
+      id: "sl",
+      header: "SL",
+      enableSorting: false,
+      meta: {
+        filterVariant: "none",
+      },
+      cell: ({ row }) => {
+        return (
+          <span className="text-gray-600 dark:text-gray-400">
+            {row.index + 1}
           </span>
-        </div>
-      );
+        );
+      },
     },
-  },
-  {
-    accessorKey: "guard_name",
-    header: "Guard Name",
-    enableSorting: true,
-    meta: {
-      filterVariant: "select",
+    {
+      accessorKey: "name",
+      header: "Role Name",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+      },
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center gap-2">
+            <FiShield className="w-4 h-4 text-blue-500" />
+            <span className="font-medium text-gray-800 dark:text-white/90">
+              {row.getValue("name")}
+            </span>
+          </div>
+        );
+      },
     },
-    cell: ({ row }) => {
-      const guardName = row.getValue("guard_name") as string;
-      return (
-        <Badge
-          size="sm"
-          color={
-            guardName === "web"
-              ? "primary"
-              : guardName === "api"
-              ? "success"
-              : "warning"
-          }
-          variant="light"
-        >
-          {guardName}
-        </Badge>
-      );
+    {
+      accessorKey: "guard_name",
+      header: "Guard Name",
+      enableSorting: true,
+      meta: {
+        filterVariant: "select",
+      },
+      cell: ({ row }) => {
+        const guardName = row.getValue("guard_name") as string;
+        return (
+          <Badge
+            size="sm"
+            color={
+              guardName === "web"
+                ? "primary"
+                : guardName === "api"
+                  ? "success"
+                  : "warning"
+            }
+            variant="light"
+          >
+            {guardName}
+          </Badge>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "created_at",
-    header: "Created At",
-    enableSorting: true,
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("created_at"));
-      return (
-        <span className="text-gray-600 dark:text-gray-400">
-          {date.toLocaleDateString()}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: "updated_at",
-    header: "Updated At",
-    enableSorting: true,
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("updated_at"));
-      return (
-        <span className="text-gray-600 dark:text-gray-400">
-          {date.toLocaleDateString()}
-        </span>
-      );
-    },
-  },
-  {
-    id: "Actions",
-    header: () => <div className="text-center">Actions</div>,
-    enableSorting: false,
-    meta: {
-      filterVariant: "none",
-    },
-    cell: ({ row }) => {
-      const role = row.original;
+    {
+      accessorKey: "created_at",
+      header: "Created At",
+      enableSorting: true,
+      cell: ({ row }) => {
+        const createdAt = row.getValue("created_at");
 
-      return (
-        <ActionButtons
-          row={role}
-          buttons={[
-            {
-              icon: FiEye,
-              onClick: (row) => console.log('View role:', row),
-              variant: "success",
-              size: "sm",
-              tooltip: "View",
-              show: () => hasPermission("role.view"),
-            },
-            {
-              icon: FiEdit,
-              onClick: (row) => handleEdit(row as Role),
-              variant: "primary",
-              size: "sm", 
-              tooltip: "Edit",
-              show: () => hasPermission("role.edit"),
-            },
-            {
-              icon: FiTrash,
-              onClick: (row) => handleDelete((row as Role).id),
-              variant: "danger",
-              size: "sm",
-              tooltip: "Delete",
-              show: () => hasPermission("role.delete"),
-            },
-          ]}
-        />
-      );
+        if (!createdAt) {
+          return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        }
+
+        const date = new Date(createdAt as string);
+        return (
+          <span className="text-gray-600 dark:text-gray-400">
+            {isNaN(date.getTime()) ? '-' : date.toLocaleDateString()}
+          </span>
+        );
+      },
     },
-  },
-];
+    {
+      accessorKey: "updated_at",
+      header: "Updated At",
+      enableSorting: true,
+      cell: ({ row }) => {
+        const updatedAt = row.getValue("updated_at");
+
+        if (!updatedAt) {
+          return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        }
+
+        const date = new Date(updatedAt as string);
+        return (
+          <span className="text-gray-600 dark:text-gray-400">
+            {isNaN(date.getTime()) ? '-' : date.toLocaleDateString()}
+          </span>
+        );
+      },
+    },
+    {
+      id: "Actions",
+      header: () => <div className="text-center">Actions</div>,
+      enableSorting: false,
+      meta: {
+        filterVariant: "none",
+      },
+      cell: ({ row }) => {
+        const role = row.original;
+
+        return (
+          <ActionButtons
+            row={role}
+            buttons={[
+              {
+                icon: FiEye,
+                onClick: (row) => console.log('View role:', row),
+                variant: "success",
+                size: "sm",
+                tooltip: "View",
+                show: () => hasPermission("role.view"),
+              },
+              {
+                icon: FiEdit,
+                onClick: (row) => handleEdit(row as Role),
+                variant: "primary",
+                size: "sm",
+                tooltip: "Edit",
+                show: () => hasPermission("role.edit"),
+              },
+              {
+                icon: FiTrash,
+                onClick: (row) => handleDelete((row as Role).id),
+                variant: "danger",
+                size: "sm",
+                tooltip: "Delete",
+                show: () => hasPermission("role.delete"),
+              },
+            ]}
+          />
+        );
+      },
+    },
+  ];
 export default function RolesDataTable() {
   const { isOpen, openModal, closeModal } = useModal();
   const { hasPermission } = useAuth();
-  
+
   // State for data and loading
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
@@ -209,28 +221,28 @@ export default function RolesDataTable() {
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const formData = new FormData(e.currentTarget);
     const roleData = {
       name: formData.get('name') as string,
-      guard_name: formData.get('guard_name') as string,
+      // guard_name: formData.get('guard_name') as string,
     };
 
     try {
       setSaving(true);
-      
+
       if (isEditMode && selectedRole) {
         // Update existing role
         const updatedRole = await roleService.updateRole(selectedRole.id, roleData);
-        setRoles(prev => prev.map(role => 
+        setRoles(prev => prev.map(role =>
           role.id === selectedRole.id ? updatedRole : role
         ));
       } else {
         // Create new role
         const newRole = await roleService.createRole(roleData);
-        setRoles(prev => [...prev, newRole]);
+        setRoles(prev => [newRole, ...prev]);
       }
-      
+
       closeModal();
       resetForm();
     } catch (err) {
@@ -280,9 +292,9 @@ export default function RolesDataTable() {
             showAddButton={hasPermission("role.create")}
             buttonLabel="Add New Role"
             openModal={handleAddNew}
-            // showRefreshButton={true}
-            // onRefresh={loadRoles}
-            // isLoading={loading}
+          showRefreshButton={true}
+          onRefresh={loadRoles}
+          isLoading={loading}
           >
             <DataTable
               columns={columns}
@@ -308,8 +320,8 @@ export default function RolesDataTable() {
               <div className="space-y-5">
                 <div>
                   <Label>Role Name *</Label>
-                  <Input 
-                    type="text" 
+                  <Input
+                    type="text"
                     name="name"
                     placeholder="admin, user, manager, etc."
                     defaultValue={selectedRole?.name || ''}
@@ -319,10 +331,10 @@ export default function RolesDataTable() {
               </div>
 
               <div className="flex items-center justify-end w-full gap-3 mt-6">
-                <Button 
+                <Button
                   type="button"
-                  size="sm" 
-                  variant="outline" 
+                  size="sm"
+                  variant="outline"
                   onClick={() => {
                     closeModal();
                     resetForm();
@@ -331,9 +343,9 @@ export default function RolesDataTable() {
                 >
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   type="submit"
-                  size="sm" 
+                  size="sm"
                   disabled={saving}
                 >
                   {saving ? 'Saving...' : (isEditMode ? 'Update Role' : 'Create Role')}
