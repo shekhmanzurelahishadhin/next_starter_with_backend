@@ -310,7 +310,7 @@ export default function RolesDataTable() {
               closeModal();
               resetForm();
             }}
-            className="max-w-md p-5 lg:p-10"
+            className="max-w-md p-5 lg:p-5"
           >
             <form onSubmit={handleSave}>
               <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">

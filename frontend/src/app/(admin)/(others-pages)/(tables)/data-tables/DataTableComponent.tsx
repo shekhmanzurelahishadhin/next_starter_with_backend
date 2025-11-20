@@ -336,7 +336,7 @@ export default function DataTableComponent() {
           <Modal
             isOpen={isOpen}
             onClose={closeModal} // Function to close the modal
-            className="max-w-[584px] p-5 lg:p-10"
+            className="max-w-[584px] p-5 lg:p-5"
           >
             <form className="">
               <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">
