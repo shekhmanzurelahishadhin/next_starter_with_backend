@@ -28,12 +28,10 @@ declare module '@tanstack/react-table' {
 }
 
 // Create columns inside the component to access hooks
-// Create columns inside the component to access hooks
 const createColumns = (
   hasPermission: (permission: string) => boolean,
   handleEdit: (role: Role) => void,
   handleDelete: (id: number) => void,
-  // Add pagination parameters
   pageIndex: number,
   pageSize: number
 ): ColumnDef<Role>[] => [
@@ -45,11 +43,9 @@ const createColumns = (
       filterVariant: "none",
       exportable: true,
       exportHeader: "SL",
-      // Update exportValue to calculate correct serial number
       exportValue: (row, index) => (pageIndex * pageSize) + (index ?? 0) + 1
     },
     cell: ({ row }) => {
-      // Calculate serial number based on current page and row index
       const serialNumber = (pageIndex * pageSize) + row.index + 1;
       return (
         <span className="text-gray-600 dark:text-gray-400">
@@ -64,7 +60,7 @@ const createColumns = (
     enableSorting: true,
     meta: {
       filterVariant: "text",
-      exportable: true, // This column will be exported
+      exportable: true,
       exportHeader: "Role Name",
       exportValue: (row) => row.name
     },
@@ -85,7 +81,7 @@ const createColumns = (
     enableSorting: true,
     meta: {
       filterVariant: "select",
-      exportable: true, // This column will be exported
+      exportable: true,
       exportHeader: "Guard Name",
       exportValue: (row) => row.guard_name
     },
@@ -113,7 +109,7 @@ const createColumns = (
     header: "Created At",
     enableSorting: true,
     meta: {
-      exportable: true, // This column will be exported
+      exportable: true,
       exportHeader: "Created At",
       exportValue: (row) => {
         if (!row.created_at) return '-';
@@ -141,7 +137,7 @@ const createColumns = (
     header: "Updated At",
     enableSorting: true,
     meta: {
-      exportable: true, // This column will be exported
+      exportable: true,
       exportHeader: "Updated At",
       exportValue: (row) => {
         if (!row.updated_at) return '-';
@@ -170,7 +166,7 @@ const createColumns = (
     enableSorting: false,
     meta: {
       filterVariant: "none",
-      exportable: false, // This column will NOT be exported
+      exportable: false,
     },
     cell: ({ row }) => {
       const role = row.original;
@@ -289,6 +285,7 @@ export default function RolesDataTable() {
     const formData = new FormData(e.currentTarget);
     const roleData = {
       name: formData.get('name') as string,
+      guard_name: formData.get('guard_name') as string || 'web',
     };
 
     try {
@@ -306,9 +303,9 @@ export default function RolesDataTable() {
       resetForm();
       // Reload data to reflect changes
       await loadRoles();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error saving role:', err);
-      alert(`Failed to ${isEditMode ? 'update' : 'create'} role`);
+      alert(`Failed to ${isEditMode ? 'update' : 'create'} role: ${err.message || 'Unknown error'}`);
     } finally {
       setSaving(false);
     }
@@ -319,20 +316,25 @@ export default function RolesDataTable() {
     setIsEditMode(false);
   };
 
-  // Handle search
-  const handleSearch = (value: string) => {
+  // Handle search with debounce
+  const handleSearch = useCallback((value: string) => {
     setSearch(value);
     // Reset to first page when searching
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
+  }, []);
+
+  // Handle refresh
+  const handleRefresh = () => {
+    loadRoles();
   };
 
   // Create columns with the required functions
-   const columns = createColumns(
+  const columns = createColumns(
     hasPermission, 
     handleEdit, 
     handleDelete,
-    pagination.pageIndex, // current page index
-    pagination.pageSize   // page size
+    pagination.pageIndex,
+    pagination.pageSize
   );
 
   return (
@@ -340,14 +342,21 @@ export default function RolesDataTable() {
       <div>
         <PageBreadcrumb pageTitle="Roles Management" />
         <div className="space-y-6">
+          {/* Error Display */}
+          {error && (
+            <div className="p-4 mb-4 text-red-700 bg-red-100 border border-red-300 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+              {error}
+            </div>
+          )}
+
           <ComponentCard
             title="Roles Management"
             desc="Manage user roles in the system"
             showAddButton={hasPermission("role.create")}
-            buttonLabel="Add New"
+            buttonLabel="Add New Role"
             openModal={handleAddNew}
             showRefreshButton={true}
-            onRefresh={loadRoles}
+            onRefresh={handleRefresh}
             isLoading={loading}
           >
             <DataTable
@@ -355,7 +364,6 @@ export default function RolesDataTable() {
               data={roles}
               searchKey="name"
               onSearchChange={handleSearch}
-              // Server-side pagination props
               pagination={pagination}
               onPaginationChange={setPagination}
               total={total}
@@ -388,6 +396,18 @@ export default function RolesDataTable() {
                     required
                   />
                 </div>
+                
+                <div>
+                  <Label>Guard Name</Label>
+                  <select
+                    name="guard_name"
+                    defaultValue={selectedRole?.guard_name || 'web'}
+                    className="w-full px-3 py-2 text-sm border rounded-md border-stroke bg-white dark:border-strokedark dark:bg-boxdark dark:text-white"
+                  >
+                    <option value="web">Web</option>
+                    <option value="api">API</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex items-center justify-end w-full gap-3 mt-6">
@@ -408,7 +428,14 @@ export default function RolesDataTable() {
                   size="sm"
                   disabled={saving}
                 >
-                  {saving ? 'Saving...' : (isEditMode ? 'Update Role' : 'Create Role')}
+                  {saving ? (
+                    <div className="flex items-center gap-2">
+                      <Spinner size="sm" />
+                      Saving...
+                    </div>
+                  ) : (
+                    isEditMode ? 'Update Role' : 'Create Role'
+                  )}
                 </Button>
               </div>
             </form>

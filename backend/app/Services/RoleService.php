@@ -18,8 +18,7 @@ class RoleService
             ->when($filters['created_at'] ?? null, fn($q, $createdAt) => $q->whereDate('created_at', date('Y-m-d', strtotime($createdAt))))
             ->when($filters['search'] ?? null, fn($q, $term) => $q->where(function ($sub) use ($term) {
                 $sub->where('name', 'like', "%{$term}%")
-                    ->orWhere('guard_name', 'like', "%{$term}%")
-                    ->orWhereHas('createdBy', fn($user) => $user->where('name', 'like', "%{$term}%"));
+                    ->orWhere('guard_name', 'like', "%{$term}%");
             })
             );
         $query->orderBy('id', 'desc');
