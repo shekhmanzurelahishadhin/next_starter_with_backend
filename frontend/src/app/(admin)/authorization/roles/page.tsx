@@ -206,7 +206,7 @@ const createColumns = (
   },
 ];
 
-export default function RolesDataTable() {
+export default function Roles() {
   const { isOpen, openModal, closeModal } = useModal();
   const { hasPermission } = useAuth();
 
@@ -355,9 +355,6 @@ export default function RolesDataTable() {
             showAddButton={hasPermission("role.create")}
             buttonLabel="Add New Role"
             openModal={handleAddNew}
-            showRefreshButton={true}
-            onRefresh={handleRefresh}
-            isLoading={loading}
           >
             <DataTable
               columns={columns}
@@ -396,18 +393,6 @@ export default function RolesDataTable() {
                     required
                   />
                 </div>
-                
-                <div>
-                  <Label>Guard Name</Label>
-                  <select
-                    name="guard_name"
-                    defaultValue={selectedRole?.guard_name || 'web'}
-                    className="w-full px-3 py-2 text-sm border rounded-md border-stroke bg-white dark:border-strokedark dark:bg-boxdark dark:text-white"
-                  >
-                    <option value="web">Web</option>
-                    <option value="api">API</option>
-                  </select>
-                </div>
               </div>
 
               <div className="flex items-center justify-end w-full gap-3 mt-6">
@@ -428,14 +413,8 @@ export default function RolesDataTable() {
                   size="sm"
                   disabled={saving}
                 >
-                  {saving ? (
-                    <div className="flex items-center gap-2">
-                      <Spinner size="sm" />
-                      Saving...
-                    </div>
-                  ) : (
-                    isEditMode ? 'Update Role' : 'Create Role'
-                  )}
+                {saving ? 'Saving...' : (isEditMode ? 'Update Role' : 'Create Role')}
+
                 </Button>
               </div>
             </form>

@@ -233,8 +233,6 @@ export function DataTable<TData, TValue>({
       </div>
       <DataTablePagination 
         table={table} 
-        total={total}
-        loading={loading}
       />
     </div>
   );
