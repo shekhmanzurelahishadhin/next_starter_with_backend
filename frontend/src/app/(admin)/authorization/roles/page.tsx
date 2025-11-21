@@ -13,8 +13,8 @@ import AccessRoute from "@/routes/AccessRoute";
 import { FiEye, FiEdit, FiTrash, FiRefreshCw, FiShield } from "@/icons/index";
 import ActionButtons from "@/components/ui/button/ActionButton";
 import { useAuth } from "@/context/AuthContext";
-import { useState, useEffect } from "react";
-import { roleService, Role } from "@/services/roleService";
+import { useState, useEffect, useCallback } from "react";
+import { roleService, Role, RoleFilters, PaginatedResponse } from "@/services/roleService";
 import Spinner from "@/components/ui/spinner/Spinner";
 
 // Extend ColumnMeta to include custom export properties
@@ -163,7 +163,7 @@ const createColumns = (
     enableSorting: false,
     meta: {
       filterVariant: "none",
-      exportable: false, // ❌ This column will NOT be exported
+      exportable: false, // This column will NOT be exported
     },
     cell: ({ row }) => {
       const role = row.original;
@@ -202,6 +202,7 @@ const createColumns = (
     },
   },
 ];
+
 export default function RolesDataTable() {
   const { isOpen, openModal, closeModal } = useModal();
   const { hasPermission } = useAuth();
@@ -213,25 +214,42 @@ export default function RolesDataTable() {
   const [saving, setSaving] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [total, setTotal] = useState(0);
+  const [search, setSearch] = useState('');
 
-  // Fetch data on component mount
-  useEffect(() => {
-    loadRoles();
-  }, []);
-
-  const loadRoles = async () => {
+  // Fetch data with pagination and filters
+  const loadRoles = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await roleService.getRoles();
-      setRoles(data);
+      
+      const filters: RoleFilters = {
+        page: pagination.pageIndex + 1,
+        per_page: pagination.pageSize,
+        ...(search && { search }),
+      };
+
+      const response: PaginatedResponse<Role> = await roleService.getRoles(filters);
+      setRoles(response.data);
+      setTotal(response.total);
     } catch (err) {
       setError('Failed to load roles');
       console.error('Error loading roles:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.pageIndex, pagination.pageSize, search]);
+
+  // Load roles when pagination or search changes
+  useEffect(() => {
+    loadRoles();
+  }, [loadRoles]);
 
   const handleEdit = (role: Role) => {
     setSelectedRole(role);
@@ -243,8 +261,8 @@ export default function RolesDataTable() {
     if (window.confirm('Are you sure you want to delete this role?')) {
       try {
         await roleService.deleteRole(id);
-        // Remove from local state
-        setRoles(prev => prev.filter(role => role.id !== id));
+        // Reload data to reflect changes
+        await loadRoles();
       } catch (err) {
         console.error('Error deleting role:', err);
         alert('Failed to delete role');
@@ -264,7 +282,6 @@ export default function RolesDataTable() {
     const formData = new FormData(e.currentTarget);
     const roleData = {
       name: formData.get('name') as string,
-      // guard_name: formData.get('guard_name') as string,
     };
 
     try {
@@ -272,18 +289,16 @@ export default function RolesDataTable() {
 
       if (isEditMode && selectedRole) {
         // Update existing role
-        const updatedRole = await roleService.updateRole(selectedRole.id, roleData);
-        setRoles(prev => prev.map(role =>
-          role.id === selectedRole.id ? updatedRole : role
-        ));
+        await roleService.updateRole(selectedRole.id, roleData);
       } else {
         // Create new role
-        const newRole = await roleService.createRole(roleData);
-        setRoles(prev => [newRole, ...prev]);
+        await roleService.createRole(roleData);
       }
 
       closeModal();
       resetForm();
+      // Reload data to reflect changes
+      await loadRoles();
     } catch (err) {
       console.error('Error saving role:', err);
       alert(`Failed to ${isEditMode ? 'update' : 'create'} role`);
@@ -297,26 +312,15 @@ export default function RolesDataTable() {
     setIsEditMode(false);
   };
 
+  // Handle search
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    // Reset to first page when searching
+    setPagination(prev => ({ ...prev, pageIndex: 0 }));
+  };
+
   // Create columns with the required functions
   const columns = createColumns(hasPermission, handleEdit, handleDelete);
-
-  if (loading) {
-    return (
-      <Spinner mode="content" />
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <div className="text-lg text-red-600">{error}</div>
-        <Button onClick={loadRoles} className="mt-4">
-          <FiRefreshCw className="mr-2" />
-          Retry
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <AccessRoute requiredPermissions={["role.view"]}>
@@ -327,16 +331,22 @@ export default function RolesDataTable() {
             title="Roles Management"
             desc="Manage user roles in the system"
             showAddButton={hasPermission("role.create")}
-            buttonLabel="Add New Role"
+            buttonLabel="Add New"
             openModal={handleAddNew}
-          // showRefreshButton={true}
-          // onRefresh={loadRoles}
-          // isLoading={loading}
+            showRefreshButton={true}
+            onRefresh={loadRoles}
+            isLoading={loading}
           >
             <DataTable
               columns={columns}
               data={roles}
               searchKey="name"
+              onSearchChange={handleSearch}
+              // Server-side pagination props
+              pagination={pagination}
+              onPaginationChange={setPagination}
+              total={total}
+              loading={loading}
             />
           </ComponentCard>
 

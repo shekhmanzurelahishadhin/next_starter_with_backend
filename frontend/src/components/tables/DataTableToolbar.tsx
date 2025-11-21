@@ -12,14 +12,16 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   searchKey?: string;
   fileName?: string;
+  onSearchChange?: (value: string) => void; // Add this
 }
 
 export function DataTableToolbar<TData>({
   table,
   searchKey,
   fileName = "data",
+  onSearchChange, // Add this
 }: DataTableToolbarProps<TData>) {
-
+  
   // Helper: Get visible headers and row data
  // Helper: Get visible headers and row data for export
 const getVisibleData = () => {
@@ -126,9 +128,7 @@ const getVisibleData = () => {
           <Input
             placeholder="Search..."
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-            onChange={(e) =>
-              table.getColumn(searchKey)?.setFilterValue(e.target.value)
-            }
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="h-10 w-[250px] lg:w-[300px] border-stroke bg-white dark:border-strokedark dark:bg-boxdark"
           />
         )}

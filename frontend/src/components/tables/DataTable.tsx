@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar } from "./DataTableToolbar";
+import Spinner from "../ui/spinner/Spinner";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -34,12 +35,26 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey?: string;
+  // Server-side pagination props
+  pagination?: {
+    pageIndex: number;
+    pageSize: number;
+  };
+  onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
+  total?: number;
+  loading?: boolean;
+  onSearchChange?: (value: string) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
+  pagination,
+  onPaginationChange,
+  total,
+  loading = false,
+  onSearchChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -55,16 +70,26 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
+    // Server-side pagination
+    manualPagination: !!pagination,
+    pageCount: pagination && total ? Math.ceil(total / pagination.pageSize) : undefined,
+    onPaginationChange: onPaginationChange as any,
     state: {
       sorting,
       columnFilters,
       rowSelection,
+      pagination: pagination || { pageIndex: 0, pageSize: 10 },
     },
   });
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} searchKey={searchKey} fileName="data-table" />
+      <DataTableToolbar 
+        table={table} 
+        searchKey={searchKey} 
+        fileName="roles"
+        onSearchChange={onSearchChange}
+      />
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="max-w-full overflow-x-auto">
           <div className="min-w-[1102px]">
@@ -82,7 +107,6 @@ export function DataTable<TData, TValue>({
                         key={header.id}
                         isHeader
                         className={`px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 ${
-                          // Check if header content has "text-center" class
                           String(header.column.columnDef.header).includes('text-center') ? 'text-center' : 'text-start'
                           }`}
                       >
@@ -198,7 +222,7 @@ export function DataTable<TData, TValue>({
                       colSpan={columns.length}
                       className="h-24 text-center text-gray-500 dark:text-gray-400"
                     >
-                      No results found.
+                      No roles found.
                     </TableCell>
                   </TableRow>
                 )}
@@ -207,12 +231,16 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination 
+        table={table} 
+        total={total}
+        loading={loading}
+      />
     </div>
   );
 }
 
-// Filter Component (same as above)
+// Filter Component 
 function Filter({ column }: { column: Column<any, unknown> }) {
   const columnFilterValue = column.getFilterValue();
   const { filterVariant } = column.columnDef.meta ?? {};
