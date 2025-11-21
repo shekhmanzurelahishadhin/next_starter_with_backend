@@ -353,7 +353,7 @@ export default function Roles() {
             title="Roles Management"
             desc="Manage user roles in the system"
             showAddButton={hasPermission("role.create")}
-            buttonLabel="Add New Role"
+            buttonLabel="Add New"
             openModal={handleAddNew}
           >
             <DataTable
@@ -413,7 +413,7 @@ export default function Roles() {
                   size="sm"
                   disabled={saving}
                 >
-                {saving ? 'Saving...' : (isEditMode ? 'Update Role' : 'Create Role')}
+                {saving ? 'Saving...' : (isEditMode ? 'Update' : 'Create')}
 
                 </Button>
               </div>
