@@ -28,10 +28,14 @@ declare module '@tanstack/react-table' {
 }
 
 // Create columns inside the component to access hooks
+// Create columns inside the component to access hooks
 const createColumns = (
   hasPermission: (permission: string) => boolean,
   handleEdit: (role: Role) => void,
-  handleDelete: (id: number) => void
+  handleDelete: (id: number) => void,
+  // Add pagination parameters
+  pageIndex: number,
+  pageSize: number
 ): ColumnDef<Role>[] => [
   {
     id: "sl",
@@ -39,14 +43,17 @@ const createColumns = (
     enableSorting: false,
     meta: {
       filterVariant: "none",
-      exportable: true, // This column will be exported
+      exportable: true,
       exportHeader: "SL",
-      exportValue: (row, index) => (index ?? 0) + 1
+      // Update exportValue to calculate correct serial number
+      exportValue: (row, index) => (pageIndex * pageSize) + (index ?? 0) + 1
     },
     cell: ({ row }) => {
+      // Calculate serial number based on current page and row index
+      const serialNumber = (pageIndex * pageSize) + row.index + 1;
       return (
         <span className="text-gray-600 dark:text-gray-400">
-          {row.index + 1}
+          {serialNumber}
         </span>
       );
     },
@@ -320,7 +327,13 @@ export default function RolesDataTable() {
   };
 
   // Create columns with the required functions
-  const columns = createColumns(hasPermission, handleEdit, handleDelete);
+   const columns = createColumns(
+    hasPermission, 
+    handleEdit, 
+    handleDelete,
+    pagination.pageIndex, // current page index
+    pagination.pageSize   // page size
+  );
 
   return (
     <AccessRoute requiredPermissions={["role.view"]}>
