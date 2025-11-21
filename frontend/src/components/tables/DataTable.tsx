@@ -200,7 +200,19 @@ export function DataTable<TData, TValue>({
 
               {/* Table Body */}
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                {table.getRowModel().rows?.length ? (
+                {loading ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center text-gray-500 dark:text-gray-400"
+                    >
+                      <div className="flex items-center justify-center">
+                        Loading...
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : 
+                table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => (
