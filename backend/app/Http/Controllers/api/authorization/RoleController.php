@@ -24,7 +24,7 @@ class RoleController extends Controller
     public function index(Request $request, RoleService $roleService)
     {
         $perPage = $request->get('per_page'); // can be null
-        $filters = $request->only('search');
+        $filters = $request->only('search','name','guard_name');
 
         $roles = $roleService->getRoles($filters, $perPage);
 
