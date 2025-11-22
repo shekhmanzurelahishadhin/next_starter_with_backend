@@ -8,6 +8,7 @@ interface SkeletonLoaderProps {
 }
 
 export default function SkeletonLoader({ columns, rowCount = 5 }: SkeletonLoaderProps) {
+    console.log(rowCount);
   // Use smaller, more reasonable widths
   const getSkeletonWidth = (index: number) => {
     const widths = ['w-16', 'w-20', 'w-24', 'w-28', 'w-20', 'w-16'];

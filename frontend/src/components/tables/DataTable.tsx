@@ -202,7 +202,7 @@ export function DataTable<TData, TValue>({
               {/* Table Body */}
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {loading ? (
-                  <SkeletonLoader columns={columns} rowCount={5} />
+                  <SkeletonLoader columns={columns} rowCount={(table.getRowModel().rows?.length && table.getRowModel().rows?.length > 0) ? table.getRowModel().rows?.length : 5} />
                 ) : 
                 table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
