@@ -24,6 +24,7 @@ import {
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar } from "./DataTableToolbar";
 import Spinner from "../ui/spinner/Spinner";
+import SkeletonLoader from "../ui/skeleton/SkeletonLoader";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -201,16 +202,7 @@ export function DataTable<TData, TValue>({
               {/* Table Body */}
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {loading ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center text-gray-500 dark:text-gray-400"
-                    >
-                      <div className="flex items-center justify-center">
-                        Loading...
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  <SkeletonLoader columns={columns} rowCount={5} />
                 ) : 
                 table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
