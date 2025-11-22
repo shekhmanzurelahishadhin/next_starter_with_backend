@@ -352,7 +352,7 @@ export default function Roles() {
           <ComponentCard
             title="Roles Management"
             desc="Manage user roles in the system"
-            showAddButton={hasPermission("role.create")}
+            showAddButton={hasPermission("role.create")} // Show add button based on permission
             buttonLabel="Add New"
             openModal={handleAddNew}
           >
