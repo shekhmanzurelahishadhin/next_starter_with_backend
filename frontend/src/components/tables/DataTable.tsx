@@ -45,6 +45,8 @@ interface DataTableProps<TData, TValue> {
   total?: number;
   loading?: boolean;
   onSearchChange?: (value: string) => void;
+  // Server-side filter props
+  onColumnFilterChange?: (columnId: string, value: string) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -56,6 +58,7 @@ export function DataTable<TData, TValue>({
   total,
   loading = false,
   onSearchChange,
+  onColumnFilterChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -188,7 +191,10 @@ export function DataTable<TData, TValue>({
                             className="text-start px-5 py-2"
                           >
                             {showFilter ? (
-                              <Filter column={header.column} />
+                              <Filter 
+                                column={header.column} 
+                                onFilterChange={onColumnFilterChange}
+                              />
                             ) : (
                               <div className="h-7"></div> // Empty space for alignment
                             )}
@@ -242,48 +248,33 @@ export function DataTable<TData, TValue>({
   );
 }
 
-// Filter Component 
-function Filter({ column }: { column: Column<any, unknown> }) {
-  const columnFilterValue = column.getFilterValue();
+// Simple Filter Component for server-side filtering
+function Filter({ 
+  column, 
+  onFilterChange 
+}: { 
+  column: Column<any, unknown>;
+  onFilterChange?: (columnId: string, value: string) => void;
+}) {
+  const [value, setValue] = useState("");
   const { filterVariant } = column.columnDef.meta ?? {};
-  const [value, setValue] = useState(columnFilterValue ?? "");
 
-  // Debounce filter updates
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      column.setFilterValue(value || undefined);
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [value, column]);
-
-  // Get unique values for select filter
-  const getUniqueValues = () => {
-    const uniqueValues = new Set<string>();
-    column.getFacetedRowModel()?.flatRows.forEach((row) => {
-      const value = row.getValue(column.id);
-      if (value != null && value !== "") {
-        uniqueValues.add(String(value));
-      }
-    });
-    return Array.from(uniqueValues).sort();
+  const handleChange = (newValue: string) => {
+    setValue(newValue);
+    if (onFilterChange) {
+      onFilterChange(column.id, newValue);
+    }
   };
 
   if (filterVariant === "select") {
-    const uniqueValues = getUniqueValues();
-
     return (
       <select
-        value={value as string}
-        onChange={(e) => setValue(e.target.value)}
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
         className="w-full max-w-[120px] text-xs h-7 rounded border border-stroke px-2 text-gray-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 dark:border-strokedark dark:bg-boxdark dark:text-gray-300"
       >
         <option className="text-gray-700 dark:bg-gray-900 dark:text-gray-400" value="">All</option>
-        {uniqueValues.map((value) => (
-          <option className="text-gray-700 dark:bg-gray-900 dark:text-gray-400" key={value} value={value}>
-            {value}
-          </option>
-        ))}
+        {/* Options will be populated from server-side data */}
       </select>
     );
   }
@@ -292,8 +283,8 @@ function Filter({ column }: { column: Column<any, unknown> }) {
   return (
     <input
       type="text"
-      value={value as string}
-      onChange={(e) => setValue(e.target.value)}
+      value={value}
+      onChange={(e) => handleChange(e.target.value)}
       placeholder={`Filter...`}
       className="w-full max-w-[120px] text-xs h-7 rounded border border-stroke px-2 text-gray-700 placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 dark:border-strokedark dark:bg-boxdark dark:text-gray-300 dark:placeholder-gray-500"
     />

@@ -217,6 +217,8 @@ export default function Roles() {
   const [saving, setSaving] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [filters, setFilters] = useState<Record<string, string | number>>({});
+
   
   // Pagination state
   const [pagination, setPagination] = useState({
@@ -232,13 +234,14 @@ export default function Roles() {
       setLoading(true);
       setError(null);
       
-      const filters: RoleFilters = {
+      const apiFilters: RoleFilters = {
         page: pagination.pageIndex + 1,
         per_page: pagination.pageSize,
         ...(search && { search }),
+        ...filters,
       };
 
-      const response: PaginatedResponse<Role> = await roleService.getRoles(filters);
+      const response: PaginatedResponse<Role> = await roleService.getRoles(apiFilters);
       setRoles(response.data);
       setTotal(response.total);
     } catch (err) {
@@ -247,7 +250,7 @@ export default function Roles() {
     } finally {
       setLoading(false);
     }
-  }, [pagination.pageIndex, pagination.pageSize, search]);
+  }, [pagination.pageIndex, pagination.pageSize, search, filters]);
 
   // Load roles when pagination or search changes
   useEffect(() => {
@@ -313,6 +316,12 @@ export default function Roles() {
     }
   };
 
+  
+  const handleFilterChange = (name: string, value: string | number) => {
+    setFilters((prev) => ({ ...prev, [name]: value }));
+    setPagination(prev => ({ ...prev, pageIndex: 0 }));
+  };
+
   const resetForm = () => {
     setSelectedRole(null);
     setIsEditMode(false);
@@ -365,6 +374,7 @@ export default function Roles() {
               onSearchChange={handleSearch}
               pagination={pagination}
               onPaginationChange={setPagination}
+              onColumnFilterChange={handleFilterChange}
               total={total}
               loading={loading}
             />

@@ -21,6 +21,10 @@ export interface RoleFilters {
   search?: string;
   page?: number;
   per_page?: number;
+  name?: string;
+  guard_name?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 class RoleService {
@@ -31,6 +35,12 @@ class RoleService {
     if (filters.page) params.append('page', filters.page.toString());
     if (filters.per_page) params.append('per_page', filters.per_page.toString());
 
+     // Specific filter fields
+  if (filters.name) params.append('name', filters.name);
+  if (filters.guard_name) params.append('guard_name', filters.guard_name);
+  if (filters.created_at) params.append('created_at', filters.created_at);
+  if (filters.updated_at) params.append('updated_at', filters.updated_at);
+  
     const response = await api.get(`/roles?${params}`);
     return response.data;
   }
