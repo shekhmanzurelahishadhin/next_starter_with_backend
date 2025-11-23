@@ -15,7 +15,8 @@ class RoleService
         $query
             ->when($filters['name'] ?? null, fn($q, $name) => $q->where('name', 'like', "%{$name}%"))
             ->when($filters['guard_name'] ?? null, fn($q, $guard_name) => $q->where('guard_name', 'like', "%{$guard_name}%"))
-            ->when($filters['created_at'] ?? null, fn($q, $createdAt) => $q->whereDate('created_at', date('Y-m-d', strtotime($createdAt))))
+            ->when($filters['created_at'] ?? null, fn($q, $created_at) => $q->whereDate('created_at', date('Y-m-d', strtotime($created_at))))
+            ->when($filters['updated_at'] ?? null, fn($q, $updated_at) => $q->whereDate('updated_at', date('Y-m-d', strtotime($updated_at))))
             ->when($filters['search'] ?? null, fn($q, $term) => $q->where(function ($sub) use ($term) {
                 $sub->where('name', 'like', "%{$term}%")
                     ->orWhere('guard_name', 'like', "%{$term}%");
