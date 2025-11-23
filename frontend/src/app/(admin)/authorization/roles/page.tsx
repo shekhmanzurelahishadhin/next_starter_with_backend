@@ -294,15 +294,17 @@ export default function Roles() {
       if (isEditMode && selectedRole) {
         // Update existing role
         await roleService.updateRole(selectedRole.id, roleData);
+          // Reload data to reflect changes
+        await loadRoles();
       } else {
         // Create new role
         await roleService.createRole(roleData);
+        // Reset to first page when creating
+        setPagination(prev => ({ ...prev, pageIndex: 0 }));
       }
 
       closeModal();
       resetForm();
-      // Reload data to reflect changes
-      await loadRoles();
     } catch (err: any) {
       console.error('Error saving role:', err);
       alert(`Failed to ${isEditMode ? 'update' : 'create'} role: ${err.message || 'Unknown error'}`);
