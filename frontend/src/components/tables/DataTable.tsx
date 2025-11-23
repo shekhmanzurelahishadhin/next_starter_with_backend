@@ -13,7 +13,7 @@ import {
   Column,
   RowData,
 } from "@tanstack/react-table";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Table,
   TableHeader,
@@ -258,10 +258,26 @@ function Filter({
 }) {
   const [value, setValue] = useState("");
   const { filterVariant } = column.columnDef.meta ?? {};
+  const previousValueRef = useRef("");
+
+  // Debounce effect
+  useEffect(() => {
+    if (!onFilterChange || value === previousValueRef.current) return;
+
+    const timeout = setTimeout(() => {
+      previousValueRef.current = value;
+      onFilterChange(column.id, value);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [value, column.id, onFilterChange]);
 
   const handleChange = (newValue: string) => {
     setValue(newValue);
-    if (onFilterChange) {
+    
+    // Clear filter immediately when empty
+    if (newValue === "" && onFilterChange) {
+      previousValueRef.current = "";
       onFilterChange(column.id, newValue);
     }
   };
@@ -279,7 +295,6 @@ function Filter({
     );
   }
 
-  // Default to text input
   return (
     <input
       type="text"
