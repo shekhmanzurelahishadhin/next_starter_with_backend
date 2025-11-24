@@ -316,7 +316,7 @@ export default function Roles() {
     }
   };
 
-  
+// Handle column filter changes  
   const handleFilterChange = (name: string, value: string | number) => {
     setFilters((prev) => ({ ...prev, [name]: value }));
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
