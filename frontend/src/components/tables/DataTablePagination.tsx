@@ -5,13 +5,20 @@ import Button from "../ui/button/Button";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+  total?: number; // Add total prop
 }
 
 export function DataTablePagination<TData>({
   table,
+  total, // Receive total from parent
 }: DataTablePaginationProps<TData>) {
   const currentPage = table.getState().pagination.pageIndex;
+  const pageSize = table.getState().pagination.pageSize;
   const pageCount = table.getPageCount();
+  
+  // Calculate showing range
+  const startItem = (currentPage * pageSize) + 1;
+  const endItem = Math.min((currentPage + 1) * pageSize, total || 0);
   
   // Generate page numbers to display
   const getPageNumbers = () => {
@@ -45,10 +52,17 @@ export function DataTablePagination<TData>({
 
   return (
     <div className="flex flex-col items-center justify-between gap-3 px-2 sm:flex-row sm:gap-0">
-      {/* Left side: selected rows info */}
+      {/* Left side: showing info */}
       <div className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
+        {total ? (
+          <>
+            Showing {startItem} to {endItem} of {total} entries
+          </>
+        ) : (
+          <>
+            Showing {startItem} to {endItem} entries
+          </>
+        )}
       </div>
 
       {/* Right side: pagination controls */}

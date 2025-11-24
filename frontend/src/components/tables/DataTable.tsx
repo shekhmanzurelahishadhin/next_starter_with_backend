@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar } from "./DataTableToolbar";
-import Spinner from "../ui/spinner/Spinner";
 import SkeletonLoader from "../ui/skeleton/SkeletonLoader";
 import { Filter } from "./Filter";
 
@@ -245,6 +244,7 @@ export function DataTable<TData, TValue>({
       </div>
       <DataTablePagination 
         table={table} 
+        total={total}
       />
     </div>
   );
