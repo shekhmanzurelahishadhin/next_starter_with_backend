@@ -35,181 +35,189 @@ const createColumns = (
   pageIndex: number,
   pageSize: number
 ): ColumnDef<Role>[] => [
-  {
-    id: "sl",
-    header: "SL",
-    enableSorting: false,
-    meta: {
-      filterVariant: "none",
-      exportable: true,
-      exportHeader: "SL",
-      exportValue: (row, index) => (pageIndex * pageSize) + (index ?? 0) + 1
-    },
-    cell: ({ row }) => {
-      const serialNumber = (pageIndex * pageSize) + row.index + 1;
-      return (
-        <span className="text-gray-600 dark:text-gray-400">
-          {serialNumber}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: "name",
-    header: "Role Name",
-    enableSorting: true,
-    meta: {
-      filterVariant: "text",
-      exportable: true,
-      exportHeader: "Role Name",
-      exportValue: (row) => row.name
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-2">
-          <FiShield className="w-4 h-4 text-blue-500" />
-          <span className="font-medium text-gray-800 dark:text-white/90">
-            {row.getValue("name")}
+    {
+      id: "sl",
+      header: "SL",
+      enableSorting: false,
+      meta: {
+        filterVariant: "none",
+        exportable: true,
+        exportHeader: "SL",
+        exportValue: (row, index) => (pageIndex * pageSize) + (index ?? 0) + 1
+      },
+      cell: ({ row }) => {
+        const serialNumber = (pageIndex * pageSize) + row.index + 1;
+        return (
+          <span className="text-gray-600 dark:text-gray-400">
+            {serialNumber}
           </span>
-        </div>
-      );
+        );
+      },
     },
-  },
-  {
-    accessorKey: "guard_name",
-    header: "Guard Name",
-    enableSorting: true,
-    meta: {
-      filterVariant: "select",
-      filterOptions: [
-      { value: "web", label: "Web" },
-      { value: "api", label: "API" },
-      { value: "sanctum", label: "Sanctum" },
-    ],
-      exportable: true,
-      exportHeader: "Guard Name",
-      exportValue: (row) => row.guard_name
+    {
+      accessorKey: "name",
+      header: "Role Name",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        exportable: true,
+        exportHeader: "Role Name",
+        exportValue: (row) => row.name
+      },
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center gap-2">
+            <FiShield className="w-4 h-4 text-blue-500" />
+            <span className="font-medium text-gray-800 dark:text-white/90">
+              {row.getValue("name")}
+            </span>
+          </div>
+        );
+      },
     },
-    cell: ({ row }) => {
-      const guardName = row.getValue("guard_name") as string;
-      return (
-        <Badge
-          size="sm"
-          color={
-            guardName === "web"
-              ? "primary"
-              : guardName === "api"
-                ? "success"
-                : "warning"
-          }
-          variant="light"
-        >
-          {guardName}
-        </Badge>
-      );
+    {
+      accessorKey: "guard_name",
+      header: "Guard Name",
+      enableSorting: true,
+      meta: {
+        filterVariant: "select",
+        filterOptions: [
+          { value: "web", label: "Web" },
+          { value: "api", label: "API" },
+          { value: "sanctum", label: "Sanctum" },
+        ],
+        exportable: true,
+        exportHeader: "Guard Name",
+        exportValue: (row) => row.guard_name
+      },
+      cell: ({ row }) => {
+        const guardName = row.getValue("guard_name") as string;
+        return (
+          <Badge
+            size="sm"
+            color={
+              guardName === "web"
+                ? "primary"
+                : guardName === "api"
+                  ? "success"
+                  : "warning"
+            }
+            variant="light"
+          >
+            {guardName}
+          </Badge>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "created_at",
-    header: "Created At",
-    enableSorting: true,
-    meta: {
-      exportable: true,
-      exportHeader: "Created At",
-      exportValue: (row) => {
-        if (!row.created_at) return '-';
-        const date = new Date(row.created_at);
-        return isNaN(date.getTime()) ? '-' : date.toLocaleDateString();
-      }
-    },
-    cell: ({ row }) => {
-      const createdAt = row.getValue("created_at");
+    {
+      accessorKey: "created_at",
+      header: "Created At",
+      enableSorting: true,
+      cell: ({ row }) => {
+        const value = row.getValue("created_at");
 
-      if (!createdAt) {
-        return <span className="text-gray-400 dark:text-gray-500">-</span>;
-      }
+        if (!value) {
+          return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        }
 
-      const date = new Date(createdAt as string);
-      return (
-        <span className="text-gray-600 dark:text-gray-400">
-          {isNaN(date.getTime()) ? '-' : date.toLocaleDateString()}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: "updated_at",
-    header: "Updated At",
-    enableSorting: true,
-    meta: {
-      exportable: true,
-      exportHeader: "Updated At",
-      exportValue: (row) => {
-        if (!row.updated_at) return '-';
-        const date = new Date(row.updated_at);
-        return isNaN(date.getTime()) ? '-' : date.toLocaleDateString();
-      }
-    },
-    cell: ({ row }) => {
-      const updatedAt = row.getValue("updated_at");
+        const [datePart] = (value as string).split(" ");
+        const [y, m, d] = datePart.split("-");
 
-      if (!updatedAt) {
-        return <span className="text-gray-400 dark:text-gray-500">-</span>;
-      }
+        return (
+          <span className="text-gray-600 dark:text-gray-400">
+            {`${d}-${m}-${y}`}
+          </span>
+        );
+      },
+      meta: {
+        exportable: true,
+        exportHeader: "Created At",
+        exportValue: (row) => {
+          if (!row.created_at) return "-";
+          const [datePart] = row.created_at.split(" ");
+          const [y, m, d] = datePart.split("-");
+          return `${d}-${m}-${y}`;
+        },
+      },
 
-      const date = new Date(updatedAt as string);
-      return (
-        <span className="text-gray-600 dark:text-gray-400">
-          {isNaN(date.getTime()) ? '-' : date.toLocaleDateString()}
-        </span>
-      );
     },
-  },
-  {
-    id: "Actions",
-    header: () => <div className="">Actions</div>,
-    enableSorting: false,
-    meta: {
-      filterVariant: "none",
-      exportable: false,
-    },
-    cell: ({ row }) => {
-      const role = row.original;
+    {
+      accessorKey: "updated_at",
+      header: "Updated At",
+      enableSorting: true,
+      cell: ({ row }) => {
+        const value = row.getValue("updated_at");
 
-      return (
-        <ActionButtons
-          row={role}
-          buttons={[
-            {
-              icon: FiEye,
-              onClick: (row) => console.log('View role:', row),
-              variant: "success",
-              size: "sm",
-              tooltip: "View",
-              show: () => hasPermission("role.view"),
-            },
-            {
-              icon: FiEdit,
-              onClick: (row) => handleEdit(row as Role),
-              variant: "primary",
-              size: "sm",
-              tooltip: "Edit",
-              show: () => hasPermission("role.edit"),
-            },
-            {
-              icon: FiTrash,
-              onClick: (row) => handleDelete((row as Role).id),
-              variant: "danger",
-              size: "sm",
-              tooltip: "Delete",
-              show: () => hasPermission("role.delete"),
-            },
-          ]}
-        />
-      );
+        if (!value) {
+          return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        }
+
+        const [datePart] = (value as string).split(" ");
+        const [y, m, d] = datePart.split("-");
+
+        return (
+          <span className="text-gray-600 dark:text-gray-400">
+            {`${d}-${m}-${y}`}
+          </span>
+        );
+      },
+      meta: {
+        exportable: true,
+        exportHeader: "Updated At",
+        exportValue: (row) => {
+          if (!row.updated_at) return "-";
+          const [datePart] = row.updated_at.split(" ");
+          const [y, m, d] = datePart.split("-");
+          return `${d}-${m}-${y}`;
+        },
+      },
+
     },
-  },
-];
+    {
+      id: "Actions",
+      header: () => <div className="">Actions</div>,
+      enableSorting: false,
+      meta: {
+        filterVariant: "none",
+        exportable: false,
+      },
+      cell: ({ row }) => {
+        const role = row.original;
+
+        return (
+          <ActionButtons
+            row={role}
+            buttons={[
+              {
+                icon: FiEye,
+                onClick: (row) => console.log('View role:', row),
+                variant: "success",
+                size: "sm",
+                tooltip: "View",
+                show: () => hasPermission("role.view"),
+              },
+              {
+                icon: FiEdit,
+                onClick: (row) => handleEdit(row as Role),
+                variant: "primary",
+                size: "sm",
+                tooltip: "Edit",
+                show: () => hasPermission("role.edit"),
+              },
+              {
+                icon: FiTrash,
+                onClick: (row) => handleDelete((row as Role).id),
+                variant: "danger",
+                size: "sm",
+                tooltip: "Delete",
+                show: () => hasPermission("role.delete"),
+              },
+            ]}
+          />
+        );
+      },
+    },
+  ];
 
 export default function Roles() {
   const { isOpen, openModal, closeModal } = useModal();
@@ -224,7 +232,7 @@ export default function Roles() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [filters, setFilters] = useState<Record<string, string | number>>({});
 
-  
+
   // Pagination state
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -238,7 +246,7 @@ export default function Roles() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const apiFilters: RoleFilters = {
         page: pagination.pageIndex + 1,
         per_page: pagination.pageSize,
@@ -302,7 +310,7 @@ export default function Roles() {
       if (isEditMode && selectedRole) {
         // Update existing role
         await roleService.updateRole(selectedRole.id, roleData);
-          // Reload data to reflect changes
+        // Reload data to reflect changes
         await loadRoles();
       } else {
         // Create new role
@@ -321,7 +329,7 @@ export default function Roles() {
     }
   };
 
-// Handle column filter changes  
+  // Handle column filter changes  
   const handleFilterChange = (name: string, value: string | number) => {
     setFilters((prev) => ({ ...prev, [name]: value }));
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
@@ -346,8 +354,8 @@ export default function Roles() {
 
   // Create columns with the required functions
   const columns = createColumns(
-    hasPermission, 
-    handleEdit, 
+    hasPermission,
+    handleEdit,
     handleDelete,
     pagination.pageIndex,
     pagination.pageSize
@@ -430,7 +438,7 @@ export default function Roles() {
                   size="sm"
                   disabled={saving}
                 >
-                {saving ? 'Saving...' : (isEditMode ? 'Update' : 'Create')}
+                  {saving ? 'Saving...' : (isEditMode ? 'Update' : 'Create')}
 
                 </Button>
               </div>
