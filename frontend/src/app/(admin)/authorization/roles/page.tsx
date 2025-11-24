@@ -15,12 +15,12 @@ import ActionButtons from "@/components/ui/button/ActionButton";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect, useCallback } from "react";
 import { roleService, Role, RoleFilters, PaginatedResponse } from "@/services/roleService";
-import Spinner from "@/components/ui/spinner/Spinner";
 
 // Extend ColumnMeta to include custom export properties
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
     filterVariant?: 'text' | 'select' | 'none';
+    filterOptions?: { value: string; label: string }[];
     exportable?: boolean;
     exportHeader?: string;
     exportValue?: (row: TData, index?: number) => string | number;
@@ -81,6 +81,11 @@ const createColumns = (
     enableSorting: true,
     meta: {
       filterVariant: "select",
+      filterOptions: [
+      { value: "web", label: "Web" },
+      { value: "api", label: "API" },
+      { value: "sanctum", label: "Sanctum" },
+    ],
       exportable: true,
       exportHeader: "Guard Name",
       exportValue: (row) => row.guard_name

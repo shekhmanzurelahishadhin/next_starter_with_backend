@@ -194,6 +194,7 @@ export function DataTable<TData, TValue>({
                             {showFilter ? (
                               <Filter 
                                 column={header.column} 
+                                options={header.column.columnDef.meta?.filterOptions}
                                 onFilterChange={onColumnFilterChange}
                               />
                             ) : (

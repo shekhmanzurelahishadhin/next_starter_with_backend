@@ -5,12 +5,14 @@ import { Column } from "@tanstack/react-table";
 
 interface FilterProps {
   column: Column<any, unknown>;
+  options?: { value: string; label: string }[];
   onFilterChange?: (columnId: string, value: string) => void;
 }
 
-export function Filter({ column, onFilterChange }: FilterProps) {
+export function Filter({ column, options , onFilterChange }: FilterProps) {
   const [value, setValue] = useState("");
   const { filterVariant } = column.columnDef.meta ?? {};
+  const filterOptions = options || column.columnDef.meta?.filterOptions;
   const previousValueRef = useRef("");
 
   // Debounce effect
@@ -43,7 +45,15 @@ export function Filter({ column, onFilterChange }: FilterProps) {
         className="w-full max-w-[120px] text-xs h-7 rounded border border-stroke px-2 text-gray-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 dark:border-strokedark dark:bg-boxdark dark:text-gray-300"
       >
         <option className="text-gray-700 dark:bg-gray-900 dark:text-gray-400" value="">All</option>
-        {/* Options will be populated from server-side data */}
+          {filterOptions?.map((option) => (
+        <option 
+          key={option.value} 
+          value={option.value}
+          className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
+        >
+          {option.label}
+        </option>
+      ))}
       </select>
     );
   }
