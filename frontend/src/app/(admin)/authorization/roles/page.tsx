@@ -227,7 +227,6 @@ export default function Roles() {
   // State for data and loading
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -246,7 +245,6 @@ export default function Roles() {
   const loadRoles = useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
 
       const apiFilters: RoleFilters = {
         page: pagination.pageIndex + 1,
@@ -259,7 +257,7 @@ export default function Roles() {
       setRoles(response.data);
       setTotal(response.total);
     } catch (err) {
-      setError('Failed to load roles');
+      toast.error('Failed to load roles');
       console.error('Error loading roles:', err);
     } finally {
       setLoading(false);
@@ -319,19 +317,19 @@ export default function Roles() {
       if (isEditMode && selectedRole) {
         // Update existing role
         await roleService.updateRole(selectedRole.id, roleData);
+        toast.success('Role updated successfully!');
         // Reload data to reflect changes
         await loadRoles();
       } else {
         // Create new role
         await roleService.createRole(roleData);
+        toast.success('Role created successfully!');
         // Reset to first page when creating
         if (pagination.pageIndex == 0) {
           await loadRoles();
-          console.log('Roles reloaded after creating new role');
         }
         else {
           setPagination(prev => ({ ...prev, pageIndex: 0 }));
-          console.log('Pagination reset to first page after creating new role');
         }
       }
 
@@ -377,13 +375,6 @@ export default function Roles() {
       <div>
         <PageBreadcrumb pageTitle="Roles Management" />
         <div className="space-y-6">
-          {/* Error Display */}
-          {error && (
-            <div className="p-4 mb-4 text-red-700 bg-red-100 border border-red-300 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
-              {error}
-            </div>
-          )}
-
           <ComponentCard
             title="Roles Management"
             desc="Manage user roles in the system"
