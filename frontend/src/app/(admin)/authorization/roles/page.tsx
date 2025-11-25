@@ -15,6 +15,8 @@ import ActionButtons from "@/components/ui/button/ActionButton";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect, useCallback } from "react";
 import { roleService, Role, RoleFilters, PaginatedResponse } from "@/services/roleService";
+import { toast } from "react-toastify";
+import { useAlert } from '@/hooks/useAlert';
 
 // Extend ColumnMeta to include custom export properties
 declare module '@tanstack/react-table' {
@@ -220,6 +222,7 @@ const createColumns = (
 export default function Roles() {
   const { isOpen, openModal, closeModal } = useModal();
   const { hasPermission } = useAuth();
+  const { confirm, alert } = useAlert();
 
   // State for data and loading
   const [roles, setRoles] = useState<Role[]>([]);
@@ -275,15 +278,23 @@ export default function Roles() {
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this role?')) {
-      try {
-        await roleService.deleteRole(id);
-        // Reload data to reflect changes
-        await loadRoles();
-      } catch (err) {
-        console.error('Error deleting role:', err);
-        alert('Failed to delete role');
-      }
+    const result = await confirm({
+      title: 'Delete Role?',
+      text: 'Are you sure you want to delete this role? This action cannot be undone.',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await roleService.deleteRole(id);
+      // Success toast
+      toast.success('Role deleted successfully!');
+      await loadRoles();
+    } catch (err) {
+      console.error('Error deleting role:', err);
+
+      // Error toast
+      toast.error('Failed to delete role');
     }
   };
 
@@ -314,14 +325,21 @@ export default function Roles() {
         // Create new role
         await roleService.createRole(roleData);
         // Reset to first page when creating
-        setPagination(prev => ({ ...prev, pageIndex: 0 }));
+        if (pagination.pageIndex == 0) {
+          await loadRoles();
+          console.log('Roles reloaded after creating new role');
+        }
+        else {
+          setPagination(prev => ({ ...prev, pageIndex: 0 }));
+          console.log('Pagination reset to first page after creating new role');
+        }
       }
 
       closeModal();
       resetForm();
     } catch (err: any) {
       console.error('Error saving role:', err);
-      alert(`Failed to ${isEditMode ? 'update' : 'create'} role: ${err.message || 'Unknown error'}`);
+      toast.error(err?.response?.data?.message || 'Failed to save role');
     } finally {
       setSaving(false);
     }
