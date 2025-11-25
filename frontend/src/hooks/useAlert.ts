@@ -10,7 +10,7 @@ interface AlertOptions {
   confirmButtonText?: string;
   cancelButtonText?: string;
   showCancelButton?: boolean;
-  timer?: number;
+  scrollbarPadding?: boolean;
 }
 
 export const useAlert = () => {
@@ -19,6 +19,7 @@ export const useAlert = () => {
     reverseButtons: true,
     confirmButtonText: 'OK',
     cancelButtonText: 'Cancel',
+    scrollbarPadding: false,
   };
 
   // Basic alert
@@ -55,15 +56,34 @@ export const useAlert = () => {
     return alert({ title, text, icon: 'warning' });
   };
 
+  // Info alert
+  const info = (title: string, text?: string) => {
+    return alert({ title, text, icon: 'info' });
+  };
+
   // Loading alert
   const loading = (title: string, text?: string) => {
     return Swal.fire({
       title,
       text,
       allowOutsideClick: false,
+      scrollbarPadding: false, // Also disable for loading
       didOpen: () => {
         Swal.showLoading();
       },
+    });
+  };
+
+  // Toast notification (alternative that doesn't affect body scroll)
+  const toast = (title: string, icon: AlertType = 'success') => {
+    return Swal.fire({
+      title,
+      icon,
+      timerProgressBar: true,
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      scrollbarPadding: false,
     });
   };
 
@@ -78,7 +98,9 @@ export const useAlert = () => {
     success,
     error,
     warning,
+    info,
     loading,
+    toast,
     close,
   };
 };

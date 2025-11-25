@@ -781,3 +781,7 @@ span.flatpickr-weekday,
   font-weight: bold !important;
   margin: 2.33em 0 !important;
 }
+ /* custome style */
+div:where(.swal2-container) {
+  z-index: 99999 !important;
+}
