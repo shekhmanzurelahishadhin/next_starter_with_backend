@@ -43,7 +43,8 @@ const createColumns = (
         filterVariant: "none",
         exportable: true,
         exportHeader: "SL",
-        exportValue: (row, index) => (pageIndex * pageSize) + (index ?? 0) + 1
+        exportValue: (row, index) => (pageIndex * pageSize) + (index ?? 0) + 1,
+        widthClass: "w-[10px]" // CSS width class only
       },
       cell: ({ row }) => {
         const serialNumber = (pageIndex * pageSize) + row.index + 1;
@@ -62,7 +63,8 @@ const createColumns = (
         filterVariant: "text",
         exportable: true,
         exportHeader: "Role Name",
-        exportValue: (row) => row.name
+        exportValue: (row) => row.name,
+        widthClass: "w-[200px]" // CSS width class only
       },
       cell: ({ row }) => {
         return (
@@ -88,7 +90,8 @@ const createColumns = (
         ],
         exportable: true,
         exportHeader: "Guard Name",
-        exportValue: (row) => row.guard_name
+        exportValue: (row) => row.guard_name,
+        widthClass: "w-[150px]" // CSS width class only
       },
       cell: ({ row }) => {
         const guardName = row.getValue("guard_name") as string;
@@ -113,22 +116,6 @@ const createColumns = (
       accessorKey: "created_at",
       header: "Created At",
       enableSorting: true,
-      cell: ({ row }) => {
-        const value = row.getValue("created_at");
-
-        if (!value) {
-          return <span className="text-gray-400 dark:text-gray-500">-</span>;
-        }
-
-        const [datePart] = (value as string).split(" ");
-        const [y, m, d] = datePart.split("-");
-
-        return (
-          <span className="text-gray-600 dark:text-gray-400">
-            {`${d}-${m}-${y}`}
-          </span>
-        );
-      },
       meta: {
         exportable: true,
         exportHeader: "Created At",
@@ -138,29 +125,26 @@ const createColumns = (
           const [y, m, d] = datePart.split("-");
           return `${d}-${m}-${y}`;
         },
+        widthClass: "w-[120px]" // CSS width class only
       },
-
-    },
-    {
-      accessorKey: "updated_at",
-      header: "Updated At",
-      enableSorting: true,
       cell: ({ row }) => {
-        const value = row.getValue("updated_at");
-
+        const value = row.getValue("created_at");
         if (!value) {
           return <span className="text-gray-400 dark:text-gray-500">-</span>;
         }
-
         const [datePart] = (value as string).split(" ");
         const [y, m, d] = datePart.split("-");
-
         return (
           <span className="text-gray-600 dark:text-gray-400">
             {`${d}-${m}-${y}`}
           </span>
         );
       },
+    },
+    {
+      accessorKey: "updated_at",
+      header: "Updated At",
+      enableSorting: true,
       meta: {
         exportable: true,
         exportHeader: "Updated At",
@@ -170,8 +154,21 @@ const createColumns = (
           const [y, m, d] = datePart.split("-");
           return `${d}-${m}-${y}`;
         },
+        widthClass: "w-[120px]" // CSS width class only
       },
-
+      cell: ({ row }) => {
+        const value = row.getValue("updated_at");
+        if (!value) {
+          return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        }
+        const [datePart] = (value as string).split(" ");
+        const [y, m, d] = datePart.split("-");
+        return (
+          <span className="text-gray-600 dark:text-gray-400">
+            {`${d}-${m}-${y}`}
+          </span>
+        );
+      },
     },
     {
       id: "Actions",
@@ -180,10 +177,10 @@ const createColumns = (
       meta: {
         filterVariant: "none",
         exportable: false,
+        widthClass: "w-[150px]" // CSS width class only
       },
       cell: ({ row }) => {
         const role = row.original;
-
         return (
           <ActionButtons
             row={role}

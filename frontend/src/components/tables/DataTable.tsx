@@ -96,7 +96,8 @@ export function DataTable<TData, TValue>({
       />
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="max-w-full overflow-x-auto">
-          <div className="min-w-[1102px]">
+          {/* Remove fixed min-width and let CSS classes handle it */}
+          <div>
             <Table>
               {/* Table Header */}
               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
@@ -105,14 +106,15 @@ export function DataTable<TData, TValue>({
                   {table.getHeaderGroups()[0].headers.map((header) => {
                     const canSort = header.column.getCanSort();
                     const isSorted = header.column.getIsSorted();
+                    const widthClass = header.column.columnDef.meta?.widthClass || '';
 
                     return (
                       <TableCell
                         key={header.id}
                         isHeader
-                        className={`px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 ${
+                        className={`px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 ${widthClass} ${
                           String(header.column.columnDef.header).includes('text-center') ? 'text-center' : 'text-start'
-                          }`}
+                        }`}
                       >
                         <div
                           className={` ${String(header.column.columnDef.header).includes('text-center')
@@ -172,7 +174,7 @@ export function DataTable<TData, TValue>({
                   })}
                 </TableRow>
 
-                {/* Filter Row - Only show if any column has filters */}
+                {/* Filter Row */}
                 {(table.getHeaderGroups()[0].headers.some(header => {
                   const canFilter = header.column.getCanFilter();
                   const { filterVariant } = header.column.columnDef.meta ?? {};
@@ -181,14 +183,14 @@ export function DataTable<TData, TValue>({
                     <TableRow>
                       {table.getHeaderGroups()[0].headers.map((header) => {
                         const canFilter = header.column.getCanFilter();
-                        const { filterVariant } = header.column.columnDef.meta ?? {};
+                        const { filterVariant, widthClass } = header.column.columnDef.meta ?? {};
                         const showFilter = canFilter && filterVariant !== "none";
 
                         return (
                           <TableCell
                             key={header.id}
                             isHeader
-                            className="text-start px-5 py-2"
+                            className={`text-start px-5 py-2 ${widthClass || ''}`}
                           >
                             {showFilter ? (
                               <Filter 
@@ -197,7 +199,7 @@ export function DataTable<TData, TValue>({
                                 onFilterChange={onColumnFilterChange}
                               />
                             ) : (
-                              <div className="h-7"></div> // Empty space for alignment
+                              <div className="h-7"></div>
                             )}
                           </TableCell>
                         );
@@ -209,22 +211,28 @@ export function DataTable<TData, TValue>({
               {/* Table Body */}
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {loading ? (
-                  <SkeletonLoader columns={columns} rowCount={(table.getRowModel().rows?.length && table.getRowModel().rows?.length > 0) ? table.getRowModel().rows?.length : 5} />
+                  <SkeletonLoader 
+                    columns={columns} 
+                    rowCount={(table.getRowModel().rows?.length && table.getRowModel().rows?.length > 0) ? table.getRowModel().rows?.length : 5} 
+                  />
                 ) : 
                 table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          className="px-5 py-4 text-start text-theme-sm text-gray-500 dark:text-gray-400"
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
+                      {row.getVisibleCells().map((cell) => {
+                        const widthClass = cell.column.columnDef.meta?.widthClass || '';
+                        return (
+                          <TableCell
+                            key={cell.id}
+                            className={`px-5 py-4 text-start text-theme-sm text-gray-500 dark:text-gray-400 ${widthClass}`}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
                   ))
                 ) : (
