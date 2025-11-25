@@ -10,7 +10,7 @@ import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
 import AccessRoute from "@/routes/AccessRoute";
-import { FiEye, FiEdit, FiTrash, FiRefreshCw, FiShield } from "@/icons/index";
+import { FiEye, FiEdit, FiTrash, FiShield } from "@/icons/index";
 import ActionButtons from "@/components/ui/button/ActionButton";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect, useCallback } from "react";
@@ -24,6 +24,7 @@ declare module '@tanstack/react-table' {
     exportable?: boolean;
     exportHeader?: string;
     exportValue?: (row: TData, index?: number) => string | number;
+    widthClass?: string;
   }
 }
 
@@ -44,7 +45,7 @@ const createColumns = (
         exportable: true,
         exportHeader: "SL",
         exportValue: (row, index) => (pageIndex * pageSize) + (index ?? 0) + 1,
-        widthClass: "w-[10px]" // CSS width class only
+        widthClass: "w-[30px]" // CSS width class only
       },
       cell: ({ row }) => {
         const serialNumber = (pageIndex * pageSize) + row.index + 1;
@@ -343,11 +344,6 @@ export default function Roles() {
     // Reset to first page when searching
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, []);
-
-  // Handle refresh
-  const handleRefresh = () => {
-    loadRoles();
-  };
 
   // Create columns with the required functions
   const columns = createColumns(
