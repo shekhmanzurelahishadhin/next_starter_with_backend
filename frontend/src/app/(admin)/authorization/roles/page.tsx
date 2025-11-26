@@ -471,7 +471,6 @@ export default function Roles() {
           >
             <div>
               <h4 className="flex items-center gap-2 mb-6 text-lg font-medium text-gray-800 dark:text-white/90">
-                <FiEye className="w-5 h-5 text-green-500" />
                 Role Details
               </h4>
 

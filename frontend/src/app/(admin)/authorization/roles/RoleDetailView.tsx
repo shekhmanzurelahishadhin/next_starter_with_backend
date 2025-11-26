@@ -1,8 +1,15 @@
 // Role Detail Component for View Modal
-import { FiShield, FiCalendar, FiUser, FiClock } from "@/icons/index";
 import Badge from "@/components/ui/badge/Badge";
-const  RoleDetailView = ({ role }: { role: Role }) => {
-    
+
+interface Role {
+  id: number | string;
+  name: string;
+  guard_name: string;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+const RoleDetailView = ({ role }: { role: Role }) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "-";
     const [datePart, timePart] = dateString.split(" ");
@@ -12,89 +19,92 @@ const  RoleDetailView = ({ role }: { role: Role }) => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Role Basic Information */}
-      <div className="p-4 border rounded-lg border-gray-200 dark:border-gray-700">
-        <h3 className="flex items-center gap-2 mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-          <FiShield className="w-5 h-5 text-blue-500" />
-          Role Information
-        </h3>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-600">
-            <span className="font-medium text-gray-600 dark:text-gray-400">Role Name</span>
-            <span className="font-semibold text-gray-800 dark:text-white/90">{role.name}</span>
-          </div>
-          
-          <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-600">
-            <span className="font-medium text-gray-600 dark:text-gray-400">Guard Name</span>
-            <Badge
-              size="sm"
-              color={
-                role.guard_name === "web"
-                  ? "primary"
-                  : role.guard_name === "api"
-                    ? "success"
-                    : "warning"
-              }
-              variant="light"
-            >
-              {role.guard_name}
-            </Badge>
-          </div>
-          
-          <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-600">
-            <span className="font-medium text-gray-600 dark:text-gray-400">Role ID</span>
-            <span className="font-mono text-sm text-gray-600 dark:text-gray-400">#{role.id}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Timestamps */}
-      <div className="p-4 border rounded-lg border-gray-200 dark:border-gray-700">
-        <h3 className="flex items-center gap-2 mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-          <FiCalendar className="w-5 h-5 text-green-500" />
-          Timestamps
-        </h3>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-600">
-            <span className="flex items-center gap-2 font-medium text-gray-600 dark:text-gray-400">
-              <FiCalendar className="w-4 h-4" />
-              Created At
-            </span>
-            <span className="text-gray-800 dark:text-white/90">{formatDate(role.created_at)}</span>
-          </div>
-          
-          <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-600">
-            <span className="flex items-center gap-2 font-medium text-gray-600 dark:text-gray-400">
-              <FiClock className="w-4 h-4" />
-              Updated At
-            </span>
-            <span className="text-gray-800 dark:text-white/90">{formatDate(role.updated_at)}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Status Information */}
-      <div className="p-4 border rounded-lg border-gray-200 dark:border-gray-700">
-        <h3 className="flex items-center gap-2 mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-          <FiUser className="w-5 h-5 text-purple-500" />
-          Status
-        </h3>
-        
-        <div className="flex items-center justify-between py-2">
-          <span className="font-medium text-gray-600 dark:text-gray-400">Active Status</span>
-          <Badge
-            size="sm"
-            color="success"
-            variant="light"
-          >
-            Active
-          </Badge>
-        </div>
+    <div className="space-y-4">
+      <div className="overflow-hidden border rounded-lg border-gray-200 dark:border-gray-700">
+        <table className="w-full">
+          <tbody>
+            {/* Role Name */}
+            <tr className="border-b border-gray-100 dark:border-gray-600">
+              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400 w-1/3">
+                Role Name
+              </td>
+              <td className="px-4 py-3 font-semibold text-gray-800 dark:text-white/90">
+                {role.name}
+              </td>
+            </tr>
+            
+            {/* Guard Name */}
+            <tr className="border-b border-gray-100 dark:border-gray-600">
+              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Guard Name
+              </td>
+              <td className="px-4 py-3">
+                <Badge
+                  size="sm"
+                  color={
+                    role.guard_name === "web"
+                      ? "primary"
+                      : role.guard_name === "api"
+                        ? "success"
+                        : "warning"
+                  }
+                  variant="light"
+                >
+                  {role.guard_name}
+                </Badge>
+              </td>
+            </tr>
+            
+            {/* Role ID */}
+            <tr className="border-b border-gray-100 dark:border-gray-600">
+              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Role ID
+              </td>
+              <td className="px-4 py-3 font-mono text-sm text-gray-600 dark:text-gray-400">
+                #{role.id}
+              </td>
+            </tr>
+            
+            {/* Created At */}
+            <tr className="border-b border-gray-100 dark:border-gray-600">
+              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Created At
+              </td>
+              <td className="px-4 py-3 text-gray-800 dark:text-white/90">
+                {formatDate(role.created_at)}
+              </td>
+            </tr>
+            
+            {/* Updated At */}
+            <tr className="border-b border-gray-100 dark:border-gray-600">
+              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Updated At
+              </td>
+              <td className="px-4 py-3 text-gray-800 dark:text-white/90">
+                {formatDate(role.updated_at)}
+              </td>
+            </tr>
+            
+            {/* Status */}
+            <tr>
+              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Status
+              </td>
+              <td className="px-4 py-3">
+                <Badge
+                  size="sm"
+                  color="success"
+                  variant="light"
+                >
+                  Active
+                </Badge>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
+
 export default RoleDetailView;
