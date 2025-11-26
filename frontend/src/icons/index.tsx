@@ -87,7 +87,8 @@ import {
   FiInfo,
   FiPlus,
   FiShield,
-  FiRefreshCw
+  FiRefreshCw,
+  FiClock
 } from 'react-icons/fi';
 
 import {
@@ -198,6 +199,7 @@ export {
   FiPlus,
   FiShield,
   FiRefreshCw,
+  FiClock,
   
   // React Icons - Font Awesome
   FaRegCircle,
