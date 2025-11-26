@@ -249,7 +249,8 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       </div>
-      <DataTablePagination
+      {/* pagination  */}
+      <DataTablePagination 
         table={table}
         total={total}
       />
