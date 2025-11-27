@@ -17,7 +17,7 @@ import { useState, useEffect, useCallback } from "react";
 import { roleService, Role, RoleFilters, PaginatedResponse } from "@/services/roleService";
 import { toast } from "react-toastify";
 import { useAlert } from '@/hooks/useAlert';
-import RoleDetailView from "./RoleDetailView";
+import RoleDetailView from "./components/RoleDetailView";
 
 // Extend ColumnMeta to include custom export properties
 declare module '@tanstack/react-table' {
