@@ -25,7 +25,7 @@ const RoleDetailView = ({ role }: { role: Role }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 py-4">
       <div className="overflow-hidden border rounded-lg border-gray-200 dark:border-gray-700">
 
         <Table>
