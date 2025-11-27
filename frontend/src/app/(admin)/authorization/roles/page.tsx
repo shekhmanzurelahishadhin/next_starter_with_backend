@@ -406,6 +406,7 @@ export default function Roles() {
               onColumnFilterChange={handleFilterChange}
               total={total}
               loading={loading}
+              exportFilename="roles"
             />
           </ComponentCard>
 

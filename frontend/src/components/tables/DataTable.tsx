@@ -47,6 +47,7 @@ interface DataTableProps<TData, TValue> {
   onSearchChange?: (value: string) => void;
   // Server-side filter props
   onColumnFilterChange?: (columnId: string, value: string) => void;
+  exportFilename?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -59,6 +60,7 @@ export function DataTable<TData, TValue>({
   loading = false,
   onSearchChange,
   onColumnFilterChange,
+  exportFilename = "data",
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -91,7 +93,7 @@ export function DataTable<TData, TValue>({
       <DataTableToolbar
         table={table}
         searchKey={searchKey}
-        fileName="roles"
+        fileName={exportFilename}
         onSearchChange={onSearchChange}
       />
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
