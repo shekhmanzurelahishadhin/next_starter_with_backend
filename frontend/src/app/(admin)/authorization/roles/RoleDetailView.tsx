@@ -55,16 +55,6 @@ const RoleDetailView = ({ role }: { role: Role }) => {
               </td>
             </tr>
             
-            {/* Role ID */}
-            <tr className="border-b border-gray-100 dark:border-gray-600">
-              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Role ID
-              </td>
-              <td className="px-4 py-3 font-mono text-sm text-gray-600 dark:text-gray-400">
-                #{role.id}
-              </td>
-            </tr>
-            
             {/* Created At */}
             <tr className="border-b border-gray-100 dark:border-gray-600">
               <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
@@ -82,22 +72,6 @@ const RoleDetailView = ({ role }: { role: Role }) => {
               </td>
               <td className="px-4 py-3 text-gray-800 dark:text-white/90">
                 {formatDate(role.updated_at)}
-              </td>
-            </tr>
-            
-            {/* Status */}
-            <tr>
-              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Status
-              </td>
-              <td className="px-4 py-3">
-                <Badge
-                  size="sm"
-                  color="success"
-                  variant="light"
-                >
-                  Active
-                </Badge>
               </td>
             </tr>
           </tbody>
