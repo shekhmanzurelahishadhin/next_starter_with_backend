@@ -1,5 +1,11 @@
-// Role Detail Component for View Modal
 import Badge from "@/components/ui/badge/Badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface Role {
   id: number | string;
@@ -21,61 +27,67 @@ const RoleDetailView = ({ role }: { role: Role }) => {
   return (
     <div className="space-y-4">
       <div className="overflow-hidden border rounded-lg border-gray-200 dark:border-gray-700">
-        <table className="w-full">
-          <tbody>
+
+        <Table>
+          {/* Body */}
+          <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+
             {/* Role Name */}
-            <tr className="border-b border-gray-100 dark:border-gray-600">
-              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400 w-1/3">
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Role Name
-              </td>
-              <td className="px-4 py-3 font-semibold text-gray-800 dark:text-white/90">
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
                 {role.name}
-              </td>
-            </tr>
-            
+              </TableCell>
+            </TableRow>
+
             {/* Guard Name */}
-            <tr className="border-b border-gray-100 dark:border-gray-600">
-              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Guard Name
-              </td>
-              <td className="px-4 py-3">
+              </TableCell>
+              <TableCell className="px-5 py-4">
                 <Badge
                   size="sm"
                   color={
                     role.guard_name === "web"
                       ? "primary"
                       : role.guard_name === "api"
-                        ? "success"
-                        : "warning"
+                      ? "success"
+                      : "warning"
                   }
                   variant="light"
                 >
                   {role.guard_name}
                 </Badge>
-              </td>
-            </tr>
-            
+              </TableCell>
+            </TableRow>
+
             {/* Created At */}
-            <tr className="border-b border-gray-100 dark:border-gray-600">
-              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Created At
-              </td>
-              <td className="px-4 py-3 text-gray-800 dark:text-white/90">
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
                 {formatDate(role.created_at)}
-              </td>
-            </tr>
-            
+              </TableCell>
+            </TableRow>
+
             {/* Updated At */}
-            <tr className="border-b border-gray-100 dark:border-gray-600">
-              <td className="px-4 py-3 font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Updated At
-              </td>
-              <td className="px-4 py-3 text-gray-800 dark:text-white/90">
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
                 {formatDate(role.updated_at)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </TableCell>
+            </TableRow>
+
+          </TableBody>
+
+        </Table>
+
       </div>
     </div>
   );
