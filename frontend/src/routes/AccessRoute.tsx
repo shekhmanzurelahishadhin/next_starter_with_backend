@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/spinner/Spinner";
+import ComponentCardSkeleton from "@/components/ui/skeleton/ComponentCardSkeleton";
 
 
 interface AccessRouteProps {
@@ -43,7 +44,7 @@ export default function AccessRoute({
   // Show loader while checking access
   if (loading || !accessChecked) {
     return (
-        <Spinner mode="content" />
+        <ComponentCardSkeleton/>
     );
   }
 

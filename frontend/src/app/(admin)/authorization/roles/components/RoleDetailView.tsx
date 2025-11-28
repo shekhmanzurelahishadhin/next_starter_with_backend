@@ -1,21 +1,18 @@
+"use client";
 import Badge from "@/components/ui/badge/Badge";
 import {
   Table,
   TableBody,
   TableCell,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Role } from "@/services/roleService";
 
-interface Role {
-  id: number | string;
-  name: string;
-  guard_name: string;
-  created_at: string | null;
-  updated_at: string | null;
+interface RoleDetailViewProps {
+  role: Role;
 }
 
-const RoleDetailView = ({ role }: { role: Role }) => {
+export function RoleDetailView({ role }: RoleDetailViewProps) {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "-";
     const [datePart, timePart] = dateString.split(" ");
@@ -27,12 +24,8 @@ const RoleDetailView = ({ role }: { role: Role }) => {
   return (
     <div className="space-y-4 py-4">
       <div className="overflow-hidden border rounded-lg border-gray-200 dark:border-gray-700">
-
         <Table>
-          {/* Body */}
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-
-            {/* Role Name */}
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Role Name
@@ -42,7 +35,6 @@ const RoleDetailView = ({ role }: { role: Role }) => {
               </TableCell>
             </TableRow>
 
-            {/* Guard Name */}
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Guard Name
@@ -64,33 +56,26 @@ const RoleDetailView = ({ role }: { role: Role }) => {
               </TableCell>
             </TableRow>
 
-            {/* Created At */}
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Created At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(role.created_at)}
+                {formatDate(role.created_at || null)}
               </TableCell>
             </TableRow>
 
-            {/* Updated At */}
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Updated At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(role.updated_at)}
+                {formatDate(role.updated_at || null)}
               </TableCell>
             </TableRow>
-
           </TableBody>
-
         </Table>
-
       </div>
     </div>
   );
-};
-
-export default RoleDetailView;
+}

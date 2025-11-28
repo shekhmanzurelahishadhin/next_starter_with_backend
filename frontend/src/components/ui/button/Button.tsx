@@ -9,8 +9,9 @@ interface ButtonProps {
   endIcon?: ReactNode; // Icon after the text
   onClick?: () => void; // Click handler
   disabled?: boolean; // Disabled state
-  className?: string; // Disabled state
+  className?: string; // Custom classes
   tooltip?: string; // Tooltip text
+  form?: string; // ID of the form this button submits (native HTML support)
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -24,6 +25,7 @@ const Button: React.FC<ButtonProps> = ({
   className = "",
   disabled = false,
   tooltip,
+  form,
 }) => {
   // Size Classes
   const sizeClasses = {
@@ -42,13 +44,14 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button title={tooltip}
       className={`inline-flex items-center justify-center font-medium gap-2 rounded-lg transition ${className} ${
-        sizeClasses[size] // Apply size classes
+        sizeClasses[size]
       } ${variantClasses[variant]} ${
         disabled ? "cursor-not-allowed opacity-50" : ""
-      }`} // Apply variant classes
+      }`}
       onClick={onClick}
       disabled={disabled}
       type={type}
+      form={form} 
     >
       {startIcon && <span className="flex items-center">{startIcon}</span>}
       {children}
