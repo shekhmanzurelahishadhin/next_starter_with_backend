@@ -22,6 +22,7 @@ export const useRoles = () => {
   
   // Filter and pagination state
   const [filters, setFilters] = useState<Record<string, string | number>>({});
+  const debouncedFilters = useDebounce(filters, 300);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
@@ -40,7 +41,7 @@ export const useRoles = () => {
         page: pagination.pageIndex + 1,
         per_page: pagination.pageSize,
         ...(debouncedSearch && { search: debouncedSearch }),
-        ...filters,
+        ...debouncedFilters,
       };
 
       const response: PaginatedResponse<Role> = await roleService.getRoles(apiFilters);
@@ -52,7 +53,8 @@ export const useRoles = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, filters]);
+    console.log(filters);
+  }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, debouncedFilters]);
 
   useEffect(() => {
     loadRoles();
@@ -163,6 +165,15 @@ export const useRoles = () => {
   const resetToFirstPage = useCallback(() => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, []);
+
+  useEffect(() => {
+  console.log('=== ROLE HOOK STATE UPDATE ===');
+  console.log('searchInput:', searchInput);
+  console.log('debouncedSearch:', debouncedSearch);
+  console.log('filters:', filters);
+  console.log('pagination:', pagination);
+  console.log('==============================');
+});
 
   return {
     // State
