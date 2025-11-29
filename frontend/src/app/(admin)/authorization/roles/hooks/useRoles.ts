@@ -166,15 +166,6 @@ export const useRoles = () => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, []);
 
-  useEffect(() => {
-  console.log('=== ROLE HOOK STATE UPDATE ===');
-  console.log('searchInput:', searchInput);
-  console.log('debouncedSearch:', debouncedSearch);
-  console.log('filters:', filters);
-  console.log('pagination:', pagination);
-  console.log('==============================');
-});
-
   return {
     // State
     roles,
