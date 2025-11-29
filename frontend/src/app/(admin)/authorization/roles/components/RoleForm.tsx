@@ -43,7 +43,8 @@ export function RoleForm({ role, mode, saving, onSubmit }: RoleFormProps) {
     <form id="role-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-5">
         <div>
-          <Label htmlFor="name">Role Name *</Label>
+          <Label htmlFor="name" required>Role Name</Label>
+          
           <Input
             id="name"
             type="text"
@@ -58,10 +59,6 @@ export function RoleForm({ role, mode, saving, onSubmit }: RoleFormProps) {
                 value: 50,
                 message: "Role name must not exceed 50 characters"
               },
-              pattern: {
-                value: /^[a-zA-Z0-9_-]+$/,
-                message: "Role name can only contain letters, numbers, hyphens and underscores"
-              }
             })}
             error={errors.name?.message} // error message
             disabled={saving}
