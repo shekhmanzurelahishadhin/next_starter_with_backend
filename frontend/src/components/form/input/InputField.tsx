@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import { UseFormRegisterReturn } from "react-hook-form";
 
 interface InputProps {
   type?: "text" | "number" | "email" | "password" | "date" | "time" | string;
@@ -14,9 +15,11 @@ interface InputProps {
   step?: number;
   disabled?: boolean;
   success?: boolean;
-  error?: boolean;
-  hint?: string; // Optional hint text
-  required?: boolean; // Add this line
+  error?: string | boolean; // Changed to accept string for error messages
+  hint?: string;
+  required?: boolean;
+  // Add React Hook Form registration props
+  register?: UseFormRegisterReturn;
 }
 
 const Input: FC<InputProps> = ({
@@ -35,18 +38,22 @@ const Input: FC<InputProps> = ({
   success = false,
   error = false,
   hint,
-  required = false, // Add this with default value
+  required = false,
+  register, // Add register prop
 }) => {
   // Determine input styles based on state (disabled, success, error)
   let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
 
+  // Check if we have an error (either boolean or string message)
+  const hasError = Boolean(error);
+  
   // Add styles for the different states
   if (disabled) {
     inputClasses += ` text-gray-500 border-gray-300 cursor-not-allowed dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700`;
-  } else if (error) {
-    inputClasses += ` text-error-800 border-error-500 focus:ring-3 focus:ring-error-500/10  dark:text-error-400 dark:border-error-500`;
+  } else if (hasError) {
+    inputClasses += ` text-error-800 border-error-500 focus:ring-3 focus:ring-error-500/10 dark:text-error-400 dark:border-error-500`;
   } else if (success) {
-    inputClasses += ` text-success-500 border-success-400 focus:ring-success-500/10 focus:border-success-300  dark:text-success-400 dark:border-success-500`;
+    inputClasses += ` text-success-500 border-success-400 focus:ring-success-500/10 focus:border-success-300 dark:text-success-400 dark:border-success-500`;
   } else {
     inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800`;
   }
@@ -67,19 +74,22 @@ const Input: FC<InputProps> = ({
         disabled={disabled}
         className={inputClasses}
         required={required}
+        // Spread register props if provided (includes ref, onChange, onBlur, etc.)
+        {...register}
       />
 
-      {/* Optional Hint Text */}
-      {hint && (
-        <p
-          className={`mt-1.5 text-xs ${
-            error
-              ? "text-error-500"
-              : success
-              ? "text-success-500"
-              : "text-gray-500"
-          }`}
-        >
+      {/* Show error message if provided as string */}
+      {typeof error === 'string' && error && (
+        <p className="mt-1.5 text-xs text-error-500">
+          {error}
+        </p>
+      )}
+
+      {/* Show hint text if no error message */}
+      {hint && !error && (
+        <p className={`mt-1.5 text-xs ${
+          success ? "text-success-500" : "text-gray-500"
+        }`}>
           {hint}
         </p>
       )}

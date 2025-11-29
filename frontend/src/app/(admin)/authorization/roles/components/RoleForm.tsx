@@ -1,8 +1,13 @@
 "use client";
-import { useRef } from "react";
+import { useForm } from "react-hook-form";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import { Role } from "@/services/roleService";
+import { useEffect } from "react";
+
+interface RoleFormData {
+  name: string;
+}
 
 interface RoleFormProps {
   role?: Role | null;
@@ -12,32 +17,53 @@ interface RoleFormProps {
 }
 
 export function RoleForm({ role, mode, saving, onSubmit }: RoleFormProps) {
-  const formRef = useRef<HTMLFormElement>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<RoleFormData>({
+    mode: "onChange",
+    defaultValues: {
+      name: role?.name || '',
+    }
+  });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const roleData = {
-      name: formData.get('name') as string,
-    };
-    onSubmit(roleData);
+  useEffect(() => {
+    reset({
+      name: role?.name || '',
+    });
+  }, [role, reset]);
+
+  const onFormSubmit = (data: RoleFormData) => {
+    onSubmit(data);
   };
 
   return (
-    <form 
-      id="role-form"
-      ref={formRef} 
-      onSubmit={handleSubmit}
-    >
+    <form id="role-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-5">
         <div>
-          <Label>Role Name *</Label>
+          <Label htmlFor="name">Role Name *</Label>
           <Input
+            id="name"
             type="text"
-            name="name"
             placeholder="admin, user, manager, etc."
-            defaultValue={role?.name || ''}
-            required
+            register={register("name", {
+              required: "Role name is required",
+              minLength: {
+                value: 2,
+                message: "Role name must be at least 2 characters"
+              },
+              maxLength: {
+                value: 50,
+                message: "Role name must not exceed 50 characters"
+              },
+              pattern: {
+                value: /^[a-zA-Z0-9_-]+$/,
+                message: "Role name can only contain letters, numbers, hyphens and underscores"
+              }
+            })}
+            error={errors.name?.message} // error message
             disabled={saving}
           />
         </div>

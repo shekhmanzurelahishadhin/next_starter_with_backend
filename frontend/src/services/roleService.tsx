@@ -86,14 +86,14 @@ class RoleService {
     return result;
   }
 
-  async createRole(roleData: { name: string; guard_name?: string }): Promise<Role> {
+  async createRole(roleData: { name: string }): Promise<Role> {
     // Clear cache on create
     cache.clear();
     const response = await api.post('/roles', roleData);
     return response.data.data;
   }
 
-  async updateRole(id: number, roleData: { name: string; guard_name?: string }): Promise<Role> {
+  async updateRole(id: number, roleData: { name: string }): Promise<Role> {
     // Clear cache on update
     cache.clear();
     const response = await api.put(`/roles/${id}`, roleData);

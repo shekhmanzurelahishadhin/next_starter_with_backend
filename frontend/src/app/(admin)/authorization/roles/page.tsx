@@ -105,7 +105,7 @@ export default function RolesPage() {
     openModal();
   }, [openModal]);
 
-  const handleSave = async (roleData: { name: string; guard_name?: string }) => {
+  const handleSave = async (roleData: { name: string }) => {
     try {
       setSaving(true);
 

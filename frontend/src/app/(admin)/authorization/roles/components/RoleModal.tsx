@@ -11,7 +11,7 @@ interface RoleModalProps {
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
-  onSave: (roleData: { name: string; guard_name?: string }) => void;
+  onSave: (roleData: { name: string}) => void;
 }
 
 export function RoleModal({
