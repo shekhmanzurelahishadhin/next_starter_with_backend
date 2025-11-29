@@ -24,6 +24,7 @@ export default function RolesPage() {
   const [saving, setSaving] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>('create');
+  const [backendErrors, setBackendErrors] = useState<Record<string, string>>({}); // Add backend errors state
   
   // Filter and pagination state
   const [filters, setFilters] = useState<Record<string, string | number>>({});
@@ -67,12 +68,14 @@ export default function RolesPage() {
   const handleView = useCallback((role: Role) => {
     setSelectedRole(role);
     setMode('view');
+    setBackendErrors({}); // Clear backend errors when viewing
     openModal();
   }, [openModal]);
 
   const handleEdit = useCallback((role: Role) => {
     setSelectedRole(role);
     setMode('edit');
+    setBackendErrors({}); // Clear backend errors when editing
     openModal();
   }, [openModal]);
 
@@ -102,12 +105,14 @@ export default function RolesPage() {
   const handleAddNew = useCallback(() => {
     setSelectedRole(null);
     setMode('create');
+    setBackendErrors({}); // Clear backend errors when creating new
     openModal();
   }, [openModal]);
 
   const handleSave = async (roleData: { name: string }) => {
     try {
       setSaving(true);
+      setBackendErrors({}); // Clear previous backend errors
 
       if (mode === 'edit' && selectedRole) {
         await roleService.updateRole(selectedRole.id, roleData);
@@ -122,7 +127,23 @@ export default function RolesPage() {
       resetForm();
       await loadRoles();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to save role');
+      // Handle backend validation errors
+      if (err?.response?.data?.errors) {
+        // Transform backend errors to match our format
+        const errors: Record<string, string> = {};
+        Object.entries(err.response.data.errors).forEach(([field, messages]) => {
+          errors[field] = Array.isArray(messages) ? messages[0] : messages;
+        });
+        setBackendErrors(errors);
+        
+        // Show general error message
+        // if (err.response.data.message) {
+        //   toast.error(err.response.data.message);
+        // }
+      } else {
+        // Handle other errors
+        toast.error(err?.response?.data?.message || 'Failed to save role');
+      }
     } finally {
       setSaving(false);
     }
@@ -141,6 +162,7 @@ export default function RolesPage() {
   const resetForm = useCallback(() => {
     setSelectedRole(null);
     setMode('create');
+    setBackendErrors({}); // Clear backend errors when resetting
   }, []);
 
   const handleModalClose = useCallback(() => {
@@ -191,6 +213,7 @@ export default function RolesPage() {
             saving={saving}
             onClose={handleModalClose}
             onSave={handleSave}
+            backendErrors={backendErrors} // Pass backend errors to modal
           />
         </div>
       </div>

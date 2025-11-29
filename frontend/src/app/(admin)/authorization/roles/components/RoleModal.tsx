@@ -11,7 +11,8 @@ interface RoleModalProps {
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
-  onSave: (roleData: { name: string}) => void;
+  onSave: (roleData: { name: string }) => void;
+  backendErrors?: Record<string, string>; // Add this prop
 }
 
 export function RoleModal({
@@ -21,6 +22,7 @@ export function RoleModal({
   saving,
   onClose,
   onSave,
+  backendErrors, // Add this prop
 }: RoleModalProps) {
   const getTitle = () => {
     switch (mode) {
@@ -46,7 +48,6 @@ export function RoleModal({
           {getTitle()}
         </h4>
 
-        {/* Content based on mode */}
         {mode === 'view' && role && (
           <RoleDetailView role={role} />
         )}
@@ -57,10 +58,10 @@ export function RoleModal({
             mode={mode}
             saving={saving}
             onSubmit={onSave}
+            backendErrors={backendErrors} // backend errors to form
           />
         )}
 
-        {/* Footer buttons */}
         <div className="flex items-center justify-end w-full gap-3 mt-6">
           {mode === 'view' ? (
             <Button

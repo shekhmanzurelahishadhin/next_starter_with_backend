@@ -13,21 +13,40 @@ interface RoleFormProps {
   role?: Role | null;
   mode: 'create' | 'edit';
   saving: boolean;
-  onSubmit: (roleData: { name: string; guard_name?: string }) => void;
+  onSubmit: (roleData: { name: string }) => void;
+  backendErrors?: Record<string, string>; // Add backend errors prop
 }
 
-export function RoleForm({ role, mode, saving, onSubmit }: RoleFormProps) {
+export function RoleForm({ role, mode, saving, onSubmit, backendErrors }: RoleFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setError, // Add setError from react-hook-form
+    clearErrors, // Add clearErrors
   } = useForm<RoleFormData>({
     mode: "onChange",
     defaultValues: {
       name: role?.name || '',
     }
   });
+
+  // Handle backend errors
+  useEffect(() => {
+    if (backendErrors) {
+      // Clear existing errors first
+      clearErrors();
+      
+      // Set backend errors on the form
+      Object.entries(backendErrors).forEach(([field, message]) => {
+        setError(field as keyof RoleFormData, {
+          type: 'server',
+          message: Array.isArray(message) ? message[0] : message
+        });
+      });
+    }
+  }, [backendErrors, setError, clearErrors]);
 
   useEffect(() => {
     reset({
@@ -44,7 +63,6 @@ export function RoleForm({ role, mode, saving, onSubmit }: RoleFormProps) {
       <div className="space-y-5">
         <div>
           <Label htmlFor="name" required>Role Name</Label>
-          
           <Input
             id="name"
             type="text"
@@ -60,7 +78,7 @@ export function RoleForm({ role, mode, saving, onSubmit }: RoleFormProps) {
                 message: "Role name must not exceed 50 characters"
               },
             })}
-            error={errors.name?.message} // error message
+            error={errors.name?.message}
             disabled={saving}
           />
         </div>
