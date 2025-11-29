@@ -1,174 +1,38 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { useModal } from "@/hooks/useModal";
 import { useAuth } from "@/context/AuthContext";
-import { toast } from "react-toastify";
-import { useAlert } from '@/hooks/useAlert';
+import { useRoles } from "./hooks/useRoles";
 import AccessRoute from "@/routes/AccessRoute";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import { DataTable } from "@/components/tables/DataTable";
 import { RoleModal } from "./components/RoleModal";
 import { useRoleColumns } from "./components/RoleColumns";
-import { roleService, Role, RoleFilters, PaginatedResponse } from "@/services/roleService";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useEffect } from "react";
 
 export default function RolesPage() {
-  const { isOpen, openModal, closeModal } = useModal();
   const { hasPermission } = useAuth();
-  const { confirm } = useAlert();
 
-  // State management
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-  const [mode, setMode] = useState<'view' | 'edit' | 'create'>('create');
-  const [backendErrors, setBackendErrors] = useState<Record<string, string>>({}); // Add backend errors state
-  
-  // Filter and pagination state
-  const [filters, setFilters] = useState<Record<string, string | number>>({});
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [total, setTotal] = useState(0);
-  
-  // Debounced search
-  const [searchInput, setSearchInput] = useState('');
-  const debouncedSearch = useDebounce(searchInput, 300);
-
-  // Load roles
-  const loadRoles = useCallback(async () => {
-    try {
-      setLoading(true);
-      const apiFilters: RoleFilters = {
-        page: pagination.pageIndex + 1,
-        per_page: pagination.pageSize,
-        ...(debouncedSearch && { search: debouncedSearch }),
-        ...filters,
-      };
-
-      const response: PaginatedResponse<Role> = await roleService.getRoles(apiFilters);
-      setRoles(response.data);
-      setTotal(response.total);
-    } catch (err) {
-      toast.error('Failed to load roles');
-      console.error('Error loading roles:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, filters]);
-
-  useEffect(() => {
-    loadRoles();
-  }, [loadRoles]);
-
-  // Role actions
-  const handleView = useCallback((role: Role) => {
-    setSelectedRole(role);
-    setMode('view');
-    setBackendErrors({}); // Clear backend errors when viewing
-    openModal();
-  }, [openModal]);
-
-  const handleEdit = useCallback((role: Role) => {
-    setSelectedRole(role);
-    setMode('edit');
-    setBackendErrors({}); // Clear backend errors when editing
-    openModal();
-  }, [openModal]);
-
-  const handleDelete = useCallback(async (id: number) => {
-    const result = await confirm({
-      title: 'Delete Role?',
-      text: 'Are you sure you want to delete this role? This action cannot be undone.',
-    });
-
-    if (!result.isConfirmed) return;
-    let previousRoles: Role[] = [];
-    try {
-      // Optimistic update
-      const previousRoles = [...roles];
-      setRoles(prev => prev.filter(role => role.id !== id));
-      
-      await roleService.deleteRole(id);
-      toast.success('Role deleted successfully!');
-      await loadRoles();
-    } catch (err) {
-      // Revert on error
-      setRoles(previousRoles);
-      toast.error('Failed to delete role');
-    }
-  }, [confirm, roles, loadRoles]);
-
-  const handleAddNew = useCallback(() => {
-    setSelectedRole(null);
-    setMode('create');
-    setBackendErrors({}); // Clear backend errors when creating new
-    openModal();
-  }, [openModal]);
-
-  const handleSave = async (roleData: { name: string }) => {
-    try {
-      setSaving(true);
-      setBackendErrors({}); // Clear previous backend errors
-
-      if (mode === 'edit' && selectedRole) {
-        await roleService.updateRole(selectedRole.id, roleData);
-        toast.success('Role updated successfully!');
-      } else {
-        await roleService.createRole(roleData);
-        toast.success('Role created successfully!');
-        setPagination(prev => ({ ...prev, pageIndex: 0 }));
-      }
-
-      closeModal();
-      resetForm();
-      await loadRoles();
-    } catch (err: any) {
-      // Handle backend validation errors
-      if (err?.response?.data?.errors) {
-        // Transform backend errors to match our format
-        const errors: Record<string, string> = {};
-        Object.entries(err.response.data.errors).forEach(([field, messages]) => {
-          errors[field] = Array.isArray(messages) ? messages[0] : messages;
-        });
-        setBackendErrors(errors);
-        
-        // Show general error message
-        // if (err.response.data.message) {
-        //   toast.error(err.response.data.message);
-        // }
-      } else {
-        // Handle other errors
-        toast.error(err?.response?.data?.message || 'Failed to save role');
-      }
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // Filter and search handlers
-  const handleFilterChange = useCallback((name: string, value: string | number) => {
-    setFilters((prev) => ({ ...prev, [name]: value }));
-    setPagination(prev => ({ ...prev, pageIndex: 0 }));
-  }, []);
-
-  const handleSearch = useCallback((value: string) => {
-    setSearchInput(value);
-  }, []);
-
-  const resetForm = useCallback(() => {
-    setSelectedRole(null);
-    setMode('create');
-    setBackendErrors({}); // Clear backend errors when resetting
-  }, []);
-
-  const handleModalClose = useCallback(() => {
-    closeModal();
-    resetForm();
-  }, [closeModal, resetForm]);
+  // Single hook for all role operations
+  const {
+    roles,
+    loading,
+    saving,
+    isOpen,
+    selectedRole,
+    mode,
+    backendErrors,
+    pagination,
+    total,
+    setPagination,
+    handleView,
+    handleEdit,
+    handleCreate,
+    handleCloseModal,
+    handleDelete,
+    handleSave,
+    handleFilterChange,
+    handleSearch,
+  } = useRoles();
 
   // Memoized columns
   const columns = useRoleColumns({
@@ -180,6 +44,10 @@ export default function RolesPage() {
     pageSize: pagination.pageSize,
   });
 
+  useEffect(() => {
+    document.title = "Roles Management | Inventory Management System";
+  }, []);
+
   return (
     <AccessRoute requiredPermissions={["role.view", "role.create", "role.update", "role.delete"]}>
       <div>
@@ -190,7 +58,7 @@ export default function RolesPage() {
             desc="Manage user roles in the system"
             showAddButton={hasPermission("role.create")}
             buttonLabel="Add New"
-            openModal={handleAddNew}
+            openModal={handleCreate}
           >
             <DataTable
               columns={columns}
@@ -202,18 +70,18 @@ export default function RolesPage() {
               onColumnFilterChange={handleFilterChange}
               total={total}
               loading={loading}
+              exportFilename="roles"
             />
           </ComponentCard>
 
-          {/* Single Modal for all modes */}
           <RoleModal
             isOpen={isOpen}
             role={selectedRole}
             mode={mode}
             saving={saving}
-            onClose={handleModalClose}
+            onClose={handleCloseModal}
             onSave={handleSave}
-            backendErrors={backendErrors} // Pass backend errors to modal
+            backendErrors={backendErrors}
           />
         </div>
       </div>
