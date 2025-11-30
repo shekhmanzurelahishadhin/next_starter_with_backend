@@ -53,7 +53,6 @@ export const useRoles = () => {
     } finally {
       setLoading(false);
     }
-    console.log(filters);
   }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, debouncedFilters]);
 
   useEffect(() => {
