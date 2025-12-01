@@ -12,6 +12,7 @@ declare module '@tanstack/react-table' {
     filterOptions?: { value: string; label: string }[];
     exportable?: boolean;
     exportHeader?: string;
+    placeholder?: string;
     exportValue?: (row: TData, index?: number) => string | number;
     widthClass?: string;
   }
@@ -61,6 +62,7 @@ export const useRoleColumns = ({
       enableSorting: true,
       meta: {
         filterVariant: "text",
+        placeholder: "Search names",
         exportable: true,
         exportHeader: "Role Name",
         exportValue: (row) => row.name,
@@ -120,6 +122,7 @@ export const useRoleColumns = ({
       meta: {
         exportable: true,
         exportHeader: "Created At",
+        placeholder: "Search created at",
         exportValue: (row) => {
           if (!row.created_at) return "-";
           const [datePart] = row.created_at.split(" ");
@@ -149,6 +152,7 @@ export const useRoleColumns = ({
       meta: {
         exportable: true,
         exportHeader: "Updated At",
+        placeholder: "Search updated at",
         exportValue: (row) => {
           if (!row.updated_at) return "-";
           const [datePart] = row.updated_at.split(" ");

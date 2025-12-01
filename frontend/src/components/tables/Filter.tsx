@@ -15,6 +15,23 @@ export function Filter({ column, options, onFilterChange }: FilterProps) {
   const filterOptions = options || column.columnDef.meta?.filterOptions;
   const previousValueRef = useRef("");
 
+    // Get column header text for placeholder
+  const getColumnHeaderText = () => {
+    const header = column.columnDef.header;
+    if (typeof header === "string") {
+      return header;
+    }
+    if (typeof header === "function") {
+      // Try to extract text from header function result
+      return "Filter";
+    }
+    return "Filter";
+  };
+
+  // Get placeholder from meta or use header text
+  const placeholder = column.columnDef.meta?.placeholder || `Search ${getColumnHeaderText()}`;
+
+
   // Debounce effect
   useEffect(() => {
     if (!onFilterChange || value === previousValueRef.current) return;
@@ -63,7 +80,7 @@ export function Filter({ column, options, onFilterChange }: FilterProps) {
       type="text"
       value={value}
       onChange={(e) => handleChange(e.target.value)}
-      // placeholder={`Filter...`}
+      // placeholder={placeholder}
       className="w-full max-w-[120px] text-xs h-7 rounded border border-gray-300 dark:border-gray-700 focus:border-brand-300 dark:focus:border-brand-800 border-stroke px-2 text-gray-700 placeholder-gray-400 focus:outline-none dark:border-strokedark dark:bg-boxdark dark:text-gray-300 dark:placeholder-gray-500"
     />
   );
