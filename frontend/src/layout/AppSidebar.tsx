@@ -73,7 +73,7 @@ const navItems: NavItem[] = [
     name: "User Roles",
     subItems: [
       { name: "Roles", path: "/authorization/roles" },
-      { name: "Permissions", path: "/ecommerce/sales" },
+      { name: "Permissions", path: "/authorization/permissions" },
       { name: "Users", path: "/ecommerce/products" },
     ],
   },

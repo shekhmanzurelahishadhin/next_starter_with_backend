@@ -9,7 +9,7 @@ interface FilterProps {
   onFilterChange?: (columnId: string, value: string) => void;
 }
 
-export function Filter({ column, options , onFilterChange }: FilterProps) {
+export function Filter({ column, options, onFilterChange }: FilterProps) {
   const [value, setValue] = useState("");
   const { filterVariant } = column.columnDef.meta ?? {};
   const filterOptions = options || column.columnDef.meta?.filterOptions;
@@ -29,7 +29,7 @@ export function Filter({ column, options , onFilterChange }: FilterProps) {
 
   const handleChange = (newValue: string) => {
     setValue(newValue);
-    
+
     // Clear filter immediately when empty
     if (newValue === "" && onFilterChange) {
       previousValueRef.current = "";
@@ -42,18 +42,18 @@ export function Filter({ column, options , onFilterChange }: FilterProps) {
       <select
         value={value}
         onChange={(e) => handleChange(e.target.value)}
-        className="w-full max-w-[120px] text-xs h-7 rounded border border-stroke px-2 text-gray-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 dark:border-strokedark dark:bg-boxdark dark:text-gray-300"
+        className="w-full max-w-[120px] text-xs h-7 rounded border border-gray-300 dark:border-gray-700  focus:border-brand-300 dark:focus:border-brand-800 border-stroke px-2 text-gray-700 focus:border-primary focus:outline-none dark:border-strokedark dark:bg-boxdark dark:text-gray-300"
       >
         <option className="text-gray-700 dark:bg-gray-900 dark:text-gray-400" value="">All</option>
-          {filterOptions?.map((option) => (
-        <option 
-          key={option.value} 
-          value={option.value}
-          className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
-        >
-          {option.label}
-        </option>
-      ))}
+        {filterOptions?.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+            className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
+          >
+            {option.label}
+          </option>
+        ))}
       </select>
     );
   }
@@ -63,8 +63,8 @@ export function Filter({ column, options , onFilterChange }: FilterProps) {
       type="text"
       value={value}
       onChange={(e) => handleChange(e.target.value)}
-      placeholder={`Filter...`}
-      className="w-full max-w-[120px] text-xs h-7 rounded border border-stroke px-2 text-gray-700 placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 dark:border-strokedark dark:bg-boxdark dark:text-gray-300 dark:placeholder-gray-500"
+      // placeholder={`Filter...`}
+      className="w-full max-w-[120px] text-xs h-7 rounded border border-gray-300 dark:border-gray-700 focus:border-brand-300 dark:focus:border-brand-800 border-stroke px-2 text-gray-700 placeholder-gray-400 focus:outline-none dark:border-strokedark dark:bg-boxdark dark:text-gray-300 dark:placeholder-gray-500"
     />
   );
 }
