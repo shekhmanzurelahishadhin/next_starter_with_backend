@@ -328,20 +328,21 @@ const AppSidebar: React.FC = () => {
 
     const pathMatch = findPathInFilteredItems(pathname);
     
+    // Open the relevant menus based on the current path
     if (pathMatch) {
       setOpenSubmenu({
         type: pathMatch.type,
         index: pathMatch.parentIndex,
-      });
+      }); // Open the main submenu
 
       if (pathMatch.subIndex !== undefined) {
         setOpenSubSubmenu({
           type: pathMatch.type,
           parentIndex: pathMatch.parentIndex,
           subIndex: pathMatch.subIndex,
-        });
+        }); // Open the sub-submenu
       } else {
-        setOpenSubSubmenu(null);
+        setOpenSubSubmenu(null); // Close sub-submenu if not applicable
       }
     } else {
       setOpenSubmenu(null);
