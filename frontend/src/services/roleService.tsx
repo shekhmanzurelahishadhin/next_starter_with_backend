@@ -54,12 +54,12 @@ class RoleService {
 
   async getRoles(filters: RoleFilters = {}): Promise<PaginatedResponse<Role>> {
     // Don't cache searches
-    if (!filters.search) {
-      const cacheKey = this.getCacheKey(filters);
-      const cached = this.getCache(cacheKey);
-      console.log('RoleService.getRoles - cacheKey:', cacheKey, 'cached:', cached);
-      if (cached) return cached;
-    }
+    // if (!filters.search) {
+    //   const cacheKey = this.getCacheKey(filters);
+    //   const cached = this.getCache(cacheKey);
+    //   console.log('RoleService.getRoles - cacheKey:', cacheKey, 'cached:', cached);
+    //   if (cached) return cached;
+    // }
 
     const params = new URLSearchParams();
     
@@ -78,31 +78,31 @@ class RoleService {
     const result = response.data;
 
     // Cache non-search results
-    if (!filters.search) {
-      const cacheKey = this.getCacheKey(filters);
-      this.setCache(cacheKey, result);
-    }
+    // if (!filters.search) {
+    //   const cacheKey = this.getCacheKey(filters);
+    //   this.setCache(cacheKey, result);
+    // }
 
     return result;
   }
 
   async createRole(roleData: { name: string }): Promise<Role> {
     // Clear cache on create
-    cache.clear();
+    // cache.clear();
     const response = await api.post('/roles', roleData);
     return response.data.data;
   }
 
   async updateRole(id: number, roleData: { name: string }): Promise<Role> {
     // Clear cache on update
-    cache.clear();
+    // cache.clear();
     const response = await api.put(`/roles/${id}`, roleData);
     return response.data.data;
   }
 
   async deleteRole(id: number): Promise<void> {
     // Clear cache on delete
-    cache.clear();
+    // cache.clear();
     await api.delete(`/roles/${id}`);
   }
 
