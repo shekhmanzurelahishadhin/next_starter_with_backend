@@ -350,6 +350,7 @@ const AppSidebar: React.FC = () => {
     }
   }, [pathname, loading, findPathInFilteredItems]);
 
+  // Handlers for submenu toggles
   const handleSubmenuToggle = (index: number, menuType: "main" | "others") => {
     setOpenSubmenu((prevOpenSubmenu) => {
       if (
@@ -364,6 +365,7 @@ const AppSidebar: React.FC = () => {
     setOpenSubSubmenu(null);
   };
 
+  // Handler for sub-submenu toggles
   const handleSubSubmenuToggle = (
     parentIndex: number,
     subIndex: number,
@@ -382,6 +384,7 @@ const AppSidebar: React.FC = () => {
     });
   };
 
+  // Render menu items
   const renderMenuItems = (
     navItems: NavItem[],
     menuType: "main" | "others"
