@@ -48,6 +48,8 @@ interface DataTableProps<TData, TValue> {
   // Server-side filter props
   onColumnFilterChange?: (columnId: string, value: string) => void;
   exportFilename?: string;
+  exportAllData?: () => Promise<TData[]>;
+  showExportAllOption?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -61,11 +63,13 @@ export function DataTable<TData, TValue>({
   onSearchChange,
   onColumnFilterChange,
   exportFilename = "data",
+  exportAllData,
+  showExportAllOption = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
-
+  console.log(showExportAllOption, 'showExportAllOption in DataTable');
   const table = useReactTable({
     data,
     columns,
@@ -95,6 +99,9 @@ export function DataTable<TData, TValue>({
         searchKey={searchKey}
         fileName={exportFilename}
         onSearchChange={onSearchChange}
+        exportAllData={exportAllData}
+        showExportAllOption={showExportAllOption}
+        loading={loading}
       />
       {/* pagination  */}
       <DataTablePagination 
