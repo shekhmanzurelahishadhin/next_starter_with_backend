@@ -64,12 +64,12 @@ export function DataTable<TData, TValue>({
   onColumnFilterChange,
   exportFilename = "data",
   exportAllData,
-  showExportAllOption = false,
+  showExportAllOption = false, // show export all option
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
-  console.log(showExportAllOption, 'showExportAllOption in DataTable');
+
   const table = useReactTable({
     data,
     columns,

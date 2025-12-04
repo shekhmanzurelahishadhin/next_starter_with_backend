@@ -32,7 +32,6 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const [searchValue, setSearchValue] = useState("");
   const [isExporting, setIsExporting] = useState(false);
-  console.log(showExportAllOption, 'showExportAllOption in DataTableToolbar');
 
   // Debounce search with useCallback
   const debouncedSearch = useCallback(

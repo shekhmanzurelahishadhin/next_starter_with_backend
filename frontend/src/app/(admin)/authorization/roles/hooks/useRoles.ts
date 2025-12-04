@@ -165,6 +165,18 @@ export const useRoles = () => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, []);
 
+    // Function to export all roles
+    const exportAllRoles = async () => {
+      try {
+        // Call API without pagination to get all data
+        const response = await roleService.getRoles({});
+        return response.data;
+      } catch (error) {
+        console.error('Error exporting all roles:', error);
+        throw error;
+      }
+    };
+
   return {
     // State
     roles,
@@ -190,5 +202,6 @@ export const useRoles = () => {
     clearBackendErrors,
     resetToFirstPage,
     loadRoles,
+    exportAllRoles,
   };
 };

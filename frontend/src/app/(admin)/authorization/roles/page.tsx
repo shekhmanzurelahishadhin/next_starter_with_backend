@@ -8,7 +8,6 @@ import { DataTable } from "@/components/tables/DataTable";
 import { RoleModal } from "./components/RoleModal";
 import { useRoleColumns } from "./components/RoleColumns";
 import { useEffect } from "react";
-import { roleService } from "@/services/roleService";
 
 export default function RolesPage() {
   const { hasPermission } = useAuth();
@@ -33,19 +32,9 @@ export default function RolesPage() {
     handleSave,
     handleFilterChange,
     handleSearch,
-    // loadRoles,
+    exportAllRoles,
   } = useRoles();
-  // Function to export all roles
-  const exportAllRoles = async () => {
-    try {
-      // Call API without pagination to get all data
-      const response = await roleService.getRoles({});
-      return response.data;
-    } catch (error) {
-      console.error('Error exporting all roles:', error);
-      throw error;
-    }
-  };
+
   // Memoized columns
   const columns = useRoleColumns({
     hasPermission,
@@ -84,7 +73,7 @@ export default function RolesPage() {
               loading={loading}
               exportFilename="roles"
               exportAllData={exportAllRoles}
-              showExportAllOption={false}
+              showExportAllOption={true}
             />
           </ComponentCard>
 
