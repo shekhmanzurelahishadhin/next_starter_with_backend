@@ -77,13 +77,13 @@ export function DataTableToolbar<TData>({
              (typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id);
     });
 
-    const data = dataToExport.map((row) =>
+    const data = dataToExport.map((row, rowIndex) =>
       visibleColumns.map((col) => {
         const meta = col.columnDef.meta as any;
         
         // Use exportValue function if provided
-        if (meta?.exportValue) {
-          return meta.exportValue(row, -1); // -1 for export all index
+         if (meta?.exportValue) {
+          return meta.exportValue(row, rowIndex);
         }
         
         // Fallback to raw value
@@ -201,7 +201,7 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-      {/* 🔍 Search */}
+      {/* Search */}
       <div className="flex flex-1 items-center space-x-2">
         {searchKey && (
           <Input

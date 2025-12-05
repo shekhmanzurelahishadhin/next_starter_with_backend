@@ -73,7 +73,7 @@ export default function RolesPage() {
               loading={loading}
               exportFilename="roles"
               exportAllData={exportAllRoles}
-              showExportAllOption={true}
+              showExportAllOption={false}
             />
           </ComponentCard>
 
