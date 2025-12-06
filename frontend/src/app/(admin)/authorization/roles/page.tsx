@@ -9,7 +9,7 @@ import { RoleModal } from "./components/RoleModal";
 import { useRoleColumns } from "./components/RoleColumns";
 import { useEffect } from "react";
 
-export default function RolesPage() {
+export default function Roles() {
   const { hasPermission } = useAuth();
 
   // Single hook for all role operations
