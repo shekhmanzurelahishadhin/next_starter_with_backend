@@ -72,8 +72,8 @@ export default function RolesPage() {
               total={total}
               loading={loading}
               exportFilename="roles"
-              exportAllData={exportAllRoles}
-              showExportAllOption={false}
+              exportAllData={exportAllRoles} // Provide exportAllRoles function
+              showExportAllOption={false} // Disable "Export All" option
             />
           </ComponentCard>
 
