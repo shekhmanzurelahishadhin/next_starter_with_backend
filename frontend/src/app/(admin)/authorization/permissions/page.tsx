@@ -1,6 +1,6 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
-import { useRoles } from "./hooks/useRoles";
+import { usePermissions } from "./hooks/usePermissions";
 import AccessRoute from "@/routes/AccessRoute";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
@@ -33,7 +33,7 @@ export default function Roles() {
     handleFilterChange,
     handleSearch,
     exportAllRoles,
-  } = useRoles();
+  } = usePermissions();
 
   // Memoized columns
   const columns = useRoleColumns({
@@ -76,7 +76,7 @@ export default function Roles() {
               onColumnFilterChange={handleFilterChange}
               total={total}
               loading={loading}
-              exportFilename="roles"
+              exportFilename="permission"
               exportAllData={exportAllRoles} // Provide exportAllRoles function
               showExportAllOption={false} // Disable "Export All" option
             />

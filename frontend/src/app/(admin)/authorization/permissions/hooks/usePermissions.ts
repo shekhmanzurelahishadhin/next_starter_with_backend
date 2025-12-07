@@ -6,7 +6,7 @@ import { useAlert } from '@/hooks/useAlert';
 import { useModal } from '@/hooks/useModal';
 import { useDebounce } from '@/hooks/useDebounce';
 
-export const useRoles = () => {
+export const usePermissions = () => {
   const { confirm } = useAlert();
   const { isOpen, openModal, closeModal } = useModal();
   
