@@ -52,7 +52,12 @@ export default function Roles() {
   return (
     <AccessRoute requiredPermissions={["permission.view", "permission.create", "permission.update", "permission.delete"]}>
       <div>
-        <PageBreadcrumb pageTitle="Permission Management" />
+         <PageBreadcrumb
+          items={[
+            { title: "User Role" }, // add href if needed links like href: "/admin/authorization/roles"
+            { title: "Permission Management" }
+          ]}
+        />
         <div className="space-y-6">
           <ComponentCard
             title="Permission Management"
