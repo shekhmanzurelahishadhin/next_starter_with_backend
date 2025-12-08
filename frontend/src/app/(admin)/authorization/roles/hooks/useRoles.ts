@@ -25,7 +25,7 @@ export const useRoles = () => {
   const debouncedFilters = useDebounce(filters, 300);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 50,
   });
   const [total, setTotal] = useState(0);
   
