@@ -10,10 +10,9 @@ import {
   SortingState,
   ColumnFiltersState,
   getFilteredRowModel,
-  Column,
   RowData,
 } from "@tanstack/react-table";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -29,6 +28,8 @@ import { Filter } from "./Filter";
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
     filterVariant?: "text" | "select" | "none";
+    widthClass?: string;
+    filterOptions?: any[];
   }
 }
 
@@ -36,17 +37,19 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey?: string;
-  // Server-side pagination props
+
   pagination?: {
     pageIndex: number;
     pageSize: number;
   };
   onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
+
   total?: number;
   loading?: boolean;
   onSearchChange?: (value: string) => void;
-  // Server-side filter props
+
   onColumnFilterChange?: (columnId: string, value: string) => void;
+
   exportFilename?: string;
   exportAllData?: () => Promise<TData[]>;
   showExportAllOption?: boolean;
@@ -84,6 +87,7 @@ export function DataTable<TData, TValue>({
     manualPagination: !!pagination,
     pageCount: pagination && total ? Math.ceil(total / pagination.pageSize) : undefined,
     onPaginationChange: onPaginationChange as any,
+
     state: {
       sorting,
       columnFilters,
@@ -94,6 +98,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
+      {/* Toolbar */}
       <DataTableToolbar
         table={table}
         searchKey={searchKey}
@@ -103,25 +108,22 @@ export function DataTable<TData, TValue>({
         showExportAllOption={showExportAllOption}
         loading={loading}
       />
-      {/* pagination  */}
-      <DataTablePagination
-        table={table}
-        total={total}
-      />
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-        <div className="max-w-full overflow-x-auto">
-          {/* Custom scrollable container */}
-          <div className="relative h-[70vh] min-h-[600px] overflow-auto">
-            <div className="absolute inset-0">
-              <Table>
-                {/* Table Header */}
-                <TableHeader className="sticky top-0 border-b border-gray-100 dark:border-white/[0.05] bg-white dark:bg-gray-800">
-                  {/* Header Row */}
-                  <TableRow>
-                    {table.getHeaderGroups()[0].headers.map((header) => {
-                      const canSort = header.column.getCanSort();
-                      const isSorted = header.column.getIsSorted();
-                      const widthClass = header.column.columnDef.meta?.widthClass || '';
+
+      {/* Pagination Top */}
+      <DataTablePagination table={table} total={total} />
+
+      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+
+        {/* 🔥 Sticky Header (PAGE TOP) */}
+        <div className="sticky top-[80px] z-40 bg-white dark:bg-gray-800 shadow-sm rounded-t-xl">
+          <Table>
+            <TableHeader>
+              {/* Header Row */}
+              <TableRow>
+                {table.getHeaderGroups()[0].headers.map((header) => {
+                  const canSort = header.column.getCanSort();
+                  const isSorted = header.column.getIsSorted();
+                  const widthClass = header.column.columnDef.meta?.widthClass || "";
 
                       return (
                         <TableCell
@@ -188,89 +190,92 @@ export function DataTable<TData, TValue>({
                     })}
                   </TableRow>
 
-                  {/* Filter Row */}
-                  {(table.getHeaderGroups()[0].headers.some(header => {
+              {/* Filter Row */}
+              {table
+                .getHeaderGroups()[0]
+                .headers.some((header) => {
+                  const meta = header.column.columnDef.meta;
+                  return header.column.getCanFilter() && meta?.filterVariant !== "none";
+                }) && (
+                <TableRow>
+                  {table.getHeaderGroups()[0].headers.map((header) => {
                     const canFilter = header.column.getCanFilter();
-                    const { filterVariant } = header.column.columnDef.meta ?? {};
-                    return canFilter && filterVariant !== "none";
-                  })) && (
-                      <TableRow>
-                        {table.getHeaderGroups()[0].headers.map((header) => {
-                          const canFilter = header.column.getCanFilter();
-                          const { filterVariant, widthClass } = header.column.columnDef.meta ?? {};
-                          const showFilter = canFilter && filterVariant !== "none";
+                    const meta = header.column.columnDef.meta ?? {};
+                    const showFilter = canFilter && meta.filterVariant !== "none";
 
-                          return (
-                            <TableCell
-                              key={header.id}
-                              isHeader
-                              className={`text-start px-5 py-2 ${widthClass || ''}`}
-                            >
-                              {showFilter ? (
-                                <Filter
-                                  column={header.column}
-                                  options={header.column.columnDef.meta?.filterOptions}
-                                  onFilterChange={onColumnFilterChange}
-                                />
-                              ) : (
-                                <div className="h-7"></div>
-                              )}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    )}
-                </TableHeader>
+                    return (
+                      <TableCell
+                        key={header.id}
+                        isHeader
+                        className={`text-start px-5 py-2 ${meta.widthClass || ""}`}
+                      >
+                        {showFilter ? (
+                          <Filter
+                            column={header.column}
+                            options={meta.filterOptions}
+                            onFilterChange={onColumnFilterChange}
+                          />
+                        ) : (
+                          <div className="h-7"></div>
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              )}
+            </TableHeader>
+          </Table>
+        </div>
 
-                {/* Table Body */}
-                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                  {loading ? (
-                    <SkeletonLoader
-                      columns={columns}
-                      rowCount={(table.getRowModel().rows?.length && table.getRowModel().rows?.length > 0) ? table.getRowModel().rows?.length : 5}
-                      widthClasses={columns.map(col => col.meta?.widthClass || '')} // Send array of width classes
-                    />
-                  ) :
-                    table.getRowModel().rows?.length ? (
-                      table.getRowModel().rows.map((row) => (
-                        <TableRow key={row.id}>
-                          {row.getVisibleCells().map((cell) => {
-                            const widthClass = cell.column.columnDef.meta?.widthClass || '';
-                            return (
-                              <TableCell
-                                key={cell.id}
-                                className={`px-5 py-4 text-start text-theme-sm text-gray-500 dark:text-gray-400 ${widthClass}`}
-                              >
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext()
-                                )}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={columns.length}
-                          className="h-24 text-center text-gray-500 dark:text-gray-400"
-                        >
-                          No roles found.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
+        {/* Scrollable Body */}
+        <div className="max-h-[70vh] overflow-auto">
+          <Table>
+            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+              {loading ? (
+                <SkeletonLoader
+                  columns={columns}
+                  rowCount={
+                    table.getRowModel().rows?.length > 0
+                      ? table.getRowModel().rows.length
+                      : 5
+                  }
+                  widthClasses={columns.map((c) => c.meta?.widthClass || "")}
+                />
+              ) : table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={`px-5 py-4 text-start text-theme-sm text-gray-500 dark:text-gray-400 ${
+                          cell.column.columnDef.meta?.widthClass || ""
+                        }`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center text-gray-500 dark:text-gray-400"
+                  >
+                    No data found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
       </div>
-      {/* pagination  */}
-      <DataTablePagination
-        table={table}
-        total={total}
-      />
+
+      {/* Pagination Bottom */}
+      <DataTablePagination table={table} total={total} />
     </div>
   );
 }
