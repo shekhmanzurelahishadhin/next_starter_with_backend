@@ -228,7 +228,7 @@ export function DataTable<TData, TValue>({
         </div>
 
         {/* Scrollable Body */}
-        <div className="max-h-[70vh] overflow-auto">
+        <div className="max-h-[70vh] overflow-auto scrollbar-hide">
           <Table>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {loading ? (
