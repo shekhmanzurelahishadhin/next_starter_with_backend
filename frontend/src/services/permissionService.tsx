@@ -6,8 +6,13 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export interface Permission {
   id: number;
+  module_id: number;
+  menu_id: number;
+  sub_menu_id: number;
   name: string;
-  guard_name: string;
+  module_name: string;
+  menu_name: string;
+  sub_menu_name: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -25,7 +30,9 @@ export interface PermissionFilters {
   page?: number;
   per_page?: number;
   name?: string;
-  guard_name?: string;
+  module_name?: string;
+  menu_name?: string;
+  sub_menu_name?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -70,7 +77,9 @@ class PermissionService {
 
     // Specific filter fields
     if (filters.name) params.append('name', filters.name);
-    if (filters.guard_name) params.append('guard_name', filters.guard_name);
+    if (filters.module_name) params.append('guard_name', filters.module_name);
+    if (filters.menu_name) params.append('guard_name', filters.menu_name);
+    if (filters.sub_menu_name) params.append('guard_name', filters.sub_menu_name);
     if (filters.created_at) params.append('created_at', filters.created_at);
     if (filters.updated_at) params.append('updated_at', filters.updated_at);
     

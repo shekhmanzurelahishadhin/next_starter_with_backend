@@ -6,13 +6,13 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { Role } from "@/services/roleService";
+import { Permission } from "@/services/permissionService";
 
-interface RoleDetailViewProps {
-  role: Role;
+interface PermissionDetailViewProps {
+  permission: Permission;
 }
 
-export function RoleDetailView({ role }: RoleDetailViewProps) {
+export function PermissionDetailView({ permission }: PermissionDetailViewProps) {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "-";
     const [datePart, timePart] = dateString.split(" ");
@@ -28,10 +28,10 @@ export function RoleDetailView({ role }: RoleDetailViewProps) {
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Role Name
+                Permission Name
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
-                {role.name}
+                {permission.name}
               </TableCell>
             </TableRow>
 
@@ -43,15 +43,15 @@ export function RoleDetailView({ role }: RoleDetailViewProps) {
                 <Badge
                   size="sm"
                   color={
-                    role.guard_name === "web"
+                    permission.guard_name === "web"
                       ? "primary"
-                      : role.guard_name === "api"
+                      : permission.guard_name === "api"
                       ? "success"
                       : "warning"
                   }
                   variant="light"
                 >
-                  {role.guard_name}
+                  {permission.guard_name}
                 </Badge>
               </TableCell>
             </TableRow>
@@ -61,7 +61,7 @@ export function RoleDetailView({ role }: RoleDetailViewProps) {
                 Created At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(role.created_at || null)}
+                {formatDate(permission.created_at || null)}
               </TableCell>
             </TableRow>
 
@@ -70,7 +70,7 @@ export function RoleDetailView({ role }: RoleDetailViewProps) {
                 Updated At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(role.updated_at || null)}
+                {formatDate(permission.updated_at || null)}
               </TableCell>
             </TableRow>
           </TableBody>

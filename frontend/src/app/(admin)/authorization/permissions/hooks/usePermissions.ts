@@ -1,7 +1,7 @@
-// hooks/useRoles.ts
+// hooks/usePermissions.ts
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { roleService, Role, RoleFilters, PaginatedResponse } from '@/services/roleService';
+import { permissionService, Permission, PermissionFilters, PaginatedResponse } from '@/services/permissionService';
 import { useAlert } from '@/hooks/useAlert';
 import { useModal } from '@/hooks/useModal';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -11,12 +11,12 @@ export const usePermissions = () => {
   const { isOpen, openModal, closeModal } = useModal();
   
   // Data state
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
   // Modal state
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>('create');
   const [backendErrors, setBackendErrors] = useState<Record<string, string>>({});
   
@@ -25,7 +25,7 @@ export const usePermissions = () => {
   const debouncedFilters = useDebounce(filters, 300);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 30,
   });
   const [total, setTotal] = useState(0);
   
@@ -33,49 +33,49 @@ export const usePermissions = () => {
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput, 300);
 
-  // Load roles
-  const loadRoles = useCallback(async () => {
+  // Load permissions
+  const loadPermissions = useCallback(async () => {
     try {
       setLoading(true);
-      const apiFilters: RoleFilters = {
+      const apiFilters: PermissionFilters = {
         page: pagination.pageIndex + 1,
         per_page: pagination.pageSize,
         ...(debouncedSearch && { search: debouncedSearch }),
         ...debouncedFilters,
       };
 
-      const response: PaginatedResponse<Role> = await roleService.getRoles(apiFilters);
-      setRoles(response.data);
+      const response: PaginatedResponse<Permission> = await permissionService.getPermissions(apiFilters);
+      setPermissions(response.data);
       setTotal(response.total);
     } catch (err) {
-      toast.error('Failed to load roles');
-      console.error('Error loading roles:', err);
+      toast.error('Failed to load permissions');
+      console.error('Error loading permissions:', err);
     } finally {
       setLoading(false);
     }
   }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, debouncedFilters]);
 
   useEffect(() => {
-    loadRoles();
-  }, [loadRoles]);
+    loadPermissions();
+  }, [loadPermissions]);
 
   // Modal operations
-  const handleView = useCallback((role: Role) => {
-    setSelectedRole(role);
+  const handleView = useCallback((permission: Permission) => {
+    setSelectedPermission(permission);
     setMode('view');
     setBackendErrors({});
     openModal();
   }, [openModal]);
 
-  const handleEdit = useCallback((role: Role) => {
-    setSelectedRole(role);
+  const handleEdit = useCallback((permission: Permission) => {
+    setSelectedPermission(permission);
     setMode('edit');
     setBackendErrors({});
     openModal();
   }, [openModal]);
 
   const handleCreate = useCallback(() => {
-    setSelectedRole(null);
+    setSelectedPermission(null);
     setMode('create');
     setBackendErrors({});
     openModal();
@@ -83,7 +83,7 @@ export const usePermissions = () => {
 
   const handleCloseModal = useCallback(() => {
     closeModal();
-    setSelectedRole(null);
+    setSelectedPermission(null);
     setMode('create');
     setBackendErrors({});
   }, [closeModal]);
@@ -91,44 +91,44 @@ export const usePermissions = () => {
   // CRUD operations
   const handleDelete = useCallback(async (id: number) => {
     const result = await confirm({
-      title: 'Delete Role?',
-      text: 'Are you sure you want to delete this role? This action cannot be undone.',
+      title: 'Delete Permission?',
+      text: 'Are you sure you want to delete this permission? This action cannot be undone.',
     });
 
     if (!result.isConfirmed) return;
 
-    let previousRoles: Role[] = [];
+    let previousPermissions: Permission[] = [];
     try {
       // Optimistic update
-      previousRoles = [...roles];
-      setRoles(prev => prev.filter(role => role.id !== id));
+      previousPermissions = [...permissions];
+      setPermissions(prev => prev.filter(permission => permission.id !== id));
       
-      await roleService.deleteRole(id);
-      toast.success('Role deleted successfully!');
-      await loadRoles();
+      await permissionService.deletePermission(id);
+      toast.success('Permission deleted successfully!');
+      await loadPermissions();
     } catch (err) {
       // Revert on error
-      setRoles(previousRoles);
-      toast.error('Failed to delete role');
+      setPermissions(previousPermissions);
+      toast.error('Failed to delete permission');
     }
-  }, [confirm, roles, loadRoles]);
+  }, [confirm, permissions, loadPermissions]);
 
-  const handleSave = useCallback(async (roleData: { name: string }) => {
+  const handleSave = useCallback(async (permissionData: { name: string }) => {
     try {
       setSaving(true);
       setBackendErrors({});
 
-      if (mode === 'edit' && selectedRole) {
-        await roleService.updateRole(selectedRole.id, roleData);
-        toast.success('Role updated successfully!');
+      if (mode === 'edit' && selectedPermission) {
+        await permissionService.updatePermission(selectedPermission.id, permissionData);
+        toast.success('Permission updated successfully!');
       } else {
-        await roleService.createRole(roleData);
-        toast.success('Role created successfully!');
+        await permissionService.createPermission(permissionData);
+        toast.success('Permission created successfully!');
         setPagination(prev => ({ ...prev, pageIndex: 0 }));
       }
 
       handleCloseModal();
-      await loadRoles();
+      await loadPermissions();
       return true;
     } catch (err: any) {
       if (err?.response?.data?.errors) {
@@ -138,13 +138,13 @@ export const usePermissions = () => {
         });
         setBackendErrors(errors);
       } else {
-        toast.error(err?.response?.data?.message || 'Failed to save role');
+        toast.error(err?.response?.data?.message || 'Failed to save permission');
       }
       return false;
     } finally {
       setSaving(false);
     }
-  }, [mode, selectedRole, loadRoles, handleCloseModal]);
+  }, [mode, selectedPermission, loadPermissions, handleCloseModal]);
 
   // Filter and search operations
   const handleFilterChange = useCallback((name: string, value: string | number) => {
@@ -165,25 +165,25 @@ export const usePermissions = () => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, []);
 
-    // Function to export all roles
-    const exportAllRoles = async () => {
+    // Function to export all permissions
+    const exportAllPermissions = async () => {
       try {
         // Call API without pagination to get all data
-        const response = await roleService.getRoles({});
+        const response = await permissionService.getPermissions({});
         return response.data;
       } catch (error) {
-        console.error('Error exporting all roles:', error);
+        console.error('Error exporting all permissions:', error);
         throw error;
       }
     };
 
   return {
     // State
-    roles,
+    permissions,
     loading,
     saving,
     isOpen,
-    selectedRole,
+    selectedPermission,
     mode,
     backendErrors,
     pagination,
@@ -201,7 +201,7 @@ export const usePermissions = () => {
     handleSearch,
     clearBackendErrors,
     resetToFirstPage,
-    loadRoles,
-    exportAllRoles,
+    loadPermissions,
+    exportAllPermissions,
   };
 };

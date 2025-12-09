@@ -1,9 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
-import Badge from "@/components/ui/badge/Badge";
 import ActionButtons from "@/components/ui/button/ActionButton";
-import { FiEye, FiEdit, FiTrash, FiShield } from "@/icons/index";
-import { Role } from "@/services/roleService";
+import { FiEye, FiEdit, FiTrash } from "@/icons/index";
+import { Permission } from "@/services/permissionService";
 import { ColumnMeta as RTColumnMeta } from '@tanstack/react-table';
 
 declare module '@tanstack/react-table' {
@@ -18,24 +17,24 @@ declare module '@tanstack/react-table' {
   }
 }
 
-interface UseRoleColumnsProps {
+interface UsePermissionColumnsProps {
   hasPermission: (permission: string) => boolean;
-  onView: (role: Role) => void;
-  onEdit: (role: Role) => void;
+  onView: (permission: Permission) => void;
+  onEdit: (permission: Permission) => void;
   onDelete: (id: number) => void;
   pageIndex: number;
   pageSize: number;
 }
 
-export const useRoleColumns = ({
+export const usePermissionColumns = ({
   hasPermission,
   onView,
   onEdit,
   onDelete,
   pageIndex,
   pageSize,
-}: UseRoleColumnsProps): ColumnDef<Role>[] => {
-  return useMemo((): ColumnDef<Role>[] => [
+}: UsePermissionColumnsProps): ColumnDef<Permission>[] => {
+  return useMemo((): ColumnDef<Permission>[] => [
     {
       id: "sl",
       header: "SL",
@@ -58,13 +57,13 @@ export const useRoleColumns = ({
     },
     {
       accessorKey: "name",
-      header: "Role Name",
+      header: "Permission Name",
       enableSorting: true,
       meta: {
         filterVariant: "text",
         placeholder: "Search names",
         exportable: true,
-        exportHeader: "Role Name",
+        exportHeader: "Permission Name",
         exportValue: (row) => row.name,
         widthClass: "w-[200px]"
       },
@@ -72,7 +71,6 @@ export const useRoleColumns = ({
         const name = row.getValue("name") as string;
         return (
           <div className="flex items-center gap-2">
-            <FiShield className="w-4 h-4 text-blue-500 flex-shrink-0" />
             <span className="font-medium text-gray-800 dark:text-white/90 truncate">
               {name}
             </span>
@@ -81,37 +79,71 @@ export const useRoleColumns = ({
       },
     },
     {
-      accessorKey: "guard_name",
-      header: "Guard Name",
+      accessorKey: "module_name",
+      header: "Module Name",
       enableSorting: true,
       meta: {
-        filterVariant: "select",
-        filterOptions: [
-          { value: "web", label: "Web" },
-          { value: "api", label: "API" },
-          { value: "sanctum", label: "Sanctum" },
-        ],
+        filterVariant: "text",
+        placeholder: "Search Module",
         exportable: true,
-        exportHeader: "Guard Name",
-        exportValue: (row) => row.guard_name,
-        widthClass: "w-[150px]"
+        exportHeader: "Module Name",
+        exportValue: (row) => row.module_name,
+        widthClass: "w-[200px]"
       },
       cell: ({ row }) => {
-        const guardName = row.getValue("guard_name") as string;
+        const module_name = row.getValue("module_name") as string;
         return (
-          <Badge
-            size="sm"
-            color={
-              guardName === "web"
-                ? "primary"
-                : guardName === "api"
-                  ? "success"
-                  : "warning"
-            }
-            variant="light"
-          >
-            {guardName}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {module_name}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "menu_name",
+      header: "Menu Name",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        placeholder: "Search Menu",
+        exportable: true,
+        exportHeader: "Menu Name",
+        exportValue: (row) => row.menu_name,
+        widthClass: "w-[200px]"
+      },
+      cell: ({ row }) => {
+        const menu_name = row.getValue("menu_name") as string;
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {menu_name}
+            </span>
+          </div>
+        );
+      },
+    },
+   {
+      accessorKey: "sub_menu_name",
+      header: "Sub Menu Name",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        placeholder: "Search Menu",
+        exportable: true,
+        exportHeader: "Menu Name",
+        exportValue: (row) => row.sub_menu_name,
+        widthClass: "w-[200px]"
+      },
+      cell: ({ row }) => {
+        const sub_menu_name = row.getValue("sub_menu_name") as string;
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {sub_menu_name}
+            </span>
+          </div>
         );
       },
     },
@@ -185,34 +217,34 @@ export const useRoleColumns = ({
         widthClass: "w-[150px]"
       },
       cell: ({ row }) => {
-        const role = row.original;
+        const permission = row.original;
         return (
           <ActionButtons
-            row={role}
+            row={permission}
             buttons={[
               {
                 icon: FiEye,
-                onClick: (row) => onView(row as Role),
+                onClick: (row) => onView(row as Permission),
                 variant: "success",
                 size: "sm",
                 tooltip: "View",
-                show: () => hasPermission("role.view"),
+                show: () => hasPermission("permission.view"),
               },
               {
                 icon: FiEdit,
-                onClick: (row) => onEdit(row as Role),
+                onClick: (row) => onEdit(row as Permission),
                 variant: "primary",
                 size: "sm",
                 tooltip: "Edit",
-                show: () => hasPermission("role.edit"),
+                show: () => hasPermission("permission.edit"),
               },
               {
                 icon: FiTrash,
-                onClick: (row) => onDelete((row as Role).id),
+                onClick: (row) => onDelete((row as Permission).id),
                 variant: "danger",
                 size: "sm",
                 tooltip: "Delete",
-                show: () => hasPermission("role.delete"),
+                show: () => hasPermission("permission.delete"),
               },
             ]}
           />

@@ -2,22 +2,22 @@
 import { useForm } from "react-hook-form";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
-import { Role } from "@/services/roleService";
+import { Permission } from "@/services/permissionService";
 import { useEffect } from "react";
 
-interface RoleFormData {
+interface PermissionFormData {
   name: string;
 }
 
-interface RoleFormProps {
-  role?: Role | null;
+interface PermissionFormProps {
+  permission?: Permission | null;
   mode: 'create' | 'edit';
   saving: boolean;
-  onSubmit: (roleData: { name: string }) => void;
+  onSubmit: (permissionData: { name: string }) => void;
   backendErrors?: Record<string, string>; // Add backend errors prop
 }
 
-export function RoleForm({ role, mode, saving, onSubmit, backendErrors }: RoleFormProps) {
+export function PermissionForm({ permission, mode, saving, onSubmit, backendErrors }: PermissionFormProps) {
   const {
     register,
     handleSubmit,
@@ -25,10 +25,10 @@ export function RoleForm({ role, mode, saving, onSubmit, backendErrors }: RoleFo
     reset,
     setError, // Add setError from react-hook-form
     clearErrors, // Add clearErrors
-  } = useForm<RoleFormData>({
+  } = useForm<PermissionFormData>({
     mode: "onChange",
     defaultValues: {
-      name: role?.name || '',
+      name: permission?.name || '',
     }
   });
 
@@ -40,7 +40,7 @@ export function RoleForm({ role, mode, saving, onSubmit, backendErrors }: RoleFo
       
       // Set backend errors on the form
       Object.entries(backendErrors).forEach(([field, message]) => {
-        setError(field as keyof RoleFormData, {
+        setError(field as keyof PermissionFormData, {
           type: 'server',
           message: Array.isArray(message) ? message[0] : message
         });
@@ -50,32 +50,32 @@ export function RoleForm({ role, mode, saving, onSubmit, backendErrors }: RoleFo
 
   useEffect(() => {
     reset({
-      name: role?.name || '',
+      name: permission?.name || '',
     });
-  }, [role, reset]);
+  }, [permission, reset]);
 
-  const onFormSubmit = (data: RoleFormData) => {
+  const onFormSubmit = (data: PermissionFormData) => {
     onSubmit(data);
   };
 
   return (
-    <form id="role-form" onSubmit={handleSubmit(onFormSubmit)}>
+    <form id="permission-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-5">
         <div>
-          <Label htmlFor="name" required>Role Name</Label>
+          <Label htmlFor="name" required>Permission Name</Label>
           <Input
             id="name"
             type="text"
             placeholder="admin, user, manager, etc."
             register={register("name", {
-              required: "Role name is required",
+              required: "Permission name is required",
               minLength: {
                 value: 2,
-                message: "Role name must be at least 2 characters"
+                message: "Permission name must be at least 2 characters"
               },
               maxLength: {
                 value: 50,
-                message: "Role name must not exceed 50 characters"
+                message: "Permission name must not exceed 50 characters"
               },
             })}
             error={errors.name?.message}

@@ -1,35 +1,35 @@
 "use client";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
-import { RoleForm } from "./RoleForm";
-import { RoleDetailView } from "./RoleDetailView";
-import { Role } from "@/services/roleService";
+import { PermissionForm } from "./PermissionForm";
+import { PermissionDetailView } from "./PermissionDetailView";
+import { Permission } from "@/services/permissionService";
 
-interface RoleModalProps {
+interface PermissionModalProps {
   isOpen: boolean;
-  role: Role | null;
+  permission: Permission | null;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
-  onSave: (roleData: { name: string }) => void;
+  onSave: (permissionData: { name: string }) => void;
   backendErrors?: Record<string, string>; // Add this prop
 }
 
-export function RoleModal({
+export function PermissionModal({
   isOpen,
-  role,
+  permission,
   mode,
   saving,
   onClose,
   onSave,
   backendErrors, // Add this prop
-}: RoleModalProps) {
+}: PermissionModalProps) {
   const getTitle = () => {
     switch (mode) {
-      case 'view': return 'Role Details';
-      case 'edit': return 'Edit Role';
-      case 'create': return 'Add New Role';
-      default: return 'Role';
+      case 'view': return 'Permission Details';
+      case 'edit': return 'Edit Permission';
+      case 'create': return 'Add New Permission';
+      default: return 'Permission';
     }
   };
 
@@ -48,13 +48,13 @@ export function RoleModal({
           {getTitle()}
         </h4>
 
-        {mode === 'view' && role && (
-          <RoleDetailView role={role} />
+        {mode === 'view' && permission && (
+          <PermissionDetailView permission={permission} />
         )}
 
         {(mode === 'create' || mode === 'edit') && (
-          <RoleForm
-            role={mode === 'edit' ? role : null}
+          <PermissionForm
+            permission={mode === 'edit' ? permission : null}
             mode={mode}
             saving={saving}
             onSubmit={onSave}
@@ -85,7 +85,7 @@ export function RoleModal({
               </Button>
               <Button
                 type="submit"
-                form="role-form"
+                form="permission-form"
                 size="sm"
                 disabled={saving}
               >

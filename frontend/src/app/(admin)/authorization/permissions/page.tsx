@@ -5,20 +5,20 @@ import AccessRoute from "@/routes/AccessRoute";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import { DataTable } from "@/components/tables/DataTable";
-import { RoleModal } from "./components/RoleModal";
-import { useRoleColumns } from "./components/RoleColumns";
+import { PermissionModal } from "./components/PermissionModal";
+import { usePermissionColumns } from "./components/PermissionColumns";
 import { useEffect } from "react";
 
-export default function Roles() {
+export default function Permissions() {
   const { hasPermission } = useAuth();
 
-  // Single hook for all role operations
+  // Single hook for all permission operations
   const {
-    roles,
+    permissions,
     loading,
     saving,
     isOpen,
-    selectedRole,
+    selectedPermission,
     mode,
     backendErrors,
     pagination,
@@ -32,11 +32,11 @@ export default function Roles() {
     handleSave,
     handleFilterChange,
     handleSearch,
-    exportAllRoles,
+    exportAllPermissions,
   } = usePermissions();
 
   // Memoized columns
-  const columns = useRoleColumns({
+  const columns = usePermissionColumns({
     hasPermission,
     onView: handleView,
     onEdit: handleEdit,
@@ -54,7 +54,7 @@ export default function Roles() {
       <div>
          <PageBreadcrumb
           items={[
-            { title: "User Role" }, // add href if needed links like href: "/admin/authorization/roles"
+            { title: "User Role" }, // add href if needed links like href: "/admin/authorization/permissions"
             { title: "Permission Management" }
           ]}
         />
@@ -68,7 +68,7 @@ export default function Roles() {
           >
             <DataTable
               columns={columns}
-              data={roles}
+              data={permissions}
               searchKey="name"
               onSearchChange={handleSearch}
               pagination={pagination}
@@ -77,14 +77,14 @@ export default function Roles() {
               total={total}
               loading={loading}
               exportFilename="permission"
-              exportAllData={exportAllRoles} // Provide exportAllRoles function
+              exportAllData={exportAllPermissions} // Provide exportAllPermissions function
               showExportAllOption={false} // Disable "Export All" option
             />
           </ComponentCard>
 
-          <RoleModal
+          <PermissionModal
             isOpen={isOpen}
-            role={selectedRole}
+            permission={selectedPermission}
             mode={mode}
             saving={saving}
             onClose={handleCloseModal}

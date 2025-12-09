@@ -24,6 +24,7 @@ class PermissionRecource extends JsonResource
             'sub_menu_id' => $this->subMenu?->id ?? null,
             'sub_menu_name' => $this->subMenu?->name ?? null,
             'created_at' => $this->created_at->toDateTimeString(),
+            'updated_at' => $this->updated_at->toDateTimeString(),
         ];
     }
 }
