@@ -66,7 +66,7 @@ export function PermissionForm({ permission, mode, saving, onSubmit, backendErro
           <Input
             id="name"
             type="text"
-            placeholder="admin, user, manager, etc."
+            placeholder="unit.create, unit.edit , etc."
             register={register("name", {
               required: "Permission name is required",
               minLength: {
