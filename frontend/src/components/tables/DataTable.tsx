@@ -208,7 +208,7 @@ export function DataTable<TData, TValue>({
                       <TableCell
                         key={header.id}
                         isHeader
-                        className={`text-start px-4 py-2 ${meta.widthClass || ""}`}
+                        className={`text-start px-4 pb-2 ${meta.widthClass || ""}`}
                         style={{ 
                           minWidth: header.column.getSize(),
                           width: header.column.getSize()

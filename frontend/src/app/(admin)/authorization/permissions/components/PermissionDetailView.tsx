@@ -34,28 +34,30 @@ export function PermissionDetailView({ permission }: PermissionDetailViewProps) 
                 {permission.name}
               </TableCell>
             </TableRow>
-
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Guard Name
+                Module Name
               </TableCell>
-              <TableCell className="px-5 py-4">
-                <Badge
-                  size="sm"
-                  color={
-                    permission.guard_name === "web"
-                      ? "primary"
-                      : permission.guard_name === "api"
-                      ? "success"
-                      : "warning"
-                  }
-                  variant="light"
-                >
-                  {permission.guard_name}
-                </Badge>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {permission.module_name ? permission.module_name : "-"}
               </TableCell>
             </TableRow>
-
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Menu Name
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {permission.menu_name ? permission.menu_name : "-"}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Sub Menu Name
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {permission.sub_menu_name ? permission.sub_menu_name : '-'}
+              </TableCell>
+            </TableRow>
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Created At
