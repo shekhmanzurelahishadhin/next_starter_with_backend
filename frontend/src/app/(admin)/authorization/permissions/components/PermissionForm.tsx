@@ -3,10 +3,13 @@ import { useForm } from "react-hook-form";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import { Permission } from "@/services/permissionService";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import ReactSelect from "@/components/form/ReactSelect";
+import { usePermissions } from "../hooks/usePermissions";
 
 interface PermissionFormData {
   name: string;
+  module_id: number | null;
 }
 
 interface PermissionFormProps {
@@ -18,6 +21,7 @@ interface PermissionFormProps {
 }
 
 export function PermissionForm({ permission, mode, saving, onSubmit, backendErrors }: PermissionFormProps) {
+  const { selectedModules, setSelectedModules } = useState();
   const {
     register,
     handleSubmit,
@@ -29,15 +33,18 @@ export function PermissionForm({ permission, mode, saving, onSubmit, backendErro
     mode: "onChange",
     defaultValues: {
       name: permission?.name || '',
+      module_id: permission?.module_id || null,
     }
   });
+
+  const { modules } = usePermissions();
 
   // Handle backend errors
   useEffect(() => {
     if (backendErrors) {
       // Clear existing errors first
       clearErrors();
-      
+
       // Set backend errors on the form
       Object.entries(backendErrors).forEach(([field, message]) => {
         setError(field as keyof PermissionFormData, {
@@ -51,11 +58,13 @@ export function PermissionForm({ permission, mode, saving, onSubmit, backendErro
   useEffect(() => {
     reset({
       name: permission?.name || '',
+      module_id: permission?.module_id || null,
     });
   }, [permission, reset]);
 
   const onFormSubmit = (data: PermissionFormData) => {
-    onSubmit(data);
+    console.log('Form submitted with data:', data);
+    // onSubmit(data);
   };
 
   return (
@@ -80,6 +89,17 @@ export function PermissionForm({ permission, mode, saving, onSubmit, backendErro
             })}
             error={errors.name?.message}
             disabled={saving}
+          />
+        </div>
+        <div>
+          <Label htmlFor="module_id" required>Module</Label>
+
+          <ReactSelect
+            options={modules}
+            value={selectedModules || null}
+            onChange={(value) => setSelectedModules(value)}
+            isDisabled={saving}
+            placeholder="Select a module"
           />
         </div>
       </div>

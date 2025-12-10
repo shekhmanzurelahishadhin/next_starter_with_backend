@@ -5,6 +5,7 @@ import { permissionService, Permission, PermissionFilters, PaginatedResponse } f
 import { useAlert } from '@/hooks/useAlert';
 import { useModal } from '@/hooks/useModal';
 import { useDebounce } from '@/hooks/useDebounce';
+import { api } from '@/lib/api';
 
 export const usePermissions = () => {
   const { confirm } = useAlert();
@@ -19,6 +20,8 @@ export const usePermissions = () => {
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>('create');
   const [backendErrors, setBackendErrors] = useState<Record<string, string>>({});
+
+  const [modules, setModules] = useState<{ value: number; label: string }[]>([]);
   
   // Filter and pagination state
   const [filters, setFilters] = useState<Record<string, string | number>>({});
@@ -177,6 +180,15 @@ export const usePermissions = () => {
       }
     };
 
+    // Fetch modules
+  const fetchModules = async () => {
+    const res = await api.get("/modules");
+    setModules(res.data.map((m: any) => ({ value: m.id, label: m.name })));
+  };
+  useEffect(() => {
+    fetchModules();
+  }, []);
+
   return {
     // State
     permissions,
@@ -203,5 +215,7 @@ export const usePermissions = () => {
     resetToFirstPage,
     loadPermissions,
     exportAllPermissions,
+    // moudle options
+    modules,
   };
 };
