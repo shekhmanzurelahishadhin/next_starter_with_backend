@@ -68,8 +68,7 @@ export function PermissionForm({
   }, [permission, reset]);
 
   const onFormSubmit = (data: PermissionFormData) => {
-    console.log("Submitted:", data);
-    // onSubmit(data);
+    onSubmit(data);
   };
 
   return (
@@ -117,14 +116,9 @@ export function PermissionForm({
                   value={field.value}
                   onChange={(value) => field.onChange(value)}
                   isDisabled={saving}
+                  error={errors.module_id?.message} // Pass error message 
                   placeholder="Select a module"
                 />
-
-                {errors.module_id && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.module_id.message}
-                  </p>
-                )}
               </>
             )}
           />

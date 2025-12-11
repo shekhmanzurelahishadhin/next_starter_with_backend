@@ -71,6 +71,7 @@ export const usePermissions = () => {
   }, [openModal]);
 
   const handleEdit = useCallback((permission: Permission) => {
+    console.log("Editing permission:", permission);
     setSelectedPermission(permission);
     setMode('edit');
     setBackendErrors({});
