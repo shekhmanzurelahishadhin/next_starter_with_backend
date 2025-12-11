@@ -129,7 +129,7 @@ export const usePermissions = () => {
   useEffect(() => {
     fetchModules();
     loadPermissions();
-  }, []);
+  }, [loadPermissions]);
 
   // Modal operations
   const handleView = useCallback(async (permission: Permission) => {
@@ -148,22 +148,29 @@ export const usePermissions = () => {
     openModal();
   }, [openModal]);
 
-  const handleEdit = useCallback(async (permission: Permission) => {
-    console.log("Editing permission:", permission);
-    setSelectedPermission(permission);
-    setMode('edit');
-    setBackendErrors({});
-    
-    // Load related data for editing
-    if (permission.module_id) {
-      await fetchMenus(permission.module_id);
+ // hooks/usePermissions.ts
+
+const handleEdit = useCallback(async (permission: Permission) => {
+  console.log("Editing permission:", permission);
+  setSelectedPermission(permission);
+  setMode('edit');
+  setBackendErrors({});
+  
+  // OPTIMIZATION: Set initial data immediately
+  setMenus([]);
+  setSubmenus([]);
+  
+  openModal();
+  
+  if (permission.module_id) {
+    // Don't await - let it load in background
+    fetchMenus(permission.module_id).then(() => {
       if (permission.menu_id) {
-        await fetchSubmenus(permission.menu_id);
+        fetchSubmenus(permission.menu_id);
       }
-    }
-    
-    openModal();
-  }, [openModal]);
+    });
+  }
+}, [openModal, fetchMenus, fetchSubmenus]);
 
   const handleCreate = useCallback(() => {
     setSelectedPermission(null);

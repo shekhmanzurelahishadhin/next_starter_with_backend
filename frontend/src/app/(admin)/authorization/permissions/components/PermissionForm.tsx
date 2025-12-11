@@ -67,10 +67,12 @@ export function PermissionForm({
   const watchedMenuId = watch("menu_id");
 
   /* ----------------------------------------
-   * RESET CHILD FIELDS ON PARENT CHANGE
+   * OPTIMIZED: Only reset when module actually changes
    * ---------------------------------------- */
   useEffect(() => {
+    if (mode === 'create') {
     fetchMenus(watchedModuleId || null);
+    }
     reset((prevValues) => ({
       ...prevValues,
       menu_id: null,
@@ -80,7 +82,9 @@ export function PermissionForm({
   }, [watchedModuleId, reset]);
 
   useEffect(() => {
+    if (mode === 'create') {
     fetchSubmenus(watchedMenuId || null);
+    }
     reset((prevValues) => ({
       ...prevValues,
       sub_menu_id: null,
@@ -102,12 +106,14 @@ export function PermissionForm({
 
 
   useEffect(() => {
-    reset({
-      name: permission?.name || "",
-      module_id: permission?.module_id || null,
-      menu_id: permission?.menu_id || null,
-      sub_menu_id: permission?.sub_menu_id || null,
-    });
+    if (permission) {
+      reset({
+        name: permission.name || "",
+        module_id: permission.module_id || null,
+        menu_id: permission.menu_id || null,
+        sub_menu_id: permission.sub_menu_id || null,
+      });
+    }
   }, [permission, reset]);
 
   const onFormSubmit = (data: PermissionFormData) => {
