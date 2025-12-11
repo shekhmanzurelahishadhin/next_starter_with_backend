@@ -12,7 +12,16 @@ interface PermissionModalProps {
   saving: boolean;
   onClose: () => void;
   onSave: (permissionData: { name: string }) => void;
-  backendErrors?: Record<string, string>; // Add this prop
+  backendErrors?: Record<string, string>;
+
+  modules: { value: number; label: string }[];
+  menus: { value: number; label: string }[];
+  submenus: { value: number; label: string }[];
+  loadingModules: boolean;
+  loadingMenus: boolean;
+  loadingSubmenus: boolean; 
+  fetchMenus: (moduleId: number | null) => void;
+  fetchSubmenus: (menuId: number | null) => void;
 }
 
 export function PermissionModal({
@@ -22,7 +31,16 @@ export function PermissionModal({
   saving,
   onClose,
   onSave,
-  backendErrors, // Add this prop
+  backendErrors, 
+
+  modules,
+  menus,
+  submenus, 
+  loadingModules,
+  loadingMenus,
+  loadingSubmenus,
+  fetchMenus,
+  fetchSubmenus
 }: PermissionModalProps) {
   const getTitle = () => {
     switch (mode) {
@@ -59,6 +77,15 @@ export function PermissionModal({
             saving={saving}
             onSubmit={onSave}
             backendErrors={backendErrors} // backend errors to form
+
+            modules={modules}
+            menus={menus}
+            submenus={submenus} 
+            loadingModules={loadingModules}
+            loadingMenus={loadingMenus}
+            loadingSubmenus={loadingSubmenus}
+            fetchMenus={fetchMenus}
+            fetchSubmenus={fetchSubmenus}
           />
         )}
 

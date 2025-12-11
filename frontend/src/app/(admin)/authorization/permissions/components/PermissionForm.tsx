@@ -5,11 +5,12 @@ import Input from "@/components/form/input/InputField";
 import { Permission } from "@/services/permissionService";
 import { useEffect } from "react";
 import ReactSelect from "@/components/form/ReactSelect";
-import { usePermissions } from "../hooks/usePermissions";
 
 interface PermissionFormData {
   name: string;
   module_id: number | null;
+  menu_id: number | null;
+  sub_menu_id: number | null;
 }
 
 interface PermissionFormProps {
@@ -18,6 +19,14 @@ interface PermissionFormProps {
   saving: boolean;
   onSubmit: (permissionData: PermissionFormData) => void;
   backendErrors?: Record<string, string>;
+  modules: { value: number; label: string }[];
+  menus: { value: number; label: string }[];
+  submenus: { value: number; label: string }[];
+  loadingModules: boolean;
+  loadingMenus: boolean;
+  loadingSubmenus: boolean;
+  fetchMenus: (moduleId: number | null) => void;
+  fetchSubmenus: (menuId: number | null) => void;
 }
 
 export function PermissionForm({
@@ -26,6 +35,14 @@ export function PermissionForm({
   saving,
   onSubmit,
   backendErrors,
+  modules,
+  menus,
+  submenus,
+  loadingModules,
+  loadingMenus,
+  loadingSubmenus,
+  fetchMenus,
+  fetchSubmenus
 }: PermissionFormProps) {
   const {
     register,
@@ -35,18 +52,42 @@ export function PermissionForm({
     setError,
     clearErrors,
     control,
+    watch,
   } = useForm<PermissionFormData>({
     mode: "onChange",
     defaultValues: {
       name: permission?.name || "",
       module_id: permission?.module_id || null,
+      menu_id: permission?.menu_id || null,
+      sub_menu_id: permission?.sub_menu_id || null,
     },
   });
 
-  const { modules } = usePermissions();
-  console.log("Modules:", modules);
+  const watchedModuleId = watch("module_id");
+  const watchedMenuId = watch("menu_id");
 
-  // Handle backend validation errors
+  /* ----------------------------------------
+   * RESET CHILD FIELDS ON PARENT CHANGE
+   * ---------------------------------------- */
+  useEffect(() => {
+    fetchMenus(watchedModuleId || null);
+    reset((prevValues) => ({
+      ...prevValues,
+      menu_id: null,
+      sub_menu_id: null,
+    }));
+    console.log('Module changed, resetting menu and submenu');
+  }, [watchedModuleId, reset]);
+
+  useEffect(() => {
+    fetchSubmenus(watchedMenuId || null);
+    reset((prevValues) => ({
+      ...prevValues,
+      sub_menu_id: null,
+    }));
+  }, [watchedMenuId, reset]);
+
+
   useEffect(() => {
     if (backendErrors) {
       clearErrors();
@@ -57,13 +98,15 @@ export function PermissionForm({
         });
       });
     }
-  }, [backendErrors, setError, clearErrors]);
+  }, [backendErrors, clearErrors, setError]);
 
-  // Reset when editing data
+
   useEffect(() => {
     reset({
       name: permission?.name || "",
       module_id: permission?.module_id || null,
+      menu_id: permission?.menu_id || null,
+      sub_menu_id: permission?.sub_menu_id || null,
     });
   }, [permission, reset]);
 
@@ -74,6 +117,7 @@ export function PermissionForm({
   return (
     <form id="permission-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-5">
+
         {/* Permission Name */}
         <div>
           <Label htmlFor="name" required>
@@ -85,14 +129,8 @@ export function PermissionForm({
             placeholder="unit.create, unit.edit, etc."
             register={register("name", {
               required: "Permission name is required",
-              minLength: {
-                value: 2,
-                message: "Must be at least 2 characters",
-              },
-              maxLength: {
-                value: 50,
-                message: "Cannot exceed 50 characters",
-              },
+              minLength: { value: 2, message: "Must be at least 2 characters" },
+              maxLength: { value: 50, message: "Cannot exceed 50 characters" },
             })}
             error={errors.name?.message}
             disabled={saving}
@@ -104,25 +142,72 @@ export function PermissionForm({
           <Label htmlFor="module_id" required>
             Module
           </Label>
-
           <Controller
             name="module_id"
             control={control}
             rules={{ required: "Module is required" }}
-            render={({ field }) => (
-              <>
-                <ReactSelect
-                  options={modules}
-                  value={field.value}
+            render={({ field, fieldState }) => (
+              <ReactSelect
+                options={modules}
+                   value={field.value}
                   onChange={(value) => field.onChange(value)}
-                  isDisabled={saving}
-                  error={errors.module_id?.message} // Pass error message 
-                  placeholder="Select a module"
-                />
-              </>
+                isDisabled={saving}
+                isLoading={loadingModules}
+                error={fieldState.error?.message}
+                placeholder="Select a module"
+              />
             )}
           />
+        </div>
 
+        {/* Menu Select */}
+        <div>
+          <Label htmlFor="menu_id" required>
+            Menu
+          </Label>
+          <Controller
+            name="menu_id"
+            control={control}
+            rules={{ required: "Menu is required" }}
+            render={({ field, fieldState }) => (
+              <ReactSelect
+                options={menus}
+                value={field.value}
+                  onChange={(value) => field.onChange(value)}
+                isDisabled={saving || !watchedModuleId}
+                isLoading={loadingMenus}
+                error={fieldState.error?.message}
+                placeholder={
+                  watchedModuleId ? "Select menu" : "Select a module first"
+                }
+              />
+            )}
+          />
+        </div>
+
+        {/* Submenu Select */}
+        <div>
+          <Label htmlFor="sub_menu_id">Submenu</Label>
+          <Controller
+            name="sub_menu_id"
+            control={control}
+            render={({ field, fieldState }) => (
+              <ReactSelect
+                options={submenus}
+                value={field.value}
+                  onChange={(value) => field.onChange(value)}
+                isDisabled={saving || !watchedMenuId}
+                isLoading={loadingSubmenus}
+                error={fieldState.error?.message}
+                placeholder={
+                  watchedMenuId
+                    ? "Select submenu (optional)"
+                    : "Select a menu first"
+                }
+                isClearable={true}
+              />
+            )}
+          />
         </div>
       </div>
     </form>

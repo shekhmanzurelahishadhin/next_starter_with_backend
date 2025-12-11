@@ -23,6 +23,14 @@ export default function Permissions() {
     backendErrors,
     pagination,
     total,
+    modules,
+    menus,
+    submenus,
+    loadingModules,
+    loadingMenus,
+    loadingSubmenus,
+    fetchMenus,
+    fetchSubmenus,
     setPagination,
     handleView,
     handleEdit,
@@ -90,6 +98,14 @@ export default function Permissions() {
             onClose={handleCloseModal}
             onSave={handleSave}
             backendErrors={backendErrors}
+            modules={modules}
+            menus={menus}
+            submenus={submenus}
+            loadingModules={loadingModules}
+            loadingMenus={loadingMenus}
+            loadingSubmenus={loadingSubmenus}
+            fetchMenus={fetchMenus}
+            fetchSubmenus={fetchSubmenus}
           />
         </div>
       </div>
