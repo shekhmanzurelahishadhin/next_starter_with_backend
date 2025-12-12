@@ -136,15 +136,6 @@ export const usePermissions = () => {
     setSelectedPermission(permission);
     setMode('view');
     setBackendErrors({});
-    
-    // Load related data for viewing
-    if (permission.module_id) {
-      await fetchMenus(permission.module_id);
-      if (permission.menu_id) {
-        await fetchSubmenus(permission.menu_id);
-      }
-    }
-    
     openModal();
   }, [openModal]);
 
