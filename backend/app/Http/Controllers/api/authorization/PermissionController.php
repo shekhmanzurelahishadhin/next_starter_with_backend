@@ -27,7 +27,7 @@ class PermissionController extends Controller
     public function index(Request $request, PermissionService $permissionService)
     {
         $perPage = $request->get('per_page'); // can be null
-        $filters = $request->only('search');
+        $filters = $request->only('search','name','module_name','menu_name','sub_menu_name','created_at','updated_at');
 
         $permissions = $permissionService->getPermission($filters, $perPage);
 

@@ -77,9 +77,9 @@ class PermissionService {
 
     // Specific filter fields
     if (filters.name) params.append('name', filters.name);
-    if (filters.module_name) params.append('guard_name', filters.module_name);
-    if (filters.menu_name) params.append('guard_name', filters.menu_name);
-    if (filters.sub_menu_name) params.append('guard_name', filters.sub_menu_name);
+    if (filters.module_name) params.append('module_name', filters.module_name);
+    if (filters.menu_name) params.append('menu_name', filters.menu_name);
+    if (filters.sub_menu_name) params.append('sub_menu_name', filters.sub_menu_name);
     if (filters.created_at) params.append('created_at', filters.created_at);
     if (filters.updated_at) params.append('updated_at', filters.updated_at);
     
