@@ -1,9 +1,5 @@
 import { api } from "@/lib/api";
 
-// Simple in-memory cache
-const cache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
 export interface Permission {
   id: number;
   module_id: number;
@@ -42,31 +38,8 @@ class PermissionService {
     return `permissions_${JSON.stringify(filters)}`;
   }
 
-  private setCache(key: string, data: any): void {
-    cache.set(key, {
-      data,
-      timestamp: Date.now()
-    });
-  }
-
-  private getCache(key: string): any {
-    const cached = cache.get(key);
-    // check expiration
-    if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-      return cached.data;
-    }
-    cache.delete(key); // expired → delete it
-    return null;
-  }
 
   async getPermissions(filters: PermissionFilters = {}): Promise<PaginatedResponse<Permission>> {
-    // Don't cache searches
-    // if (!filters.search) {
-    //   const cacheKey = this.getCacheKey(filters);
-    //   const cached = this.getCache(cacheKey);
-    //   console.log('PermissionService.getPermissions - cacheKey:', cacheKey, 'cached:', cached);
-    //   if (cached) return cached;
-    // }
 
     const params = new URLSearchParams();
     
@@ -86,32 +59,20 @@ class PermissionService {
     const response = await api.get(`/permissions?${params}`);
     const result = response.data;
 
-    // Cache non-search results
-    // if (!filters.search) {
-    //   const cacheKey = this.getCacheKey(filters);
-    //   this.setCache(cacheKey, result);
-    // }
-
     return result;
   }
 
   async createPermission(permissionData: { name: string }): Promise<Permission> {
-    // Clear cache on create
-    // cache.clear();
     const response = await api.post('/permissions', permissionData);
     return response.data.data;
   }
 
   async updatePermission(id: number, permissionData: { name: string }): Promise<Permission> {
-    // Clear cache on update
-    // cache.clear();
     const response = await api.put(`/permissions/${id}`, permissionData);
     return response.data.data;
   }
 
   async deletePermission(id: number): Promise<void> {
-    // Clear cache on delete
-    // cache.clear();
     await api.delete(`/permissions/${id}`);
   }
 

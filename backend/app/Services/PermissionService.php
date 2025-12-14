@@ -9,31 +9,65 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionService
 {
-    public function getPermission($filters = [], $perPage)
+    public function getPermission(array $filters, $perPage = null)
     {
         $query = PermissionModel::query();
 
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
+        $query
+            ->when($filters['name'] ?? null, fn ($q, $name) =>
+            $q->where('name', 'like', "%{$name}%")
+            )
 
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhereHas('module', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
-                })
-                ->orWhereHas('menu', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
-                })
-                ->orWhereHas('subMenu', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
-                });
-        }
+            ->when($filters['module_name'] ?? null, fn ($q, $moduleName) =>
+            $q->whereHas('module', fn ($m) =>
+            $m->where('name', 'like', "%{$moduleName}%")
+            )
+            )
 
-        $query->with(['module:id,name','menu:id,name','subMenu:id,name'])
-            ->orderBy('id', 'desc');
+            ->when($filters['menu_name'] ?? null, fn ($q, $menuName) =>
+            $q->whereHas('menu', fn ($m) =>
+            $m->where('name', 'like', "%{$menuName}%")
+            )
+            )
 
-        // If perPage is provided, paginate; otherwise return all
+            ->when($filters['sub_menu_name'] ?? null, fn ($q, $subMenuName) =>
+            $q->whereHas('subMenu', fn ($sm) =>
+            $sm->where('name', 'like', "%{$subMenuName}%")
+            )
+            )
+
+            ->when($filters['created_at'] ?? null, fn ($q, $date) =>
+            $q->whereDate('created_at', date('Y-m-d', strtotime($date)))
+            )
+
+            ->when($filters['updated_at'] ?? null, fn ($q, $date) =>
+            $q->whereDate('updated_at', date('Y-m-d', strtotime($date)))
+            )
+
+            ->when($filters['search'] ?? null, fn ($q, $term) =>
+            $q->where(function ($sub) use ($term) {
+                $sub->where('name', 'like', "%{$term}%")
+                    ->orWhereHas('module', fn ($m) =>
+                    $m->where('name', 'like', "%{$term}%")
+                    )
+                    ->orWhereHas('menu', fn ($m) =>
+                    $m->where('name', 'like', "%{$term}%")
+                    )
+                    ->orWhereHas('subMenu', fn ($sm) =>
+                    $sm->where('name', 'like', "%{$term}%")
+                    );
+            })
+            );
+
+        $query->with([
+            'module:id,name',
+            'menu:id,name',
+            'subMenu:id,name'
+        ])->orderBy('id', 'desc');
+
         return $perPage ? $query->paginate($perPage) : $query->get();
     }
+
 
     public function createPermission(array $data)
     {
