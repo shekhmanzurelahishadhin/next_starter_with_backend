@@ -86,7 +86,7 @@ export default function Permissions() {
               loading={loading}
               exportFilename="permission"
               exportAllData={exportAllPermissions} // Provide exportAllPermissions function
-              showExportAllOption={false} // Disable "Export All" option
+              showExportAllOption={true} // Disable "Export All" option
             />
           </ComponentCard>
 

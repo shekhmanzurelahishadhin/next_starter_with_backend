@@ -11,12 +11,12 @@ import { set } from 'react-hook-form';
 export const usePermissions = () => {
   const { confirm } = useAlert();
   const { isOpen, openModal, closeModal } = useModal();
-  
+
   // Data state
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
+
   // Modal state
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>('create');
@@ -29,7 +29,7 @@ export const usePermissions = () => {
   const [loadingModules, setLoadingModules] = useState(false);
   const [loadingMenus, setLoadingMenus] = useState(false);
   const [loadingSubmenus, setLoadingSubmenus] = useState(false);
-  
+
   // Filter and pagination state
   const [filters, setFilters] = useState<Record<string, string | number>>({});
   const debouncedFilters = useDebounce(filters, 300);
@@ -38,7 +38,7 @@ export const usePermissions = () => {
     pageSize: 30,
   });
   const [total, setTotal] = useState(0);
-  
+
   // Search state
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput, 300);
@@ -66,21 +66,21 @@ export const usePermissions = () => {
   }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, debouncedFilters]);
 
   // Fetch modules
- const fetchModules = useCallback(async () => {
-  if (modules.length > 0) return; // Prevent re-fetching if already loaded
-  console.log("Fetching modules...");
-  
-  try {
-    setLoadingModules(true);
-    const res = await api.get("/modules");
-    setModules(res.data.map((m: any) => ({ value: m.id, label: m.name })));
-  } catch (err) {
-    console.error("Failed to fetch modules", err);
-    toast.error("Failed to load modules");
-  } finally {
-    setLoadingModules(false);
-  }
-}, [modules.length]);
+  const fetchModules = useCallback(async () => {
+    if (modules.length > 0) return; // Prevent re-fetching if already loaded
+    console.log("Fetching modules...");
+
+    try {
+      setLoadingModules(true);
+      const res = await api.get("/modules");
+      setModules(res.data.map((m: any) => ({ value: m.id, label: m.name })));
+    } catch (err) {
+      console.error("Failed to fetch modules", err);
+      toast.error("Failed to load modules");
+    } finally {
+      setLoadingModules(false);
+    }
+  }, [modules.length]);
 
   // Fetch menus based on module ID
   const fetchMenus = async (moduleId: number | null) => {
@@ -139,29 +139,29 @@ export const usePermissions = () => {
     openModal();
   }, [openModal]);
 
- // hooks/usePermissions.ts
+  // hooks/usePermissions.ts
 
-const handleEdit = useCallback(async (permission: Permission) => {
-  console.log("Editing permission:", permission);
-  setSelectedPermission(permission);
-  setMode('edit');
-  setBackendErrors({});
-  
-  // OPTIMIZATION: Set initial data immediately
-  setMenus([]);
-  setSubmenus([]);
-  
-  openModal();
-  
-  if (permission.module_id) {
-    // Don't await - let it load in background
-    fetchMenus(permission.module_id).then(() => {
-      if (permission.menu_id) {
-        fetchSubmenus(permission.menu_id);
-      }
-    });
-  }
-}, [openModal, fetchMenus, fetchSubmenus]);
+  const handleEdit = useCallback(async (permission: Permission) => {
+    console.log("Editing permission:", permission);
+    setSelectedPermission(permission);
+    setMode('edit');
+    setBackendErrors({});
+
+    // OPTIMIZATION: Set initial data immediately
+    setMenus([]);
+    setSubmenus([]);
+
+    openModal();
+
+    if (permission.module_id) {
+      // Don't await - let it load in background
+      fetchMenus(permission.module_id).then(() => {
+        if (permission.menu_id) {
+          fetchSubmenus(permission.menu_id);
+        }
+      });
+    }
+  }, [openModal, fetchMenus, fetchSubmenus]);
 
   const handleCreate = useCallback(() => {
     setSelectedPermission(null);
@@ -195,7 +195,7 @@ const handleEdit = useCallback(async (permission: Permission) => {
       // Optimistic update
       previousPermissions = [...permissions];
       setPermissions(prev => prev.filter(permission => permission.id !== id));
-      
+
       await permissionService.deletePermission(id);
       toast.success('Permission deleted successfully!');
       await loadPermissions();
@@ -206,11 +206,11 @@ const handleEdit = useCallback(async (permission: Permission) => {
     }
   }, [confirm, permissions, loadPermissions]);
 
-  const handleSave = useCallback(async (permissionData: { 
+  const handleSave = useCallback(async (permissionData: {
     name: string;
     module_id: number | null;
     menu_id: number | null;
-    submenu_id: number | null;
+    sub_menu_id: number | null;
   }) => {
     try {
       setSaving(true);
@@ -265,13 +265,9 @@ const handleEdit = useCallback(async (permission: Permission) => {
 
   // Function to export all permissions
   const exportAllPermissions = async () => {
-    try {
-      const response = await permissionService.getPermissions({});
-      return response.data;
-    } catch (error) {
-      console.error('Error exporting all permissions:', error);
-      throw error;
-    }
+    return permissionService.getPermissions({
+      per_page: 100000,
+    }).then(res => res.data);
   };
 
   return {
@@ -285,7 +281,7 @@ const handleEdit = useCallback(async (permission: Permission) => {
     backendErrors,
     pagination,
     total,
-    
+
     // Dropdown data
     modules,
     menus,
@@ -293,11 +289,11 @@ const handleEdit = useCallback(async (permission: Permission) => {
     loadingModules,
     loadingMenus,
     loadingSubmenus,
-    
+
     // Data fetching functions
     fetchMenus,
     fetchSubmenus,
-    
+
     // Actions
     setPagination,
     handleView,

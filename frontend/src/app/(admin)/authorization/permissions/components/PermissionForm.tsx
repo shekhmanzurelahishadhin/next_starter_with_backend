@@ -66,9 +66,7 @@ export function PermissionForm({
   const watchedModuleId = watch("module_id");
   const watchedMenuId = watch("menu_id");
 
-  /* ----------------------------------------
-   * OPTIMIZED: Only reset when module actually changes
-   * ---------------------------------------- */
+
   useEffect(() => {
     if (mode === 'create') {
     fetchMenus(watchedModuleId || null);
