@@ -147,14 +147,12 @@ export const usePermissions = () => {
     setMode('edit');
     setBackendErrors({});
 
-    // OPTIMIZATION: Set initial data immediately
     setMenus([]);
     setSubmenus([]);
 
     openModal();
 
     if (permission.module_id) {
-      // Don't await - let it load in background
       fetchMenus(permission.module_id).then(() => {
         if (permission.menu_id) {
           fetchSubmenus(permission.menu_id);

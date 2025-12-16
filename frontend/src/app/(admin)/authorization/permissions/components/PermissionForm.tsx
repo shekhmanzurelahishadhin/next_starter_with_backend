@@ -1,10 +1,11 @@
 "use client";
+
 import { useForm, Controller } from "react-hook-form";
+import { useEffect } from "react";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
-import { Permission } from "@/services/permissionService";
-import { useEffect } from "react";
 import ReactSelect from "@/components/form/ReactSelect";
+import { Permission } from "@/services/permissionService";
 
 interface PermissionFormData {
   name: string;
@@ -42,84 +43,96 @@ export function PermissionForm({
   loadingMenus,
   loadingSubmenus,
   fetchMenus,
-  fetchSubmenus
+  fetchSubmenus,
 }: PermissionFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    control,
+    watch,
+    setValue,
     reset,
     setError,
     clearErrors,
-    control,
-    watch,
   } = useForm<PermissionFormData>({
     mode: "onChange",
     defaultValues: {
-      name: permission?.name || "",
-      module_id: permission?.module_id || null,
-      menu_id: permission?.menu_id || null,
-      sub_menu_id: permission?.sub_menu_id || null,
+      name: "",
+      module_id: null,
+      menu_id: null,
+      sub_menu_id: null,
     },
   });
 
   const watchedModuleId = watch("module_id");
   const watchedMenuId = watch("menu_id");
 
-
+  /* ----------------------------------------
+   * Handle module change
+   * ---------------------------------------- */
   useEffect(() => {
-    if (mode === 'create') {
-    fetchMenus(watchedModuleId || null);
+    if (!watchedModuleId) {
+      setValue("menu_id", null);
+      setValue("sub_menu_id", null);
+      return;
     }
-    reset((prevValues) => ({
-      ...prevValues,
-      menu_id: null,
-      sub_menu_id: null,
-    }));
-    console.log('Module changed, resetting menu and submenu');
-  }, [watchedModuleId, reset]);
 
-  useEffect(() => {
-    if (mode === 'create') {
-    fetchSubmenus(watchedMenuId || null);
+
+    fetchMenus(watchedModuleId);
+    if (mode === "create") {
+      setValue("menu_id", null);
+      setValue("sub_menu_id", null);
     }
-    reset((prevValues) => ({
-      ...prevValues,
-      sub_menu_id: null,
-    }));
-  }, [watchedMenuId, reset]);
+  }, [watchedModuleId, setValue]);
 
-
+  /* ----------------------------------------
+   * Handle menu change
+   * ---------------------------------------- */
   useEffect(() => {
-    if (backendErrors) {
-      clearErrors();
-      Object.entries(backendErrors).forEach(([field, message]) => {
-        setError(field as keyof PermissionFormData, {
-          type: "server",
-          message: Array.isArray(message) ? message[0] : message,
-        });
+    if (!watchedMenuId) {
+      setValue("sub_menu_id", null);
+      return;
+    }
+
+
+    fetchSubmenus(watchedMenuId);
+    if (mode === "create") {
+      setValue("sub_menu_id", null);
+    }
+  }, [watchedMenuId, setValue]);
+
+  /* ----------------------------------------
+   * Backend validation errors
+   * ---------------------------------------- */
+  useEffect(() => {
+    if (!backendErrors) return;
+
+    clearErrors();
+    Object.entries(backendErrors).forEach(([field, message]) => {
+      setError(field as keyof PermissionFormData, {
+        type: "server",
+        message: Array.isArray(message) ? message[0] : message,
       });
-    }
+    });
   }, [backendErrors, clearErrors, setError]);
 
-
+  /* ----------------------------------------
+   * Edit mode: load permission once
+   * ---------------------------------------- */
   useEffect(() => {
-    if (permission) {
-      reset({
-        name: permission.name || "",
-        module_id: permission.module_id || null,
-        menu_id: permission.menu_id || null,
-        sub_menu_id: permission.sub_menu_id || null,
-      });
-    }
+    if (!permission) return;
+
+    reset({
+      name: permission.name ?? "",
+      module_id: permission.module_id ?? null,
+      menu_id: permission.menu_id ?? null,
+      sub_menu_id: permission.sub_menu_id ?? null,
+    });
   }, [permission, reset]);
 
-  const onFormSubmit = (data: PermissionFormData) => {
-    onSubmit(data);
-  };
-
   return (
-    <form id="permission-form" onSubmit={handleSubmit(onFormSubmit)}>
+    <form id="permission-form" onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-5">
 
         {/* Permission Name */}
@@ -141,7 +154,7 @@ export function PermissionForm({
           />
         </div>
 
-        {/* Module Select */}
+        {/* Module */}
         <div>
           <Label htmlFor="module_id" required>
             Module
@@ -153,8 +166,8 @@ export function PermissionForm({
             render={({ field, fieldState }) => (
               <ReactSelect
                 options={modules}
-                   value={field.value}
-                  onChange={(value) => field.onChange(value)}
+                value={field.value}
+                onChange={field.onChange}
                 isDisabled={saving}
                 isLoading={loadingModules}
                 error={fieldState.error?.message}
@@ -164,7 +177,7 @@ export function PermissionForm({
           />
         </div>
 
-        {/* Menu Select */}
+        {/* Menu */}
         <div>
           <Label htmlFor="menu_id" required>
             Menu
@@ -177,7 +190,7 @@ export function PermissionForm({
               <ReactSelect
                 options={menus}
                 value={field.value}
-                  onChange={(value) => field.onChange(value)}
+                onChange={field.onChange}
                 isDisabled={saving || !watchedModuleId}
                 isLoading={loadingMenus}
                 error={fieldState.error?.message}
@@ -189,7 +202,7 @@ export function PermissionForm({
           />
         </div>
 
-        {/* Submenu Select */}
+        {/* Submenu */}
         <div>
           <Label htmlFor="sub_menu_id">Submenu</Label>
           <Controller
@@ -199,7 +212,7 @@ export function PermissionForm({
               <ReactSelect
                 options={submenus}
                 value={field.value}
-                  onChange={(value) => field.onChange(value)}
+                onChange={field.onChange}
                 isDisabled={saving || !watchedMenuId}
                 isLoading={loadingSubmenus}
                 error={fieldState.error?.message}
@@ -208,11 +221,12 @@ export function PermissionForm({
                     ? "Select submenu (optional)"
                     : "Select a menu first"
                 }
-                isClearable={true}
+                isClearable
               />
             )}
           />
         </div>
+
       </div>
     </form>
   );
