@@ -83,7 +83,7 @@ export const usePermissions = () => {
   }, [modules.length]);
 
   // Fetch menus based on module ID
-  const fetchMenus = async (moduleId: number | null) => {
+  const fetchMenus = useCallback(async (moduleId: number | null) => {
     if (!moduleId) {
       setMenus([]);
       setSubmenus([]);
@@ -93,7 +93,6 @@ export const usePermissions = () => {
     try {
       setLoadingMenus(true);
       const res = await api.get(`/menus?module_id=${moduleId}`);
-      console.log("Fetched menus:", res.data);
       setMenus(res.data.map((m: any) => ({ value: m.id, label: m.name })));
       setSubmenus([]); // Clear submenus when module changes
     } catch (err) {
@@ -103,10 +102,10 @@ export const usePermissions = () => {
     } finally {
       setLoadingMenus(false);
     }
-  };
+  },[]);
 
   // Fetch submenus based on menu ID
-  const fetchSubmenus = async (menuId: number | null) => {
+  const fetchSubmenus = useCallback(async (menuId: number | null) => {
     if (!menuId) {
       setSubmenus([]);
       return;
@@ -123,7 +122,7 @@ export const usePermissions = () => {
     } finally {
       setLoadingSubmenus(false);
     }
-  };
+  },[]);
 
   // Load all initial data
   useEffect(() => {
@@ -151,15 +150,7 @@ export const usePermissions = () => {
     setSubmenus([]);
 
     openModal();
-
-    if (permission.module_id) {
-      fetchMenus(permission.module_id).then(() => {
-        if (permission.menu_id) {
-          fetchSubmenus(permission.menu_id);
-        }
-      });
-    }
-  }, [openModal, fetchMenus, fetchSubmenus]);
+  }, [openModal]);
 
   const handleCreate = useCallback(() => {
     setSelectedPermission(null);
