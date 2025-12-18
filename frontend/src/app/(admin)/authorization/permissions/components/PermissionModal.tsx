@@ -5,13 +5,19 @@ import { PermissionForm } from "./PermissionForm";
 import { PermissionDetailView } from "./PermissionDetailView";
 import { Permission } from "@/services/permissionService";
 
+interface PermissionFormData {
+  name: string;
+  module_id: number | null;
+  menu_id: number | null;
+  sub_menu_id: number | null;
+}
 interface PermissionModalProps {
   isOpen: boolean;
   permission: Permission | null;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
-  onSave: (permissionData: { name: string }) => void;
+  onSave: (permissionData: PermissionFormData) => void;
   backendErrors?: Record<string, string>;
 
   modules: { value: number; label: string }[];
