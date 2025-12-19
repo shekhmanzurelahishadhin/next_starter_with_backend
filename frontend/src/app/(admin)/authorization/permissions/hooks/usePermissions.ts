@@ -39,10 +39,6 @@ export const usePermissions = () => {
   });
   const [total, setTotal] = useState(0);
 
-  // Search state
-  const [searchInput, setSearchInput] = useState('');
-  const debouncedSearch = useDebounce(searchInput, 300);
-
   // Load permissions
   const loadPermissions = useCallback(async () => {
     try {
@@ -50,7 +46,6 @@ export const usePermissions = () => {
       const apiFilters: PermissionFilters = {
         page: pagination.pageIndex + 1,
         per_page: pagination.pageSize,
-        ...(debouncedSearch && { search: debouncedSearch }),
         ...debouncedFilters,
       };
 
@@ -63,7 +58,7 @@ export const usePermissions = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, debouncedFilters]);
+  }, [pagination.pageIndex, pagination.pageSize, debouncedFilters]);
 
   // Fetch modules
   const fetchModules = useCallback(async () => {
@@ -239,10 +234,6 @@ export const usePermissions = () => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, []);
 
-  const handleSearch = useCallback((value: string) => {
-    setSearchInput(value);
-  }, []);
-
   // Utility functions
   const clearBackendErrors = useCallback(() => {
     setBackendErrors({});
@@ -292,7 +283,6 @@ export const usePermissions = () => {
     handleDelete,
     handleSave,
     handleFilterChange,
-    handleSearch,
     clearBackendErrors,
     resetToFirstPage,
     loadPermissions,

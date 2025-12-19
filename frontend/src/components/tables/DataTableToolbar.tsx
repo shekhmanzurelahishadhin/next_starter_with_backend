@@ -1,13 +1,12 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 import { DownloadIcon, CopyIcon, FileIcon, GridIcon } from "../../icons/index";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { useState, useEffect, useCallback } from "react";
+import { useState} from "react";
 import { toast } from "react-toastify";
 
 
@@ -23,44 +22,12 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar<TData>({
   table,
-  searchKey,
   fileName = "data",
-  onSearchChange,
   exportAllData,
   showExportAllOption = false,
   loading = false,
 }: DataTableToolbarProps<TData>) {
-  const [searchValue, setSearchValue] = useState("");
   const [isExporting, setIsExporting] = useState(false);
-
-  // Debounce search with useCallback
-  const debouncedSearch = useCallback(
-    (value: string) => {
-      if (onSearchChange) {
-        onSearchChange(value);
-      } else {
-        // Fallback to local filtering if no onSearchChange provided
-        table.getColumn(searchKey!)?.setFilterValue(value);
-      }
-    },
-    [onSearchChange, table, searchKey]
-  );
-
-  // Effect for debouncing
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      debouncedSearch(searchValue);
-    }, 500); // 500ms debounce delay
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [searchValue, debouncedSearch]);
-
-  // Handle input change
-  const handleInputChange = (value: string) => {
-    setSearchValue(value);
-  };
 
   // Helper: Get visible headers and row data for export
   const getVisibleData = (dataToExport: TData[]) => {
@@ -201,19 +168,7 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-      {/* Search */}
-      <div className="flex flex-1 items-center space-x-2">
-        {searchKey && (
-          <Input
-            placeholder="Search..."
-            value={searchValue}
-            onChange={(e) => handleInputChange(e.target.value)}
-            className="h-10 w-[250px] lg:w-[300px] border-stroke bg-white dark:border-strokedark dark:bg-boxdark"
-            disabled={isExporting}
-          />
-        )}
-      </div>
-
+   
       {/* 📦 Export Buttons */}
       <div className="flex flex-wrap items-center gap-2">
         {/* Copy Button */}

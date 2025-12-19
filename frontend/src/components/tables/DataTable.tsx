@@ -59,7 +59,6 @@ export function DataTable<TData, TValue>({
   onPaginationChange,
   total,
   loading = false,
-  onSearchChange,
   onColumnFilterChange,
   exportFilename = "data",
   exportAllData,
@@ -97,7 +96,6 @@ export function DataTable<TData, TValue>({
         table={table}
         searchKey={searchKey}
         fileName={exportFilename}
-        onSearchChange={onSearchChange}
         exportAllData={exportAllData}
         showExportAllOption={showExportAllOption}
         loading={loading}

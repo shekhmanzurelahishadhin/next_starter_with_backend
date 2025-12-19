@@ -39,7 +39,6 @@ export default function Permissions() {
     handleDelete,
     handleSave,
     handleFilterChange,
-    handleSearch,
     exportAllPermissions,
   } = usePermissions();
 
@@ -78,7 +77,6 @@ export default function Permissions() {
               columns={columns}
               data={permissions}
               searchKey="name"
-              onSearchChange={handleSearch}
               pagination={pagination}
               onPaginationChange={setPagination}
               onColumnFilterChange={handleFilterChange}
