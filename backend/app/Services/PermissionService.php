@@ -52,8 +52,6 @@ class PermissionService
 
     public function createPermission(array $data)
     {
-        $data['guard_name'] = 'web';
-
         return Permission::create($data);
     }
 

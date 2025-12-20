@@ -28,10 +28,6 @@ export const useRoles = () => {
     pageSize: 50,
   });
   const [total, setTotal] = useState(0);
-  
-  // Search state
-  const [searchInput, setSearchInput] = useState('');
-  const debouncedSearch = useDebounce(searchInput, 300);
 
   // Load roles
   const loadRoles = useCallback(async () => {
@@ -40,7 +36,6 @@ export const useRoles = () => {
       const apiFilters: RoleFilters = {
         page: pagination.pageIndex + 1,
         per_page: pagination.pageSize,
-        ...(debouncedSearch && { search: debouncedSearch }),
         ...debouncedFilters,
       };
 
@@ -53,7 +48,7 @@ export const useRoles = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, debouncedFilters]);
+  }, [pagination.pageIndex, pagination.pageSize, debouncedFilters]);
 
   useEffect(() => {
     loadRoles();
@@ -152,9 +147,7 @@ export const useRoles = () => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, []);
 
-  const handleSearch = useCallback((value: string) => {
-    setSearchInput(value);
-  }, []);
+
 
   // Utility functions
   const clearBackendErrors = useCallback(() => {
@@ -198,7 +191,6 @@ export const useRoles = () => {
     handleDelete,
     handleSave,
     handleFilterChange,
-    handleSearch,
     clearBackendErrors,
     resetToFirstPage,
     loadRoles,

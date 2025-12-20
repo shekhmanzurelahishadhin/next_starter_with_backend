@@ -31,7 +31,6 @@ export default function Roles() {
     handleDelete,
     handleSave,
     handleFilterChange,
-    handleSearch,
     exportAllRoles,
   } = useRoles();
 
@@ -70,7 +69,6 @@ export default function Roles() {
               columns={columns}
               data={roles}
               searchKey="name"
-              onSearchChange={handleSearch}
               pagination={pagination}
               onPaginationChange={setPagination}
               onColumnFilterChange={handleFilterChange}
