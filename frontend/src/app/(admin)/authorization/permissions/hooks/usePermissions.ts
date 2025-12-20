@@ -6,7 +6,6 @@ import { useAlert } from '@/hooks/useAlert';
 import { useModal } from '@/hooks/useModal';
 import { useDebounce } from '@/hooks/useDebounce';
 import { api } from '@/lib/api';
-import { set } from 'react-hook-form';
 
 export const usePermissions = () => {
   const { confirm } = useAlert();
