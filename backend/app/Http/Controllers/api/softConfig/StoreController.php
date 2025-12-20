@@ -9,6 +9,7 @@ use App\Http\Resources\softConfig\store\StoreResource;
 use App\Models\softConfig\Store;
 use App\Services\softConfig\StoreService;
 use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
 
 class StoreController extends Controller
 {
@@ -21,29 +22,37 @@ class StoreController extends Controller
     }
     public function index(Request $request, StoreService $storeService)
     {
-        $perPage = $request->get('per_page');
-        $filters = $request->only('search','status','name','company_name','code','address','created_at','created_by');
-        $companyId = $request->query('company_id');
+        try{
+            $perPage = $request->get('per_page');
+            $filters = $request->only('search','status','name','company_name','code','address','created_at','created_by');
+            $companyId = $request->query('company_id');
 
-        $stores = $storeService->getStores($filters, $perPage, $companyId);
+            $stores = $storeService->getStores($filters, $perPage, $companyId);
 
-        if ($stores instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            // Paginated response
-            return response()->json([
-                'data' => StoreResource::collection($stores->items()),
-                'total' => $stores->total(),
-                'current_page' => $stores->currentPage(),
-                'per_page' => $stores->perPage(),
-            ]);
+            if ($stores instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'data'         => StoreResource::collection($stores->items()),
+                    'total'        => $stores->total(),
+                    'current_page' => $stores->currentPage(),
+                    'per_page'     => $stores->perPage(),
+                ];
+            }else {
+                // Collection response (no pagination)
+                $data = [
+                    'data'         => StoreResource::collection($stores),
+                    'total'        => $stores->count(),
+                    'current_page' => 1,
+                    'per_page'     => $stores->count(),
+                ];
+            }
+
+            return ApiResponse::success($data, 'Store retrieve successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve Store');
         }
 
-        // Collection response (no pagination)
-        return response()->json([
-            'data' => StoreResource::collection($stores),
-            'total' => $stores->count(),
-            'current_page' => 1,
-            'per_page' => $stores->count(),
-        ]);
     }
 
     /**
@@ -55,10 +64,11 @@ class StoreController extends Controller
 
         $store  = $storeService->createStore($validatedData);
 
-        return response()->json([
-            'message' => 'Store created successfully',
-            'data' => new StoreResource($store),
-        ]);
+        return ApiResponse::success(
+            new StoreResource($store),
+            'Store created successfully',
+            201
+        );
     }
 
     /**
@@ -66,7 +76,12 @@ class StoreController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $store  = Store::withTrashed()->findOrFail($id);
+        return ApiResponse::success(
+            new StoreResource($store),
+            'Store retrieve successfully',
+            201
+        );
     }
 
     /**
@@ -76,10 +91,10 @@ class StoreController extends Controller
     {
         $store  = $storeService->updateStore($store , $request->validated());
 
-        return response()->json([
-            'message' => 'Store updated successfully',
-            'data' => new StoreResource($store),
-        ]);
+        return ApiResponse::success(
+            new StoreResource($store),
+            'Store updated successfully'
+        );
     }
 
     /**
@@ -91,9 +106,10 @@ class StoreController extends Controller
     {
         $storeService->softDeleteStore($store);
 
-        return response()->json([
-            'message' => 'Store moved to trash successfully',
-        ]);
+        return ApiResponse::success(
+            null,
+            'Store moved to trash successfully'
+        );
     }
 
     // Restore soft-deleted store

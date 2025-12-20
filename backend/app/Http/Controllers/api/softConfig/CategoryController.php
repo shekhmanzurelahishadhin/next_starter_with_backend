@@ -9,6 +9,9 @@ use App\Http\Resources\softConfig\category\CategoryResource;
 use App\Models\softConfig\Category;
 use App\Services\softConfig\CategoryService;
 use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 
 class CategoryController extends Controller
 {
@@ -24,28 +27,35 @@ class CategoryController extends Controller
      */
     public function index(Request $request, CategoryService $categoryService)
     {
-        $perPage = $request->get('per_page');
-        $filters = $request->only('search','status','name','description','created_by','created_at');
+        try {
+            $perPage = $request->get('per_page');
+            $filters = $request->only('search','status','name', 'slug', 'description','created_by','created_at');
 
-        $categories = $categoryService->getCategories($filters, $perPage);
+            $categories = $categoryService->getCategories($filters, $perPage);
 
-        if ($categories instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            // Paginated response
-            return response()->json([
-                'data' => CategoryResource::collection($categories->items()),
-                'total' => $categories->total(),
-                'current_page' => $categories->currentPage(),
-                'per_page' => $categories->perPage(),
-            ]);
+            if ($categories instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'data'         => CategoryResource::collection($categories->items()),
+                    'total'        => $categories->total(),
+                    'current_page' => $categories->currentPage(),
+                    'per_page'     => $categories->perPage(),
+                ];
+            }else {
+                // Collection response (no pagination)
+                $data = [
+                    'data'         => CategoryResource::collection($categories),
+                    'total'        => $categories->count(),
+                    'current_page' => 1,
+                    'per_page'     => $categories->count(),
+                ];
+            }
+
+            return ApiResponse::success($data, 'Categories retrieved successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve categories');
         }
-
-        // Collection response (no pagination)
-        return response()->json([
-            'data' => CategoryResource::collection($categories),
-            'total' => $categories->count(),
-            'current_page' => 1,
-            'per_page' => $categories->count(),
-        ]);
     }
 
     /**
@@ -53,14 +63,20 @@ class CategoryController extends Controller
      */
     public function store(CreateCategoryRequest $request, CategoryService $categoryService)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $category = $categoryService->createCategory($validatedData);
+            $category = $categoryService->createCategory($validatedData);
 
-        return response()->json([
-            'message' => 'Category created successfully',
-            'data' => new CategoryResource($category),
-        ]);
+            return ApiResponse::success(
+                new CategoryResource($category),
+                'Category created successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to create category');
+        }
     }
 
     /**
@@ -68,7 +84,7 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return ApiResponse::notFound('Not implemented');
     }
 
     /**
@@ -76,13 +92,17 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, CategoryService $categoryService, Category $category)
     {
+        try {
+            $category = $categoryService->updateCategory($category, $request->validated());
 
-        $category = $categoryService->updateCategory($category, $request->validated());
+            return ApiResponse::success(
+                new CategoryResource($category),
+                'Category updated successfully'
+            );
 
-        return response()->json([
-            'message' => 'Category updated successfully',
-            'data' => new CategoryResource($category),
-        ]);
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to update category');
+        }
     }
 
     /**
@@ -92,40 +112,62 @@ class CategoryController extends Controller
     // Soft delete (move to trash)
     public function trash(Category $category, CategoryService $categoryService)
     {
-        $categoryService->softDeleteCategory($category);
+        try {
+            $categoryService->softDeleteCategory($category);
 
-        return response()->json([
-            'message' => 'Category moved to trash successfully',
-        ]);
+            return ApiResponse::success(
+                null,
+                'Category moved to trash successfully'
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to move category to trash');
+        }
     }
 
     // Restore soft-deleted category
     public function restore($id, CategoryService $categoryService)
     {
-        $category = Category::withTrashed()->findOrFail($id);
+        try {
+            $category = Category::withTrashed()->findOrFail($id);
 
-        $category = $categoryService->restoreCategory($category);
+            $category = $categoryService->restoreCategory($category);
 
-        return response()->json([
-            'message' => 'Category restored successfully',
-            'data' => $category,
-        ]);
+            return ApiResponse::success(
+                new CategoryResource($category),
+                'Category restored successfully'
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::notFound('Category not found');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to restore category');
+        }
     }
 
     // Force delete permanently
     public function destroy($id, CategoryService $categoryService)
     {
-        $category = Category::withTrashed()->findOrFail($id);
-        $deleted = $categoryService->forceDeleteCategory($category);
+        try {
+            $category = Category::withTrashed()->findOrFail($id);
+            $deleted = $categoryService->forceDeleteCategory($category);
 
-        if ($deleted) {
-            return response()->json([
-                'message' => 'Category permanently deleted',
-            ]);
+            if ($deleted) {
+                return ApiResponse::success(
+                    null,
+                    'Category permanently deleted'
+                );
+            }
+
+            return ApiResponse::error(
+                'Category is not in trash',
+                400
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::notFound('Category not found');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to delete category');
         }
-
-        return response()->json([
-            'message' => 'Category is not in trash',
-        ], 400);
     }
 }

@@ -9,6 +9,8 @@ use App\Http\Resources\softConfig\unit\UnitResource;
 use App\Models\softConfig\Unit;
 use App\Services\softConfig\UnitService;
 use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UnitController extends Controller
 {
@@ -24,28 +26,34 @@ class UnitController extends Controller
      */
     public function index(Request $request, UnitService $unitService)
     {
-        $perPage = $request->get('per_page');
-        $filters = $request->only('search','status','name','code','created_at','created_by');
+        try{
+            $perPage = $request->get('per_page');
+            $filters = $request->only('search','status','name','code','created_at','created_by');
 
-        $units = $unitService->getUnits($filters, $perPage);
+            $units = $unitService->getUnits($filters, $perPage);
 
-        if ($units instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            // Paginated response
-            return response()->json([
-                'data' => UnitResource::collection($units->items()),
-                'total' => $units->total(),
-                'current_page' => $units->currentPage(),
-                'per_page' => $units->perPage(),
-            ]);
+            if ($units instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data =[
+                    'data'         => UnitResource::collection($units->items()),
+                    'total'        => $units->total(),
+                    'current_page' => $units->currentPage(),
+                    'per_page'     => $units->perPage(),
+                ];
+            }else{
+                // Collection response (no pagination)
+                $data = [
+                    'data'         => UnitResource::collection($units),
+                    'total'        => $units->count(),
+                    'current_page' => 1,
+                    'per_page'     => $units->count(),
+                ];
+            }
+            return ApiResponse::success($data, 'Unit retrieve successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve Unit');
         }
-
-        // Collection response (no pagination)
-        return response()->json([
-            'data' => UnitResource::collection($units),
-            'total' => $units->count(),
-            'current_page' => 1,
-            'per_page' => $units->count(),
-        ]);
     }
 
     /**
@@ -53,14 +61,20 @@ class UnitController extends Controller
      */
     public function store(CreateUnitRequest $request, UnitService $unitService)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $unit = $unitService->createUnit($validatedData);
+            $unit = $unitService->createUnit($validatedData);
 
-        return response()->json([
-            'message' => 'Unit created successfully',
-            'data' => new UnitResource($unit),
-        ]);
+            return ApiResponse::success(
+                new UnitResource($unit),
+                'Unit created successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to create unit');
+        }
     }
 
     /**
@@ -68,7 +82,18 @@ class UnitController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $unit = Unit::withTrashed()->findOrFail($id);
+
+            return ApiResponse::success(
+                new UnitResource($unit),
+                'Unit retrieve successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve Unit');
+        }
     }
 
     /**
@@ -76,13 +101,16 @@ class UnitController extends Controller
      */
     public function update(UpdateUnitRequest $request, UnitService $unitService, Unit $unit)
     {
+        try {
+            $unit = $unitService->updateUnit($unit, $request->validated());
+            return ApiResponse::success(
+                new UnitResource($unit),
+                'Unit updated successfully'
+            );
 
-        $unit = $unitService->updateUnit($unit, $request->validated());
-
-        return response()->json([
-            'message' => 'Unit updated successfully',
-            'data' => new UnitResource($unit),
-        ]);
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to update Unit');
+        }
     }
 
     /**
@@ -92,24 +120,37 @@ class UnitController extends Controller
     // Soft delete (move to trash)
     public function trash(Unit $unit, UnitService $unitService)
     {
-        $unitService->softDeleteUnit($unit);
+        try {
+            $unitService->softDeleteUnit($unit);
 
-        return response()->json([
-            'message' => 'Unit moved to trash successfully',
-        ]);
+            return ApiResponse::success(
+                null,
+                'Unit moved to trash successfully'
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to move Unit to trash');
+        }
     }
 
     // Restore soft-deleted unit
     public function restore($id, UnitService $unitService)
     {
-        $unit = Unit::withTrashed()->findOrFail($id);
+        try {
+            $unit = Unit::withTrashed()->findOrFail($id);
 
-        $unit = $unitService->restoreUnit($unit);
+            $unit = $unitService->restoreUnit($unit);
 
-        return response()->json([
-            'message' => 'Unit restored successfully',
-            'data' => $unit,
-        ]);
+            return ApiResponse::success(
+                new UnitResource($unit),
+                'Unit restored successfully'
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::notFound('Unit not found');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to restore Unit');
+        }
     }
 
     // Force delete permanently

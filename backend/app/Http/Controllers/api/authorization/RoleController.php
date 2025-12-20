@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\api\authorization;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\authorization\roles\CreateRoleRequest;
 use App\Http\Requests\authorization\roles\UpdateRoleRequest;
 use App\Http\Resources\authorization\RoleResource;
 use App\Services\RoleService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
@@ -23,58 +25,93 @@ class RoleController extends Controller
 
     public function index(Request $request, RoleService $roleService)
     {
-        $perPage = $request->get('per_page'); // can be null
-        $filters = $request->only('name','guard_name','created_at','updated_at');
+        try {
+            $perPage = $request->get('per_page');
+            $filters = $request->only('name','guard_name','created_at','updated_at');
 
-        $roles = $roleService->getRoles($filters, $perPage);
+            $roles = $roleService->getRoles($filters, $perPage);
 
-        // Check if paginated
-        if ($roles instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            return response()->json([
-                'data' => RoleResource::collection($roles),
-                'total' => $roles->total(),
-                'current_page' => $roles->currentPage(),
-                'per_page' => $roles->perPage(),
-            ]);
+            if ($roles instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'data' => RoleResource::collection($roles->items()),
+                    'total' => $roles->total(),
+                    'current_page' => $roles->currentPage(),
+                    'per_page' => $roles->perPage(),
+                ];
+            }else {
+                // Collection response (no pagination)
+                $data = [
+                    'data' => RoleResource::collection($roles->items()),
+                    'total' => $roles->count(),
+                    'current_page' => 1,
+                    'per_page' => $roles->count(),
+                ];
+            }
+
+            return ApiResponse::success($data, 'Roles retrieved successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve roles');
         }
-
-        // Not paginated, return all
-        return response()->json([
-            'data' => RoleResource::collection($roles),
-            'total' => $roles->count(),
-            'current_page' => 1,
-            'per_page' => $roles->count(),
-        ]);
     }
 
 
     public function store(CreateRoleRequest $request,  RoleService $roleService)
     {
-        $role = $roleService->createRole($request->validated());
+        try {
+            $validatedData = $request->validated();
 
-        return response()->json([
-            'message' => 'Role created successfully',
-            'data' => new RoleResource($role),
-        ]);
+            $role = $roleService->createRole($validatedData);
+
+            return ApiResponse::success(
+                new RoleResource($role),
+                'Role created successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to create role');
+        }
     }
 
     public function update(UpdateRoleRequest $request, RoleService $roleService,  Role $role)
     {
-        $updatedRole = $roleService->updateRole($role, $request->validated());
+        try {
+            $role = $roleService->updateRole($role, $request->validated());
 
-        return response()->json([
-            'message' => 'Role updated successfully',
-            'data' => new RoleResource($updatedRole),
-        ]);
+            return ApiResponse::success(
+                new RoleResource($role),
+                'Role updated successfully'
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to update role');
+        }
     }
 
     public function destroy(RoleService $roleService, Role $role)
     {
-        $roleService->deleteRole($role);
+        try {
+            $deleted = $roleService->deleteRole($role);
 
-        return response()->json([
-            'message' => 'Role deleted successfully',
-        ]);
+            if ($deleted) {
+                return ApiResponse::success(
+                    null,
+                    'Role permanently deleted'
+                );
+            }
+
+            return ApiResponse::error(
+                'Role is not in trash',
+                400
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::notFound('Role not found');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to delete role');
+        }
     }
 
     // RoleController.php

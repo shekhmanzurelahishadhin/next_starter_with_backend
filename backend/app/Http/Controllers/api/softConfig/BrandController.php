@@ -9,6 +9,8 @@ use App\Http\Resources\softConfig\brand\BrandResource;
 use App\Models\softConfig\Brand;
 use App\Services\softConfig\BrandService;
 use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BrandController extends Controller
 {
@@ -22,28 +24,34 @@ class BrandController extends Controller
 
     public function index(Request $request, BrandService $brandService)
     {
-        $perPage = $request->get('per_page');
-        $filters = $request->only('search','status','name','created_at','created_by');
+        try {
+            $perPage = $request->get('per_page');
+            $filters = $request->only('search','status','name','created_at','created_by');
 
-        $brands = $brandService->getBrands($filters, $perPage);
+            $brands = $brandService->getBrands($filters, $perPage);
 
-        if ($brands instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            // Paginated response
-            return response()->json([
-                'data' => BrandResource::collection($brands->items()),
-                'total' => $brands->total(),
-                'current_page' => $brands->currentPage(),
-                'per_page' => $brands->perPage(),
-            ]);
+            if ($brands instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'data'         => BrandResource::collection($brands->items()),
+                    'total'        => $brands->total(),
+                    'current_page' => $brands->currentPage(),
+                    'per_page'     => $brands->perPage(),
+                ];
+            }else{
+                // Collection response (no pagination)
+                $data = [
+                    'data'         => BrandResource::collection($brands),
+                    'total'        => $brands->count(),
+                    'current_page' => 1,
+                    'per_page'     => $brands->count(),
+                ];
+            }
+            return ApiResponse::success($data, 'Brand retrieved successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve Brand');
         }
-
-        // Collection response (no pagination)
-        return response()->json([
-            'data' => BrandResource::collection($brands),
-            'total' => $brands->count(),
-            'current_page' => 1,
-            'per_page' => $brands->count(),
-        ]);
     }
 
     /**
@@ -51,14 +59,19 @@ class BrandController extends Controller
      */
     public function store(CreateBrandRequest $request, BrandService $brandService)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $brand = $brandService->createBrand($validatedData);
+            $brand = $brandService->createBrand($validatedData);
 
-        return response()->json([
-            'message' => 'Brand created successfully',
-            'data' => new BrandResource($brand),
-        ]);
+            return ApiResponse::success(
+                new BrandResource($brand),
+                'Brand created successfully',
+                201
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to create Brand');
+        }
     }
 
     /**
@@ -66,7 +79,18 @@ class BrandController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $brand = Brand::withTrashed()->findOrFail($id);
+
+            return ApiResponse::success(
+                new BrandResource($brand),
+                'Brand retrieved successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieved Brand');
+        }
     }
 
     /**
@@ -74,13 +98,17 @@ class BrandController extends Controller
      */
     public function update(UpdateBrandRequest $request, BrandService $brandService, Brand $brand)
     {
+        try {
+            $brand = $brandService->updateBrand($brand, $request->validated());
 
-        $brand = $brandService->updateBrand($brand, $request->validated());
+            return ApiResponse::success(
+                new BrandResource($brand),
+                'Brand updated successfully'
+            );
 
-        return response()->json([
-            'message' => 'Brand updated successfully',
-            'data' => new BrandResource($brand),
-        ]);
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to update Brand');
+        }
     }
 
     /**
@@ -90,24 +118,37 @@ class BrandController extends Controller
     // Soft delete (move to trash)
     public function trash(Brand $brand, BrandService $brandService)
     {
-        $brandService->softDeleteBrand($brand);
+        try {
+            $brandService->softDeleteBrand($brand);
 
-        return response()->json([
-            'message' => 'Brand moved to trash successfully',
-        ]);
+            return ApiResponse::success(
+                null,
+                'Brand moved to trash successfully'
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to move Brand to trash');
+        }
     }
 
     // Restore soft-deleted brand
     public function restore($id, BrandService $brandService)
     {
-        $brand = Brand::withTrashed()->findOrFail($id);
+        try {
+            $brand = Brand::withTrashed()->findOrFail($id);
 
-        $brand = $brandService->restoreBrand($brand);
+            $brand = $brandService->restoreBrand($brand);
 
-        return response()->json([
-            'message' => 'Brand restored successfully',
-            'data' => $brand,
-        ]);
+            return ApiResponse::success(
+                new BrandResource($brand),
+                'Brand restored successfully'
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::notFound('Brand not found');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to restore Brand');
+        }
     }
 
     // Force delete permanently

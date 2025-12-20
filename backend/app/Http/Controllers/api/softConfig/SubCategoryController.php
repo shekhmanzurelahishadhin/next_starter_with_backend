@@ -5,10 +5,13 @@ namespace App\Http\Controllers\api\softConfig;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\softConfig\subCategory\CreateSubCategoryRequest;
 use App\Http\Requests\softConfig\subCategory\UpdateSubCategoryRequest;
+use App\Http\Resources\softConfig\category\CategoryResource;
 use App\Http\Resources\softConfig\subCategory\SubCategoryResource;
 use App\Models\softConfig\SubCategory;
 use App\Services\softConfig\SubCategoryService;
 use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SubCategoryController extends Controller
 {
@@ -21,7 +24,7 @@ class SubCategoryController extends Controller
     }
     public function index(Request $request, SubCategoryService $subCategoryService)
     {
-        $perPage = $request->get('per_page');
+        /*$perPage = $request->get('per_page');
         $filters = $request->only('search','status','name','category_name','created_at','created_by');
         $categoryId = $request->query('category_id');
 
@@ -43,7 +46,37 @@ class SubCategoryController extends Controller
             'total' => $subCategories->count(),
             'current_page' => 1,
             'per_page' => $subCategories->count(),
-        ]);
+        ]);*/
+        try {
+            $perPage    = $request->get('per_page');
+            $filters    = $request->only('search','status','name','category_name','created_at','created_by');
+            $categoryId = $request->query('category_id');
+
+            $subCategories = $subCategoryService->getSubCategories($filters, $perPage, $categoryId);
+
+            if ($subCategories instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'data'         => SubCategoryResource::collection($subCategories->items()),
+                    'total'        => $subCategories->total(),
+                    'current_page' => $subCategories->currentPage(),
+                    'per_page'     => $subCategories->perPage(),
+                ];
+            }else{
+                // Collection response (no pagination)
+                $data = [
+                    'data'         => SubCategoryResource::collection($subCategories),
+                    'total'        => $subCategories->count(),
+                    'current_page' => 1,
+                    'per_page'     => $subCategories->count(),
+                ];
+            }
+
+            return ApiResponse::success($data, 'Sub-categories retrieved successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve sub-categories');
+        }
     }
 
     /**
@@ -51,14 +84,19 @@ class SubCategoryController extends Controller
      */
     public function store(CreateSubCategoryRequest $request, SubCategoryService $subCategoryService)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
+            $subCategory   = $subCategoryService->createSubCategory($validatedData);
 
-        $subCategory  = $subCategoryService->createSubCategory($validatedData);
+            return ApiResponse::success(
+                new SubCategoryResource($subCategory),
+                'SubCategory created successfully',
+                201
+            );
 
-        return response()->json([
-            'message' => 'SubCategory created successfully',
-            'data' => new SubCategoryResource($subCategory),
-        ]);
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to create SubCategory');
+        }
     }
 
     /**
@@ -66,7 +104,18 @@ class SubCategoryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $subCategory  = SubCategory::withTrashed()->findOrFail($id);
+
+            return ApiResponse::success(
+                new SubCategoryResource($subCategory),
+                'SubCategory retrieved successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieved SubCategory');
+        }
     }
 
     /**
@@ -74,12 +123,17 @@ class SubCategoryController extends Controller
      */
     public function update(UpdateSubCategoryRequest $request, SubCategoryService $subCategoryService, SubCategory $subCategory)
     {
-        $subCategory  = $subCategoryService->updateSubCategory($subCategory , $request->validated());
+        try {
+            $subCategory  = $subCategoryService->updateSubCategory($subCategory , $request->validated());
 
-        return response()->json([
-            'message' => 'Category updated successfully',
-            'data' => new SubCategoryResource($subCategory),
-        ]);
+            return ApiResponse::success(
+                new SubCategoryResource($subCategory),
+                'SubCategory updated successfully'
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to update SubCategory');
+        }
     }
 
     /**
@@ -89,24 +143,37 @@ class SubCategoryController extends Controller
     // Soft delete (move to trash)
     public function trash(SubCategory $subCategory , SubCategoryService $subCategoryService)
     {
-        $subCategoryService->softDeleteSubCategory($subCategory);
+        try {
+            $subCategoryService->softDeleteSubCategory($subCategory);
 
-        return response()->json([
-            'message' => 'SubCategory moved to trash successfully',
-        ]);
+            return ApiResponse::success(
+                null,
+                'SubCategory moved to trash successfully'
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to move SubCategory to trash');
+        }
     }
 
     // Restore soft-deleted category
     public function restore($id, SubCategoryService $subCategoryService)
     {
-        $subCategory  = SubCategory::withTrashed()->findOrFail($id);
+        try {
+            $subCategory  = SubCategory::withTrashed()->findOrFail($id);
 
-        $subCategory  = $subCategoryService->restoreSubCategory($subCategory);
+            $subCategory  = $subCategoryService->restoreSubCategory($subCategory);
 
-        return response()->json([
-            'message' => 'SubCategory restored successfully',
-            'data' => $subCategory ,
-        ]);
+            return ApiResponse::success(
+                new SubCategoryResource($subCategory),
+                'SubCategory restored successfully'
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::notFound('SubCategory not found');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to restore SubCategory');
+        }
     }
 
     // Force delete permanently
