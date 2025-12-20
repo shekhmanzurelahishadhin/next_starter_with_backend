@@ -4,7 +4,7 @@ import './globals.css';
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
- import { ToastContainer, toast } from 'react-toastify';
+ import { ToastContainer } from 'react-toastify';
 
 const outfit = Outfit({
   subsets: ["latin"],
