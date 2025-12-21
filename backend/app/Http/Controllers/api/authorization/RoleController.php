@@ -34,7 +34,7 @@ class RoleController extends Controller
             if ($roles instanceof \Illuminate\Pagination\LengthAwarePaginator) {
                 // Paginated response
                 $data = [
-                    'data' => RoleResource::collection($roles->items()),
+                    'items' => RoleResource::collection($roles->items()),
                     'total' => $roles->total(),
                     'current_page' => $roles->currentPage(),
                     'per_page' => $roles->perPage(),
@@ -42,7 +42,7 @@ class RoleController extends Controller
             }else {
                 // Collection response (no pagination)
                 $data = [
-                    'data' => RoleResource::collection($roles->items()),
+                    'items' => RoleResource::collection($roles),
                     'total' => $roles->count(),
                     'current_page' => 1,
                     'per_page' => $roles->count(),

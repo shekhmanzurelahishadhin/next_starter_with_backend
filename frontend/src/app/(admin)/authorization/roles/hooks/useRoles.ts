@@ -40,8 +40,8 @@ export const useRoles = () => {
       };
 
       const response: PaginatedResponse<Role> = await roleService.getRoles(apiFilters);
-      setRoles(response.data);
-      setTotal(response.total);
+      setRoles(response.data?.items);
+      setTotal(response.data?.total);
     } catch (err) {
       toast.error('Failed to load roles');
       console.error('Error loading roles:', err);
@@ -163,7 +163,7 @@ export const useRoles = () => {
       try {
         // Call API without pagination to get all data
         const response = await roleService.getRoles({});
-        return response.data;
+        return response.data?.items;
       } catch (error) {
         console.error('Error exporting all roles:', error);
         throw error;

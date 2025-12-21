@@ -52,6 +52,7 @@ class PermissionService
 
     public function createPermission(array $data)
     {
+        $data['guard_name'] = 'web';
         return Permission::create($data);
     }
 
@@ -67,6 +68,11 @@ class PermissionService
 
     public function deletePermission($permission)
     {
-        return $permission->delete();
+        try {
+            return $permission->delete();
+        }catch (\Exception $e){
+            return $e->getMessage();
+        }
+
     }
 }
