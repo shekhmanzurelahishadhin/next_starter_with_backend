@@ -6,7 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\authorization\permission\CreatePermissionRequest;
 use App\Http\Requests\authorization\permission\UpdatePermissionRequest;
-use App\Http\Resources\authorization\PermissionRecource;
+use App\Http\Resources\authorization\PermissionResource;
 use App\Models\authorization\Menu;
 use App\Models\authorization\Module;
 use App\Models\authorization\PermissionModel;
@@ -36,7 +36,7 @@ class PermissionController extends Controller
             if ($permissions instanceof \Illuminate\Pagination\LengthAwarePaginator) {
                 // Paginated response
                 $data = [
-                    'items' => PermissionRecource::collection($permissions->items()),
+                    'items' => PermissionResource::collection($permissions->items()),
                     'total' => $permissions->total(),
                     'current_page' => $permissions->currentPage(),
                     'per_page' => $permissions->perPage(),
@@ -44,7 +44,7 @@ class PermissionController extends Controller
             }else {
                 // Collection response (no pagination)
                 $data = [
-                    'items' => PermissionRecource::collection($permissions),
+                    'items' => PermissionResource::collection($permissions),
                     'total' => $permissions->count(),
                     'current_page' => 1,
                     'per_page' => $permissions->count(),
@@ -60,32 +60,59 @@ class PermissionController extends Controller
 
     public function store(CreatePermissionRequest $request,  PermissionService $permissionService)
     {
-        $permission = $permissionService->createPermission($request->validated());
+        try {
+            $validatedData = $request->validated();
 
-        return response()->json([
-            'message' => 'Permission created successfully',
-            'data' => new PermissionRecource($permission),
-        ]);
+            $permission = $permissionService->createPermission($validatedData);
+
+            return ApiResponse::success(
+                new PermissionResource($permission),
+                'Permission created successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to create permission');
+        }
     }
 
     public function update(UpdatePermissionRequest $request, PermissionService $permissionService,  Permission $permission)
     {
-        $updatedPermission = $permissionService->updatePermission($permission, $request->validated());
+        try {
+            $permission = $permissionService->updatePermission($permission, $request->validated());
 
+            return ApiResponse::success(
+                new PermissionResource($permission),
+                'Permission updated successfully'
+            );
 
-        return response()->json([
-            'message' => 'Permission updated successfully',
-            'data' => new PermissionRecource($updatedPermission),
-        ]);
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to update permission');
+        }
     }
 
     public function destroy(PermissionService $permissionService, Permission $permission)
     {
-        $permissionService->deletePermission($permission);
+        try {
+            $deleted = $permissionService->deletePermission($permission);
 
-        return response()->json([
-            'message' => 'Permission deleted successfully',
-        ]);
+            if ($deleted) {
+                return ApiResponse::success(
+                    null,
+                    'Permission permanently deleted'
+                );
+            }
+
+            return ApiResponse::error(
+                'Permission is not in trash',
+                400
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::notFound('Permission not found');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to delete permission');
+        }
     }
     public function modules()
     {
