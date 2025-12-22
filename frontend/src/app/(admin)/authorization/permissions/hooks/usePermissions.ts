@@ -49,8 +49,8 @@ export const usePermissions = () => {
       };
 
       const response: PaginatedResponse<Permission> = await permissionService.getPermissions(apiFilters);
-      setPermissions(response.data);
-      setTotal(response.total);
+      setPermissions(response.data?.items);
+      setTotal(response.data?.total);
     } catch (err) {
       toast.error('Failed to load permissions');
       console.error('Error loading permissions:', err);
@@ -246,7 +246,7 @@ export const usePermissions = () => {
   const exportAllPermissions = async () => {
     return permissionService.getPermissions({
       per_page: 100000,
-    }).then(res => res.data);
+    }).then(res => res.data?.items);
   };
 
   return {

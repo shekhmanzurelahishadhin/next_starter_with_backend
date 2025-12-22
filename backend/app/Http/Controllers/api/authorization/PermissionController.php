@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\authorization;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\authorization\permission\CreatePermissionRequest;
 use App\Http\Requests\authorization\permission\UpdatePermissionRequest;
@@ -26,27 +27,35 @@ class PermissionController extends Controller
 
     public function index(Request $request, PermissionService $permissionService)
     {
-        $perPage = $request->get('per_page'); // can be null
-        $filters = $request->only('name','module_name','menu_name','sub_menu_name','created_at','updated_at');
+        try {
+            $perPage = $request->get('per_page'); // can be null
+            $filters = $request->only('name','module_name','menu_name','sub_menu_name','created_at','updated_at');
 
-        $permissions = $permissionService->getPermission($filters, $perPage);
+            $permissions = $permissionService->getPermission($filters, $perPage);
 
-        // Check if paginated
-        if ($permissions instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            return response()->json([
-                'data' => PermissionRecource::collection($permissions),
-                'total' => $permissions->total(),
-                'current_page' => $permissions->currentPage(),
-                'per_page' => $permissions->perPage(),
-            ]);
+            if ($permissions instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'items' => PermissionRecource::collection($permissions->items()),
+                    'total' => $permissions->total(),
+                    'current_page' => $permissions->currentPage(),
+                    'per_page' => $permissions->perPage(),
+                ];
+            }else {
+                // Collection response (no pagination)
+                $data = [
+                    'items' => PermissionRecource::collection($permissions),
+                    'total' => $permissions->count(),
+                    'current_page' => 1,
+                    'per_page' => $permissions->count(),
+                ];
+            }
+
+            return ApiResponse::success($data, 'Permissions retrieved successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve permission');
         }
-
-        return response()->json([
-            'data' => PermissionRecource::collection($permissions),
-            'total' => $permissions->count(),
-            'current_page' => 1,
-            'per_page' => $permissions->count(),
-        ]);
     }
 
     public function store(CreatePermissionRequest $request,  PermissionService $permissionService)
