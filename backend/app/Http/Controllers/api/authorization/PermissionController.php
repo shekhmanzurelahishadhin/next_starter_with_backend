@@ -11,6 +11,7 @@ use App\Models\authorization\Menu;
 use App\Models\authorization\Module;
 use App\Models\authorization\PermissionModel;
 use App\Models\authorization\SubMenu;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Services\PermissionService;
 use Spatie\Permission\Models\Permission;
