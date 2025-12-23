@@ -62,7 +62,6 @@ export const usePermissions = () => {
   // Fetch modules
   const fetchModules = useCallback(async () => {
     if (modules.length > 0) return; // Prevent re-fetching if already loaded
-    console.log("Fetching modules...");
 
     try {
       setLoadingModules(true);
