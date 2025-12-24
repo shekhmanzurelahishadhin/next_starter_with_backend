@@ -72,9 +72,9 @@ const navItems: NavItem[] = [
     icon: <FiUser />,
     name: "User Roles",
     subItems: [
-      { name: "Roles", path: "/authorization/roles", requiredPermissions: ["role.view","role.edit","role.create", "role.delete"] },
-      { name: "Permissions", path: "/authorization/permissions", requiredPermissions: ["permission.view","permission.edit","permission.create", "permission.delete"] },
-      { name: "Users", path: "/ecommerce/products" },
+      { name: "Roles", path: "/authorization/roles", requiredPermissions:["role.view", "role.create", "role.edit", "role.delete"] },
+      { name: "Permissions", path: "/authorization/permissions", requiredPermissions:["permission.view", "permission.create", "permission.edit", "permission.delete"] },
+      { name: "Users", path: "/users", requiredPermissions:["user.view", "user.create", "user.edit", "user.delete"] },
     ],
   },
   {
