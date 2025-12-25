@@ -89,7 +89,7 @@ import {
   FiShield,
   FiRefreshCw,
   FiClock,
-  FiKey
+  FiKey,
 } from 'react-icons/fi';
 
 import {
@@ -100,7 +100,8 @@ import {
   FaRegUserCircle,
   FaTable,
   FaCubes,
-  FaPlug
+  FaPlug,
+  FaUserTag,
 } from 'react-icons/fa';
 
 import {
@@ -211,6 +212,7 @@ export {
   FaTable,
   FaCubes,
   FaPlug,
+  FaUserTag,
   
   // React Icons - Heroicons
   HiOutlineDocument,

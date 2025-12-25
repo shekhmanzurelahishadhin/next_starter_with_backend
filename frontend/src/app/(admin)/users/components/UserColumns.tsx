@@ -1,9 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import ActionButtons from "@/components/ui/button/ActionButton";
-import { FiEye, FiEdit, FiTrash } from "@/icons/index";
+import { FiEye, FiEdit, FiTrash, FaUserTag } from "@/icons/index";
 import { User } from "@/services/userService";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
@@ -37,6 +38,7 @@ export const useUserColumns = ({
   formatDate,
 }: UseUserColumnsProps): ColumnDef<User>[] => {
   const {user: currentLoginUser} = useAuth();
+   const router = useRouter();
 
   return useMemo((): ColumnDef<User>[] => [
     {
@@ -225,6 +227,17 @@ export const useUserColumns = ({
                 show: (user) =>
                 !user.roles_name?.includes("Super Admin") &&
                 hasPermission("user.edit"),
+              },
+              {
+                icon: FaUserTag,
+                onClick: (user) =>
+                router.push(`/dashboard/users/role-permissions/${user.id}`),
+                variant: "info",
+                size: "sm",
+                tooltip: "Assign Permissions",
+                show: (user) =>
+                !user.roles_name?.includes("Super Admin") &&
+                hasPermission("user.assign-permissions"),
               },
               {
                 icon: FiTrash,
