@@ -690,7 +690,7 @@ const AppSidebar: React.FC = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
+                  "Others Shadhin"
                 ) : (
                   <HorizontaLDots />
                 )}
