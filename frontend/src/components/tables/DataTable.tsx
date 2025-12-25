@@ -29,7 +29,7 @@ declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
     filterVariant?: "text" | "select" | "none";
     widthClass?: string;
-    filterOptions?: any[];
+    filterOptions?: { value: string; label: string }[];
   }
 }
 

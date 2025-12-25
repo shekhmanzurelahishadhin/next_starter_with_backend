@@ -8,6 +8,7 @@ import {
   BoxCubeIcon,
   CalenderIcon,
   ChevronDownIcon,
+  FiSettings,
   GridIcon,
   HorizontaLDots,
   ListIcon,
@@ -121,6 +122,20 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Blank Page", path: "/blank"},
       { name: "404 Error", path: "/error-404"},
+    ],
+  },
+  {
+    icon: <FiSettings />,
+    name: "Soft Configure",
+    subItems: [
+      { 
+        name: "Product", 
+        path: "/",
+        subSubItems: [
+          { name: "Category", path: "/categories", requiredPermissions:["category.create", "category.edit", "category.delete"] },
+          { name: "Sub-Category", path: "/line-chart/advanced"},
+        ]
+      },
     ],
   },
 ];

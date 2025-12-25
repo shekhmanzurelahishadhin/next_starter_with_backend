@@ -1,9 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
-import { useRouter } from "next/navigation";
 import Badge from "@/components/ui/badge/Badge";
 import ActionButtons from "@/components/ui/button/ActionButton";
-import { FiEye, FiEdit, FiTrash, FiShield, FiKey } from "@/icons/index";
+import { FiEye, FiEdit, FiTrash, FiShield } from "@/icons/index";
 import { Role } from "@/services/roleService";
 import { ColumnMeta as RTColumnMeta } from '@tanstack/react-table';
 
@@ -36,7 +35,6 @@ export const useRoleColumns = ({
   pageIndex,
   pageSize,
 }: UseRoleColumnsProps): ColumnDef<Role>[] => {
-  const router = useRouter();
   return useMemo((): ColumnDef<Role>[] => [
     {
       id: "sl",
@@ -199,14 +197,6 @@ export const useRoleColumns = ({
                 size: "sm",
                 tooltip: "View",
                 show: () => hasPermission("role.view"),
-              },
-               {
-                icon: FiKey,
-                 onClick: (r) => router.push(`/dashboard/authorization/roles/role-permissions/${r.id}`),
-                variant: "primary",
-                size: "sm",
-                tooltip: "Assign Permissions",
-                show: (r) => !r.name?.includes("Super Admin") && hasPermission("role.assign-permissions"),
               },
               {
                 icon: FiEdit,
