@@ -7,14 +7,17 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class CompanyResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
+    protected $columns;
+
+    public function __construct($resource, $columns = null)
+    {
+        parent::__construct($resource);
+        $this->columns = $columns;
+    }
+
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
@@ -33,5 +36,12 @@ class CompanyResource extends JsonResource
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
         ];
+
+          // If columns specified, filter
+          if (!empty($this->columns) && is_array($this->columns) && $this->columns !== ['*']) {
+              return array_intersect_key($data, array_flip($this->columns));
+          }
+
+        return $data;
     }
 }

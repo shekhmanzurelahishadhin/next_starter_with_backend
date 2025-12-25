@@ -28,21 +28,23 @@ class RoleController extends Controller
         try {
             $perPage = $request->get('per_page');
             $filters = $request->only('name','guard_name','created_at','updated_at');
-
-            $roles = $roleService->getRoles($filters, $perPage);
+            $columns = $request->get('columns', ['*']); // Default all columns
+            $roles = $roleService->getRoles($filters, $perPage, $columns);
 
             if ($roles instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                $items = collect($roles->items())->map(fn($role) => new RoleResource((object) $role, $columns));
                 // Paginated response
                 $data = [
-                    'items' => RoleResource::collection($roles->items()),
+                    'items' => $items,
                     'total' => $roles->total(),
                     'current_page' => $roles->currentPage(),
                     'per_page' => $roles->perPage(),
                 ];
             }else {
                 // Collection response (no pagination)
+                $items = collect($roles)->map(fn($role) => new RoleResource((object) $role, $columns));
                 $data = [
-                    'items' => RoleResource::collection($roles),
+                    'items' => $items,
                     'total' => $roles->count(),
                     'current_page' => 1,
                     'per_page' => $roles->count(),
@@ -52,7 +54,7 @@ class RoleController extends Controller
             return ApiResponse::success($data, 'Roles retrieved successfully');
 
         } catch (\Exception $e) {
-            return ApiResponse::serverError('Failed to retrieve roles');
+            return ApiResponse::serverError('Failed to retrieve roles'.$e);
         }
     }
 

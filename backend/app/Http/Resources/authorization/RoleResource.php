@@ -7,19 +7,30 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoleResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
+    protected $columns;
+
+    public function __construct($resource, $columns = null)
+    {
+        parent::__construct($resource);
+        $this->columns = $columns;
+    }
+
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
-            'guard_name' => $this->guard_name,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+            'guard_name' => $this->guard_name ?? null,
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
         ];
+
+        // If columns specified, filter
+          if (!empty($this->columns) && is_array($this->columns) && $this->columns !== ['*']) {
+              return array_intersect_key($data, array_flip($this->columns));
+          }
+
+        return $data;
     }
+
 }

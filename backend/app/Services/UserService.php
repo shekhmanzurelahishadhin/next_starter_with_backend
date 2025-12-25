@@ -23,21 +23,34 @@ class UserService
             $query->where('company_id', Auth::user()->company_id);
         }
 
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhereHas('roles', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%{$search}%");
-                    });
+        $query
+            ->when($filters['name'] ?? null, function ($q, $name) {
+                return $q->where('name', 'like', "%{$name}%");
+            })
+            ->when($filters['email'] ?? null, function ($q, $email) {
+                return $q->where('email', 'like', "%{$email}%");
+            })
+            ->when($filters['roles_name'] ?? null, function ($q, $roles_name) {
+                $q->whereHas('roles', function ($roleQuery) use ($roles_name) {
+                    $roleQuery->where('name', 'like', "%{$roles_name}%");
+                });
+            })
+            ->when($filters['company'] ?? null, function ($q, $company) {
+                return $q->whereHas('company', function ($m) use ($company) {
+                    $m->where('name', 'like', "%{$company}%");
+                });
+            })
+            ->when($filters['created_at'] ?? null, function ($q, $date) {
+                return $q->whereDate('created_at', date('Y-m-d', strtotime($date)));
+            })
+            ->when($filters['updated_at'] ?? null, function ($q, $date) {
+                return $q->whereDate('updated_at', date('Y-m-d', strtotime($date)));
             });
-        }
 
         $query->with(['roles:id,name','company:id,name'])->orderBy('id','desc');
 
-        // Return paginated if perPage is provided, else all
+        $perPage = $perPage ?: 30;
+
         return $perPage ? $query->paginate($perPage) : $query->get();
     }
 

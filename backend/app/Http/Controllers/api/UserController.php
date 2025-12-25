@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\users\StoreUserRequest;
 use App\Http\Requests\users\UpdateUserRequest;
@@ -40,28 +41,36 @@ class UserController extends Controller
 
     public function index(Request $request, UserService $userService)
     {
-        $perPage = $request->get('per_page'); // may be null
-        $filters = $request->only('search');
 
-        $users = $userService->getUsers($filters, $perPage);
+        try {
+            $perPage = $request->get('per_page'); // can be null
+            $filters = $request->only('name','email','company','roles_name','created_at','updated_at');
 
-        // Check if paginated
-        if ($users instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            return response()->json([
-                'data' => UserResource::collection($users),
-                'total' => $users->total(),
-                'current_page' => $users->currentPage(),
-                'per_page' => $users->perPage(),
-            ]);
+            $users = $userService->getUsers($filters, $perPage);
+
+            if ($users instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'items' => UserResource::collection($users->items()),
+                    'total' => $users->total(),
+                    'current_page' => $users->currentPage(),
+                    'per_page' => $users->perPage(),
+                ];
+            }else {
+                // Collection response (no pagination)
+                $data = [
+                    'items' => UserResource::collection($users),
+                    'total' => $users->count(),
+                    'current_page' => 1,
+                    'per_page' => $users->count(),
+                ];
+            }
+
+            return ApiResponse::success($data, 'Users retrieved successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve user'.$e);
         }
-
-        // Not paginated, return all
-        return response()->json([
-            'data' => UserResource::collection($users),
-            'total' => $users->count(),
-            'current_page' => 1,
-            'per_page' => $users->count(),
-        ]);
     }
 
 

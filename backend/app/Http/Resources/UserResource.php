@@ -20,9 +20,10 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'company_id' => $this->company_id,
             'company' => $this->company?->name,
-            'rolesName' => $this->roles->pluck('name')->implode(', '), // comma separated
+            'roles_name' => $this->roles->pluck('name')->implode(', '), // comma separated
             'roles'   => $this->roles->pluck('id'),
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

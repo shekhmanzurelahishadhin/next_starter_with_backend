@@ -8,9 +8,9 @@ use Spatie\Permission\Models\Role;
 
 class RoleService
 {
-    public function getRoles($filters = [], $perPage)
+    public function getRoles($filters = [], $perPage, $columns = ['*'])
     {
-        $query = Role::query();
+        $query = Role::query()->select($columns);
 
         $query
             ->when($filters['name'] ?? null, fn($q, $name) => $q->where('name', 'like', "%{$name}%"))

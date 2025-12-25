@@ -13,20 +13,9 @@ class CompanyService
 {
     use FileUploader;
 
-    public function getCompanies(array $filters = [], $perPage = null)
+    public function getCompanies(array $filters = [], $perPage = null, $columns = ['*'])
     {
-        $query = Company::query()->select(
-            'id',
-            'name',
-            'email',
-            'address',
-            'code',
-            'logo',
-            'status',
-            'created_by',
-            'created_at',
-            'deleted_at'
-        );
+        $query = Company::query()->select($columns);
         // Restrict data if user is not superadmin and has a company_id
         if (Auth::check() && !Auth::user()->hasRole('Super Admin') && !empty(Auth::user()->company_id)) {
             $query->where('id', Auth::user()->company_id);
@@ -61,17 +50,6 @@ class CompanyService
             )
             ->when($filters['created_at'] ?? null, fn($q, $createdAt) =>
             $q->whereDate('created_at', date('Y-m-d', strtotime($createdAt)))
-            )
-            ->when($filters['search'] ?? null, fn($q, $term) =>
-            $q->where(function ($sub) use ($term) {
-                $sub->where('name', 'like', "%{$term}%")
-                    ->orWhere('email', 'like', "%{$term}%")
-                    ->orWhere('address', 'like', "%{$term}%")
-                    ->orWhere('code', 'like', "%{$term}%")
-                    ->orWhereHas('createdBy', fn($user) =>
-                    $user->where('name', 'like', "%{$term}%")
-                    );
-            })
             );
 
         // Eager load common relations
