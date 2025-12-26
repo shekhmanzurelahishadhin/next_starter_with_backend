@@ -1,7 +1,8 @@
+// components/form/input/Checkbox.tsx
 import type React from "react";
 
 interface CheckboxProps {
-  label?: string;
+  label?: string | React.ReactNode;
   checked: boolean;
   className?: string;
   id?: string;
@@ -17,11 +18,23 @@ const Checkbox: React.FC<CheckboxProps> = ({
   className = "",
   disabled = false,
 }) => {
+  // Handle change and stop propagation
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation(); // This is crucial
+    onChange(e.target.checked);
+  };
+
+  // Also stop click propagation on the label
+  const handleLabelClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <label
       className={`flex items-center space-x-3 group cursor-pointer ${
         disabled ? "cursor-not-allowed opacity-60" : ""
       }`}
+      onClick={handleLabelClick}
     >
       <div className="relative w-5 h-5">
         <input
@@ -30,7 +43,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
           className={`w-5 h-5 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-brand-500 disabled:opacity-60 
           ${className}`}
           checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
+          onChange={handleChange}
           disabled={disabled}
         />
         {checked && (
