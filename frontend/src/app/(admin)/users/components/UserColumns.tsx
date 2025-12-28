@@ -15,6 +15,8 @@ declare module '@tanstack/react-table' {
     placeholder?: string;
     exportValue?: (row: TData, index?: number) => string | number;
     widthClass?: string;
+    minWidth?: string;
+    maxWidth?: string;
   }
 }
 
@@ -37,8 +39,8 @@ export const useUserColumns = ({
   pageSize,
   formatDate,
 }: UseUserColumnsProps): ColumnDef<User>[] => {
-  const {user: currentLoginUser} = useAuth();
-   const router = useRouter();
+  const { user: currentLoginUser } = useAuth();
+  const router = useRouter();
 
   return useMemo((): ColumnDef<User>[] => [
     {
@@ -50,14 +52,18 @@ export const useUserColumns = ({
         exportable: true,
         exportHeader: "SL",
         exportValue: (row, index) => (pageIndex * pageSize) + (index ?? 0) + 1,
-        widthClass: "w-[30px]"
+        widthClass: "w-[30px] min-w-[30px] max-w-[40px]",
+        minWidth: "30px",
+        maxWidth: "40px"
       },
       cell: ({ row }) => {
         const serialNumber = (pageIndex * pageSize) + row.index + 1;
         return (
-          <span className="text-gray-600 dark:text-gray-400">
-            {serialNumber}
-          </span>
+          <div className="px-2">
+            <span className="text-gray-600 dark:text-gray-400 font-medium">
+              {serialNumber}
+            </span>
+          </div>
         );
       },
     },
@@ -71,13 +77,15 @@ export const useUserColumns = ({
         exportable: true,
         exportHeader: "User Name",
         exportValue: (row) => row.name,
-        widthClass: "w-[200px]"
+        widthClass: "w-[180px] min-w-[150px] max-w-[220px]",
+        minWidth: "150px",
+        maxWidth: "220px"
       },
       cell: ({ row }) => {
         const name = row.getValue("name") as string;
         return (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+          <div className="px-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate block">
               {name}
             </span>
           </div>
@@ -94,13 +102,15 @@ export const useUserColumns = ({
         exportable: true,
         exportHeader: "Email",
         exportValue: (row) => row.email,
-        widthClass: "w-[200px]"
+        widthClass: "w-[220px] min-w-[180px] max-w-[280px]",
+        minWidth: "180px",
+        maxWidth: "280px"
       },
       cell: ({ row }) => {
         const email = row.getValue("email") as string;
         return (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+          <div className="px-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate block">
               {email}
             </span>
           </div>
@@ -117,14 +127,16 @@ export const useUserColumns = ({
         exportable: true,
         exportHeader: "Roles",
         exportValue: (row) => row.roles_name,
-        widthClass: "w-[200px]"
+        widthClass: "w-[160px] min-w-[140px] max-w-[200px]",
+        minWidth: "140px",
+        maxWidth: "200px"
       },
       cell: ({ row }) => {
         const roles_name = row.getValue("roles_name") as string;
         return (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
-              {roles_name}
+          <div className="px-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate block">
+              {roles_name || "—"}
             </span>
           </div>
         );
@@ -139,15 +151,17 @@ export const useUserColumns = ({
         placeholder: "Search Company",
         exportable: true,
         exportHeader: "Company",
-        exportValue: (row) => row.company || "-",
-        widthClass: "w-[200px]"
+        exportValue: (row) => row.company || "—",
+        widthClass: "w-[160px] min-w-[140px] max-w-[200px]",
+        minWidth: "140px",
+        maxWidth: "200px"
       },
       cell: ({ row }) => {
         const company = row.getValue("company") as string;
         return (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
-              {company}
+          <div className="px-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate block">
+              {company || "—"}
             </span>
           </div>
         );
@@ -155,104 +169,112 @@ export const useUserColumns = ({
     },
     {
       accessorKey: "created_at",
-      header: "Created At",
+      header: "Created",
       enableSorting: true,
       meta: {
         exportable: true,
         exportHeader: "Created At",
-        placeholder: "Search created at",
+        placeholder: "Search created",
         exportValue: (row) => formatDate(row.created_at),
-        widthClass: "w-[120px]",
+        widthClass: "w-[120px] min-w-[110px] max-w-[130px]",
+        minWidth: "110px",
+        maxWidth: "130px"
       },
       cell: ({ row }) => {
         const value = row.getValue("created_at") as string | undefined;
         return (
-          <span className="text-gray-600 dark:text-gray-400">
-            {formatDate(value)}
-          </span>
+          <div className="px-2">
+            <span className="text-gray-600 dark:text-gray-400 text-sm">
+              {formatDate(value)}
+            </span>
+          </div>
         );
       },
     },
-
     {
       accessorKey: "updated_at",
-      header: "Updated At",
+      header: "Updated",
       enableSorting: true,
       meta: {
         exportable: true,
         exportHeader: "Updated At",
-        placeholder: "Search updated at",
+        placeholder: "Search updated",
         exportValue: (row) => formatDate(row.updated_at),
-        widthClass: "w-[120px]",
+        widthClass: "w-[120px] min-w-[110px] max-w-[130px]",
+        minWidth: "110px",
+        maxWidth: "130px"
       },
       cell: ({ row }) => {
         const value = row.getValue("updated_at") as string | undefined;
         return (
-          <span className="text-gray-600 dark:text-gray-400">
-            {formatDate(value)}
-          </span>
+          <div className="px-2">
+            <span className="text-gray-600 dark:text-gray-400 text-sm">
+              {formatDate(value)}
+            </span>
+          </div>
         );
       },
-    }
-    ,
+    },
     {
-      id: "Actions",
+      id: "actions",
       header: () => <div className="">Actions</div>,
       enableSorting: false,
       meta: {
         filterVariant: "none",
         exportable: false,
-        widthClass: "w-[150px]"
+        widthClass: "w-[180px] min-w-[160px] max-w-[200px]",
+        minWidth: "160px",
+        maxWidth: "200px"
       },
       cell: ({ row }) => {
         const user = row.original;
         return (
-          <ActionButtons
-            row={user}
-            buttons={[
-              {
-                icon: FiEye,
-                onClick: (row) => onView(row as User),
-                variant: "success",
-                size: "sm",
-                tooltip: "View",
-                show: () => hasPermission("user.view"),
-              },
-              {
-                icon: FiEdit,
-                onClick: (row) => onEdit(row as User),
-                variant: "primary",
-                size: "sm",
-                tooltip: "Edit",
-                show: (user) =>
-                !user.roles_name?.includes("Super Admin") &&
-                hasPermission("user.edit"),
-              },
-              {
-                icon: FaUserTag,
-                onClick: (user) =>
-                router.push(`/users/user-permissions/${user.id}`),
-                variant: "info",
-                size: "sm",
-                tooltip: "Assign Permissions",
-                show: (user) =>
-                !user.roles_name?.includes("Super Admin") &&
-                hasPermission("user.assign-permissions"),
-              },
-              {
-                icon: FiTrash,
-                onClick: (row) => onDelete((row as User).id),
-                variant: "danger",
-                size: "sm",
-                tooltip: "Delete",
-                show: (user) =>
-                !user.roles_name?.includes("Super Admin") &&
-                hasPermission("user.delete") && user.id !== currentLoginUser?.id,
-              },
-            ]}
-          />
+            <ActionButtons
+              row={user}
+              buttons={[
+                {
+                  icon: FiEye,
+                  onClick: (row) => onView(row as User),
+                  variant: "success",
+                  size: "sm",
+                  tooltip: "View",
+                  show: () => hasPermission("user.view"),
+                },
+                {
+                  icon: FiEdit,
+                  onClick: (row) => onEdit(row as User),
+                  variant: "primary",
+                  size: "sm",
+                  tooltip: "Edit",
+                  show: (user) =>
+                    !user.roles_name?.includes("Super Admin") &&
+                    hasPermission("user.edit"),
+                },
+                {
+                  icon: FaUserTag,
+                  onClick: (user) =>
+                    router.push(`/users/user-permissions/${user.id}`),
+                  variant: "info",
+                  size: "sm",
+                  tooltip: "Assign Permissions",
+                  show: (user) =>
+                    !user.roles_name?.includes("Super Admin") &&
+                    hasPermission("user.assign-permissions"),
+                },
+                {
+                  icon: FiTrash,
+                  onClick: (row) => onDelete((row as User).id),
+                  variant: "danger",
+                  size: "sm",
+                  tooltip: "Delete",
+                  show: (user) =>
+                    !user.roles_name?.includes("Super Admin") &&
+                    hasPermission("user.delete") && user.id !== currentLoginUser?.id,
+                },
+              ]}
+            />
         );
       },
     },
-  ], [hasPermission, onView, onEdit, onDelete, pageIndex, pageSize]);
+  ], [hasPermission, onView, onEdit, onDelete, pageIndex, pageSize, currentLoginUser, router, formatDate]);
 };
