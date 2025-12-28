@@ -231,7 +231,7 @@ export const useUserColumns = ({
               {
                 icon: FaUserTag,
                 onClick: (user) =>
-                router.push(`/dashboard/users/role-permissions/${user.id}`),
+                router.push(`/users/user-permissions/${user.id}`),
                 variant: "info",
                 size: "sm",
                 tooltip: "Assign Permissions",
