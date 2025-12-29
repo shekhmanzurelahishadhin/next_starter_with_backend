@@ -93,7 +93,7 @@ export function UserForm({
 
   return (
     <form id="user-form" onSubmit={handleSubmit(onSubmit)}>
-      <div className="space-y-5">
+      <div className="space-y-2">
 
         {/* User Name */}
         <div>

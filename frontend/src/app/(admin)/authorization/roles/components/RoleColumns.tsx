@@ -5,7 +5,6 @@ import Badge from "@/components/ui/badge/Badge";
 import ActionButtons from "@/components/ui/button/ActionButton";
 import { FiEye, FiEdit, FiTrash, FiShield, FiKey } from "@/icons/index";
 import { Role } from "@/services/roleService";
-import { ColumnMeta as RTColumnMeta } from '@tanstack/react-table';
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {

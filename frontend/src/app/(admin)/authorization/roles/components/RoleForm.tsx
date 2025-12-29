@@ -60,7 +60,7 @@ export function RoleForm({ role, mode, saving, onSubmit, backendErrors }: RoleFo
 
   return (
     <form id="role-form" onSubmit={handleSubmit(onFormSubmit)}>
-      <div className="space-y-5">
+      <div className="space-y-2">
         <div>
           <Label htmlFor="name" required>Role Name</Label>
           <Input

@@ -133,7 +133,7 @@ export function PermissionForm({
 
   return (
     <form id="permission-form" onSubmit={handleSubmit(onSubmit)}>
-      <div className="space-y-5">
+      <div className="space-y-2">
 
         {/* Permission Name */}
         <div>
