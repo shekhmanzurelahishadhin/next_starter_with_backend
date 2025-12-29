@@ -101,15 +101,6 @@ class CategoryService {
   async deleteCategory(id: number): Promise<void> {
     await api.delete(`/configure/categories/${id}`);
   }
-
-  async getPermissions(categoryId: number): Promise<{ category: Category; permissions: string[] }> {
-    const response = await api.get(`/configure/categories/${categoryId}/permissions`);
-    return response.data;
-  }
-
-  async assignPermissions(categoryId: number, permissions: string[]): Promise<void> {
-    await api.post(`/configure/categories/${categoryId}/assign-permissions`, { permissions });
-  }
 }
 
 export const categoryService = new CategoryService();
