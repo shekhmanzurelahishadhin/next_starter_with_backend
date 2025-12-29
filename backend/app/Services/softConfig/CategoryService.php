@@ -17,7 +17,8 @@ class CategoryService
             'status',
             'created_by',
             'created_at',
-            'deleted_at'
+            'deleted_at',
+            'updated_at'
         );
 
         // Handle status / trash logic
