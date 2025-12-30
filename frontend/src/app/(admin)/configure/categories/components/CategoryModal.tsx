@@ -7,13 +7,14 @@ import { Category } from "@/services/categoryService";
 
 interface CategoryModalProps {
   isOpen: boolean;
-  status: { value: number; label: string }[];
+  status: { value: string; label: string }[];
   category: Category | null;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
-  onSave: (categoryData: { name: string }) => void;
+  onSave: (categoryData: { name: string, description: string }) => void;
   backendErrors?: Record<string, string>; // Add this prop
+  formatDate: (dateString?: string) => string;
 }
 
 export function CategoryModal({
@@ -25,6 +26,7 @@ export function CategoryModal({
   onClose,
   onSave,
   backendErrors, // Add this prop
+  formatDate,
 }: CategoryModalProps) {
   const getTitle = () => {
     switch (mode) {
@@ -51,7 +53,7 @@ export function CategoryModal({
         </h4>
 
         {mode === 'view' && category && (
-          <CategoryDetailView category={category} />
+          <CategoryDetailView category={category} formatDate={formatDate} />
         )}
 
         {(mode === 'create' || mode === 'edit') && (

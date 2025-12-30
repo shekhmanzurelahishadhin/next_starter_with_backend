@@ -15,7 +15,7 @@ interface CategoryFormData {
 }
 
 interface CategoryFormProps {
-  status: { value: number; label: string }[];
+  status: { value: string; label: string }[];
   category?: Category | null;
   mode: 'create' | 'edit';
   saving: boolean;

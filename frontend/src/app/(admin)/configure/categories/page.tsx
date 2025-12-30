@@ -77,7 +77,6 @@ export default function Categories() {
           >
             <DataTable
               columns={columns}
-              status = {status}
               data={categories}
               searchKey="name"
               pagination={pagination}
@@ -100,6 +99,7 @@ export default function Categories() {
             onClose={handleCloseModal}
             onSave={handleSave}
             backendErrors={backendErrors}
+            formatDate={formatDate}
           />
         </div>
       </div>

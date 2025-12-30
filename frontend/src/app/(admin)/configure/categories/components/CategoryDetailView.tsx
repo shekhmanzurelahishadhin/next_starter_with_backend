@@ -10,17 +10,11 @@ import { Category } from "@/services/categoryService";
 
 interface CategoryDetailViewProps {
   category: Category;
+  formatDate: (dateString?: string) => string;
 }
 
-export function CategoryDetailView({ category }: CategoryDetailViewProps) {
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "-";
-    const [datePart, timePart] = dateString.split(" ");
-    const [y, m, d] = datePart.split("-");
-    const [hour, minute] = timePart ? timePart.split(":") : ["00", "00"];
-    return `${d}-${m}-${y} ${hour}:${minute}`;
-  };
-
+export function CategoryDetailView({ category, formatDate }: CategoryDetailViewProps) {
+ 
   return (
     <div className="space-y-4 py-4">
       <div className="overflow-hidden border rounded-lg border-gray-200 dark:border-gray-700">
@@ -32,14 +26,6 @@ export function CategoryDetailView({ category }: CategoryDetailViewProps) {
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
                 {category.name}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Slug
-              </TableCell>
-              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
-                {category.slug}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -67,7 +53,11 @@ export function CategoryDetailView({ category }: CategoryDetailViewProps) {
                   }
                   variant="light"
                 >
-                  {category.status}
+                  {category.status == "1"
+                    ? "Active"
+                    : category.status == "0"
+                      ? "Inactive"
+                      : "Unknown"}
                 </Badge>
               </TableCell>
             </TableRow>
@@ -77,7 +67,7 @@ export function CategoryDetailView({ category }: CategoryDetailViewProps) {
                 Created At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(category.created_at || null)}
+                {formatDate(category.created_at)}
               </TableCell>
             </TableRow>
 
@@ -86,7 +76,7 @@ export function CategoryDetailView({ category }: CategoryDetailViewProps) {
                 Updated At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(category.updated_at || null)}
+                {formatDate(category.updated_at)}
               </TableCell>
             </TableRow>
           </TableBody>
