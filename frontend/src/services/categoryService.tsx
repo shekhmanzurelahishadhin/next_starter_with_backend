@@ -12,6 +12,7 @@ export interface Category {
   status: string;
   created_at?: string;
   updated_at?: string;
+  deleted_at?: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -66,7 +67,7 @@ class CategoryService {
     // }
 
     const params = new URLSearchParams();
-    
+
     // Common filter fields
     if (filters.search) params.append('search', filters.search);
     if (filters.page) params.append('page', filters.page.toString());
@@ -79,27 +80,35 @@ class CategoryService {
     if (filters.status) params.append('status', filters.status);
     if (filters.created_at) params.append('created_at', filters.created_at);
     if (filters.updated_at) params.append('updated_at', filters.updated_at);
-    
+
     const response = await api.get(`/configure/categories?${params}`);
     const result = response.data.data;
 
     return result;
   }
 
-  async createCategory(categoryData: { name: string, slug: string, description: string }): Promise<Category> {
+  async createCategory(categoryData: { name: string, description: string }): Promise<Category> {
 
     const response = await api.post('/configure/categories', categoryData);
     return response.data.data;
   }
 
-  async updateCategory(id: number, categoryData: { name: string, slug: string, description: string, status: string }): Promise<Category> {
+  async updateCategory(id: number, categoryData: { name: string, description: string }): Promise<Category> {
 
     const response = await api.put(`/configure/categories/${id}`, categoryData);
     return response.data.data;
   }
 
-  async deleteCategory(id: number): Promise<void> {
+  async softDeleteCategory(id: number): Promise<void> {
+    await api.post(`/configure/categories/trash/${id}`);
+  }
+
+  async forceDeleteCategory(id: number): Promise<void> {
     await api.delete(`/configure/categories/${id}`);
+  }
+
+  async restoreCategory(id: number): Promise<void> {
+    await api.post(`/configure/categories/restore/${id}`);
   }
 }
 

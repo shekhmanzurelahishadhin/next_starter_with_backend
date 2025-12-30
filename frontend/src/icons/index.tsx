@@ -102,6 +102,8 @@ import {
   FaCubes,
   FaPlug,
   FaUserTag,
+  FaTrashRestore,
+  FaUndo,
 } from 'react-icons/fa';
 
 import {
@@ -213,6 +215,8 @@ export {
   FaCubes,
   FaPlug,
   FaUserTag,
+  FaTrashRestore,
+  FaUndo,
   
   // React Icons - Heroicons
   HiOutlineDocument,
