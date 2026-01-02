@@ -107,7 +107,7 @@ export const useSubCategories = () => {
   const handleSoftDelete = useCallback(async (id: number) => {
     const result = await confirm({
       title: 'Move to Trash?',
-      text: 'Are you sure you want to move this sub category to trash? This action cannot be undone.',
+      text: 'Are you sure you want to move this Sub-Category to trash? This action cannot be undone.',
     });
 
     if (!result.isConfirmed) return;
@@ -117,19 +117,19 @@ export const useSubCategories = () => {
       previousSubCategories = [...subCategories];
       setSubCategories(prev => prev.filter(subCategory => subCategory.id !== id));
       await subCategoryService.softDeleteSubCategory(id);
-      toast.success('Sub Category moved to trashed!');
+      toast.success('Sub-Category moved to trashed!');
       await loadSubCategories();
     } catch (err) {
       // Revert on error
       setSubCategories(previousSubCategories);
-      toast.error('Failed to delete sub category');
+      toast.error('Failed to delete Sub-Category');
     }
   }, [confirm, subCategories, loadSubCategories]);
 
   const handleForceDelete = useCallback(async (id: number) => {
     const result = await confirm({
-      title: 'Delete Sub Category?',
-      text: 'Are you sure you want to delete this sub category? This action cannot be undone.',
+      title: 'Delete Sub-Category?',
+      text: 'Are you sure you want to delete this Sub-Category? This action cannot be undone.',
     });
 
     if (!result.isConfirmed) return;
@@ -140,23 +140,23 @@ export const useSubCategories = () => {
       previousSubCategories = [...subCategories];
       setSubCategories(prev => prev.filter(subCategory => subCategory.id !== id));
       await subCategoryService.forceDeleteSubCategory(id);
-      toast.success('Sub Category deleted successfully!');
+      toast.success('Sub-Category deleted successfully!');
       await loadSubCategories();
     } catch (err) {
       // Revert on error
       setSubCategories(previousSubCategories);
-      toast.error('Failed to delete sub category');
+      toast.error('Failed to delete Sub-Category');
     }
   }, [confirm, subCategories, loadSubCategories]);
 
   const handleRestore = useCallback(async (id: number) => {
     try {
       await subCategoryService.restoreSubCategory(id);
-      toast.success('Sub Category restored successfully!');
+      toast.success('Sub-Category restored successfully!');
       await loadSubCategories();
     } catch (err) {
       // Revert on error
-      toast.error('Failed to restore sub category');
+      toast.error('Failed to restore Sub-Category');
     }
   }, [subCategories, loadSubCategories]);
 
@@ -167,10 +167,10 @@ export const useSubCategories = () => {
 
       if (mode === 'edit' && selectedSubCategory) {
         await subCategoryService.updateSubCategory(selectedSubCategory.id, subCategoryData);
-        toast.success('Sub Category updated successfully!');
+        toast.success('Sub-Category updated successfully!');
       } else {
         await subCategoryService.createSubCategory(subCategoryData);
-        toast.success('Sub Category created successfully!');
+        toast.success('Sub-Category created successfully!');
         setPagination(prev => ({ ...prev, pageIndex: 0 }));
       }
 
@@ -185,7 +185,7 @@ export const useSubCategories = () => {
         });
         setBackendErrors(errors);
       } else {
-        toast.error(err?.response?.data?.message || 'Failed to save sub category');
+        toast.error(err?.response?.data?.message || 'Failed to save Sub-Category');
       }
       return false;
     } finally {

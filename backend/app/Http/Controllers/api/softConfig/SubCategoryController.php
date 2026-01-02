@@ -24,29 +24,6 @@ class SubCategoryController extends Controller
     }
     public function index(Request $request, SubCategoryService $subCategoryService)
     {
-        /*$perPage = $request->get('per_page');
-        $filters = $request->only('search','status','name','category_name','created_at','created_by');
-        $categoryId = $request->query('category_id');
-
-        $subCategories = $subCategoryService->getSubCategories($filters, $perPage, $categoryId);
-
-        if ($subCategories instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            // Paginated response
-            return response()->json([
-                'data' => SubCategoryResource::collection($subCategories->items()),
-                'total' => $subCategories->total(),
-                'current_page' => $subCategories->currentPage(),
-                'per_page' => $subCategories->perPage(),
-            ]);
-        }
-
-        // Collection response (no pagination)
-        return response()->json([
-            'data' => SubCategoryResource::collection($subCategories),
-            'total' => $subCategories->count(),
-            'current_page' => 1,
-            'per_page' => $subCategories->count(),
-        ]);*/
         try {
             $perPage    = $request->get('per_page');
             $filters    = $request->only('search','status','name','category_name','created_at','created_by');

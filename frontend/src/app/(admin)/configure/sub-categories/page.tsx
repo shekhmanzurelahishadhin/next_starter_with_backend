@@ -14,7 +14,7 @@ export default function SubCategories() {
 
   // Single hook for all subCategory operations
   const {
-    categories,
+    subCategories,
     loading,
     saving,
     isOpen,
@@ -55,7 +55,7 @@ export default function SubCategories() {
   });
 
   useEffect(() => {
-    document.title = "Sub Category | Inventory Management System";
+    document.title = "Sub-Category | Inventory Management System";
   }, []);
 
   return (
@@ -64,12 +64,12 @@ export default function SubCategories() {
          <PageBreadcrumb
           items={[
             { title: "Configure" }, // add href if needed links like href: "/admin/authorization/permissions"
-            { title: "Sub Category Management" }
+            { title: "Sub-Category Management" }
           ]}
         />
         <div className="space-y-6">
           <ComponentCard
-            title="Sub Category Management"
+            title="Sub-Category Management"
             desc="Manage sub sub-category in the system"
             showAddButton={hasPermission("sub-category.create")}
             buttonLabel="Add New"
@@ -77,7 +77,7 @@ export default function SubCategories() {
           >
             <DataTable
               columns={columns}
-              data={categories}
+              data={subCategories}
               searchKey="name"
               pagination={pagination}
               onPaginationChange={setPagination}

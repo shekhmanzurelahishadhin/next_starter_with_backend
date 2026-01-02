@@ -77,20 +77,20 @@ export function SubCategoryForm({ status, subCategory, mode, saving, onSubmit, b
     <form id="sub-category-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-2">
         <div>
-          <Label htmlFor="name" required>Sub Category Name</Label>
+          <Label htmlFor="name" required>Sub-Category Name</Label>
           <Input
             id="name"
             type="text"
             placeholder="Enter sub-category name."
             register={register("name", {
-              required: "Sub Category name is required",
+              required: "Sub-Category name is required",
               minLength: {
                 value: 2,
-                message: "Sub Category name must be at least 2 characters"
+                message: "Sub-Category name must be at least 2 characters"
               },
               maxLength: {
                 value: 50,
-                message: "Sub Category name must not exceed 50 characters"
+                message: "Sub-Category name must not exceed 50 characters"
               },
             })}
             error={errors.name?.message}
@@ -113,7 +113,7 @@ export function SubCategoryForm({ status, subCategory, mode, saving, onSubmit, b
             render={({ field }) => (
               <TextArea
                 id="description"
-                placeholder="Enter sub category description."
+                placeholder="Enter Sub-Category description."
                 value={field.value || ""}
                 onChange={field.onChange}
                 error={errors.description?.message}

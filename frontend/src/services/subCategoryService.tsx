@@ -7,6 +7,8 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 export interface SubCategory {
   id: number;
   name: string;
+  category_id: number;
+  categiory_name: string;
   slug: string;
   description: string;
   status: string;
@@ -29,7 +31,7 @@ export interface SubCategoryFilters {
   per_page?: number;
   name?: string;
   slug?: string;
-  description?: string;
+  category_name?: string;
   status?: string;
   created_at?: string;
   updated_at?: string;
@@ -76,7 +78,7 @@ class SubCategoryService {
     // Specific filter fields
     if (filters.name) params.append('name', filters.name);
     if (filters.slug) params.append('slug', filters.slug);
-    if (filters.description) params.append('description', filters.description);
+    if (filters.category_name) params.append('category_name', filters.category_name);
     if (filters.status) params.append('status', filters.status);
     if (filters.created_at) params.append('created_at', filters.created_at);
     if (filters.updated_at) params.append('updated_at', filters.updated_at);

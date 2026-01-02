@@ -3,12 +3,12 @@ import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 import { SubCategoryForm } from "./SubCategoryForm";
 import { SubCategoryDetailView } from "./SubCategoryDetailView";
-import { SubCategory } from "@/services/categoryService";
+import { SubCategory } from "@/services/subCategoryService";
 
 interface SubCategoryModalProps {
   isOpen: boolean;
   status: { value: string; label: string }[];
-  category: SubCategory | null;
+  subCategory: SubCategory | null;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
@@ -20,7 +20,7 @@ interface SubCategoryModalProps {
 export function SubCategoryModal({
   isOpen,
   status,
-  category,
+  subCategory,
   mode,
   saving,
   onClose,
@@ -30,10 +30,10 @@ export function SubCategoryModal({
 }: SubCategoryModalProps) {
   const getTitle = () => {
     switch (mode) {
-      case 'view': return 'Sub Category Details';
-      case 'edit': return 'Edit Sub Category';
-      case 'create': return 'Add New Sub Category';
-      default: return 'Sub Category';
+      case 'view': return 'Sub-Category Details';
+      case 'edit': return 'Edit Sub-Category';
+      case 'create': return 'Add New Sub-Category';
+      default: return 'Sub-Category';
     }
   };
 
@@ -52,14 +52,14 @@ export function SubCategoryModal({
           {getTitle()}
         </h4>
 
-        {mode === 'view' && category && (
-          <SubCategoryDetailView category={category} formatDate={formatDate} />
+        {mode === 'view' && subCategory && (
+          <SubCategoryDetailView subCategory={subCategory} formatDate={formatDate} />
         )}
 
         {(mode === 'create' || mode === 'edit') && (
           <SubCategoryForm
           status={status}
-            category={mode === 'edit' ? category : null}
+            subCategory={mode === 'edit' ? subCategory : null}
             mode={mode}
             saving={saving}
             onSubmit={onSave}
