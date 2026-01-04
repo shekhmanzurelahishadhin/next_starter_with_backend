@@ -6,15 +6,18 @@ import { lookupService } from '@/services/lookupService';
 import { useAlert } from '@/hooks/useAlert';
 import { useModal } from '@/hooks/useModal';
 import { useDebounce } from '@/hooks/useDebounce';
+import { api } from '@/lib/api';
 export const useSubCategories = () => {
   const { confirm } = useAlert();
   const { isOpen, openModal, closeModal } = useModal();
 
   // Data state
+  const [categories, setCategories] = useState<{ value: number; label: string }[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState<{ value: string; label: string }[]>([]);
+  const [status, setStatus] = useState<{ value: number; label: string }[]>([]);
 
   // Modal state
   const [selectedSubCategory, setSelectedSubCategory] = useState<SubCategory | null>(null);
@@ -57,11 +60,23 @@ export const useSubCategories = () => {
     try {
       const type = "active_status";
       const res = await lookupService.getLookupByType(type);
-      console.log("Lookups fetched:", res);
       setStatus(res);
     } catch (error) {
       console.error("Failed to fetch lookups", error);
     }
+  };
+
+  const fetchCategories = async () => {
+   
+    setLoadingCategories(true);
+    try {
+      const res = await api.get("/configure/categories", { params: { status: 1, per_page: null, columns: ['id','name'] } });
+      setCategories(res.data.data.data.map((cat) => ({ value: Number(cat.id), label: cat.name })));
+      setLoadingCategories(false);
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+      setLoadingCategories(false);
+    }   
   };
 
   useEffect(() => {
@@ -86,6 +101,7 @@ export const useSubCategories = () => {
     setSelectedSubCategory(subCategory);
     setMode('edit');
     setBackendErrors({});
+    fetchCategories();
     openModal();
   }, [openModal]);
 
@@ -93,6 +109,7 @@ export const useSubCategories = () => {
     setSelectedSubCategory(null);
     setMode('create');
     setBackendErrors({});
+    fetchCategories();
     openModal();
   }, [openModal]);
 
@@ -216,7 +233,7 @@ export const useSubCategories = () => {
       const response = await subCategoryService.getSubCategories({});
       return response.data;
     } catch (error) {
-      console.error('Error exporting all roles:', error);
+      console.error('Error exporting all sub categories:', error);
       throw error;
     }
   };
@@ -235,6 +252,8 @@ export const useSubCategories = () => {
   return {
     // State
     subCategories,
+    categories,
+    loadingCategories,
     loading,
     saving,
     isOpen,

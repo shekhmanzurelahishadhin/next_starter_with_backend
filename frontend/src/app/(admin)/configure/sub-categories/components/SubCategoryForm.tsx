@@ -4,26 +4,28 @@ import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import { SubCategory } from "@/services/subCategoryService";
 import { useEffect } from "react";
-import TextArea from "@/components/form/input/TextArea";
 import Select from "@/components/form/Select";
 import { ChevronDownIcon } from "@/icons";
+import ReactSelect from "@/components/form/ReactSelect";
 
 interface SubCategoryFormData {
   name: string;
-  description: string;
-  status?: number;
+  category_id?: number | null;
+  status?: number ;
 }
 
 interface SubCategoryFormProps {
-  status: { value: string; label: string }[];
+  status: { value: number; label: string }[];
   subCategory?: SubCategory | null;
+  categories?: { value: number; label: string }[];
+  loadingCategories: boolean;
   mode: 'create' | 'edit';
   saving: boolean;
   onSubmit: (subCategoryData: SubCategoryFormData) => void;
   backendErrors?: Record<string, string>;
 }
 
-export function SubCategoryForm({ status, subCategory, mode, saving, onSubmit, backendErrors }: SubCategoryFormProps) {
+export function SubCategoryForm({ status, subCategory, categories, loadingCategories, mode, saving, onSubmit, backendErrors }: SubCategoryFormProps) {
   const {
     register,
     handleSubmit,
@@ -36,7 +38,7 @@ export function SubCategoryForm({ status, subCategory, mode, saving, onSubmit, b
     mode: "onChange",
     defaultValues: {
       name: "",
-      description: "",
+      category_id: null,
     }
   });
 
@@ -57,13 +59,13 @@ export function SubCategoryForm({ status, subCategory, mode, saving, onSubmit, b
     if (mode === 'edit' && subCategory) {
       reset({
         name: subCategory?.name ?? '',
-        description: subCategory?.description ?? '',
-        status: Number(subCategory?.status ?? 1),
+        category_id: subCategory?.category_id ?? null,
+        status: subCategory?.status ?? 1,
       });
     } else {
       reset({
         name: '',
-        description: '',
+        category_id: undefined,
       });
     }
   }, [subCategory, reset, mode]);
@@ -76,6 +78,31 @@ export function SubCategoryForm({ status, subCategory, mode, saving, onSubmit, b
   return (
     <form id="sub-category-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-2">
+           <div>
+          <Label htmlFor="category_id" required>
+            Category
+          </Label>
+          <Controller
+            control={control}
+            name="category_id"
+            rules={{
+              required: {
+                value: true,
+                message: "Please select a category"
+              }
+            }}
+            render={({ field, fieldState }) => (
+              <ReactSelect
+                {...field}
+                options={categories || []}
+                placeholder="Select category"
+                isLoading={loadingCategories}
+                error={fieldState.error?.message}
+                isDisabled={saving}
+              />
+            )}
+          />
+        </div>
         <div>
           <Label htmlFor="name" required>Sub-Category Name</Label>
           <Input
@@ -95,32 +122,6 @@ export function SubCategoryForm({ status, subCategory, mode, saving, onSubmit, b
             })}
             error={errors.name?.message}
             disabled={saving}
-          />
-        </div>
-
-        <div>
-          <Label>Description</Label>
-
-          <Controller
-            name="description"
-            control={control}
-            rules={{
-              maxLength: {
-                value: 255,
-                message: "Max length is 255 characters",
-              },
-            }}
-            render={({ field }) => (
-              <TextArea
-                id="description"
-                placeholder="Enter Sub-Category description."
-                value={field.value || ""}
-                onChange={field.onChange}
-                error={errors.description?.message}
-                disabled={saving}
-                rows={3}
-              />
-            )}
           />
         </div>
 

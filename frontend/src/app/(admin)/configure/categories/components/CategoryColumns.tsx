@@ -26,7 +26,7 @@ interface UseCategoryColumnsProps {
   pageIndex: number;
   pageSize: number;
   formatDate: (dateString?: string) => string;
-  status: { value: string; label: string }[];
+  status: { value: number; label: string }[];
 }
 
 export const useCategoryColumns = ({

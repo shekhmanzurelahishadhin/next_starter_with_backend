@@ -15,6 +15,8 @@ export default function SubCategories() {
   // Single hook for all subCategory operations
   const {
     subCategories,
+    categories,
+    loadingCategories,
     loading,
     saving,
     isOpen,
@@ -94,6 +96,8 @@ export default function SubCategories() {
             isOpen={isOpen}
             status={status}
             subCategory={selectedSubCategory}
+            categories={categories}
+            loadingCategories={loadingCategories}
             mode={mode}
             saving={saving}
             onClose={handleCloseModal}

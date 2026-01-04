@@ -10,12 +10,12 @@ import { ChevronDownIcon } from "@/icons";
 
 interface CategoryFormData {
   name: string;
-  description?: string;
+  description: string;
   status?: number;
 }
 
 interface CategoryFormProps {
-  status: { value: string; label: string }[];
+  status: { value: number; label: string }[];
   category?: Category | null;
   mode: 'create' | 'edit';
   saving: boolean;

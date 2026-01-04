@@ -28,7 +28,14 @@ export function SubCategoryDetailView({ subCategory, formatDate }: SubCategoryDe
                 {subCategory.name}
               </TableCell>
             </TableRow>
-
+              <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Category Name
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {subCategory.category_name}
+              </TableCell>
+            </TableRow>
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Status
@@ -37,17 +44,17 @@ export function SubCategoryDetailView({ subCategory, formatDate }: SubCategoryDe
                 <Badge
                   size="sm"
                   color={
-                    subCategory.status == "1"
+                    subCategory.status == 1
                       ? "success"
-                      : subCategory.status == "0"
+                      : subCategory.status == 0
                         ? "warning"
                         : "warning"
                   }
                   variant="light"
                 >
-                  {subCategory.status == "1"
+                  {subCategory.status == 1
                     ? "Active"
-                    : subCategory.status == "0"
+                    : subCategory.status == 0
                       ? "Inactive"
                       : "Unknown"}
                 </Badge>

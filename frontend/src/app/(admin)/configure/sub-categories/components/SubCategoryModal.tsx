@@ -7,8 +7,10 @@ import { SubCategory } from "@/services/subCategoryService";
 
 interface SubCategoryModalProps {
   isOpen: boolean;
-  status: { value: string; label: string }[];
+  status: { value: number; label: string }[];
   subCategory: SubCategory | null;
+  categories: { value: number; label: string }[];
+  loadingCategories: boolean;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
@@ -21,6 +23,8 @@ export function SubCategoryModal({
   isOpen,
   status,
   subCategory,
+  categories,
+  loadingCategories,
   mode,
   saving,
   onClose,
@@ -60,6 +64,8 @@ export function SubCategoryModal({
           <SubCategoryForm
           status={status}
             subCategory={mode === 'edit' ? subCategory : null}
+            categories={categories}
+            loadingCategories={loadingCategories}
             mode={mode}
             saving={saving}
             onSubmit={onSave}
@@ -90,7 +96,7 @@ export function SubCategoryModal({
               </Button>
               <Button
                 type="submit"
-                form="category-form"
+                form="sub-category-form"
                 size="sm"
                 disabled={saving}
               >

@@ -8,19 +8,20 @@ use App\Models\softConfig\Category;
 
 class CategoryService
 {
-    public function getCategories(array $filters = [], $perPage = null)
+    const defaultColumns = [
+        'id',
+        'name',
+        'slug',
+        'description',
+        'status',
+        'created_by',
+        'created_at',
+        'deleted_at',
+        'updated_at'
+    ];
+    public function getCategories(array $filters = [], $perPage = null, $columns = self::defaultColumns)
     {
-        $query = Category::query()->select(
-            'id',
-            'name',
-            'slug',
-            'description',
-            'status',
-            'created_by',
-            'created_at',
-            'deleted_at',
-            'updated_at'
-        );
+        $query = Category::query()->select($columns);
 
         // Handle status / trash logic
         if (($filters['status'] ?? '') === 'trash') {

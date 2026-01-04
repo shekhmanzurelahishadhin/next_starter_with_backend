@@ -26,7 +26,7 @@ interface UseSubCategoryColumnsProps {
   pageIndex: number;
   pageSize: number;
   formatDate: (dateString?: string) => string;
-  status: { value: string; label: string }[];
+  status: { value: number; label: string }[];
 }
 
 export const useSubCategoryColumns = ({
@@ -79,6 +79,31 @@ export const useSubCategoryColumns = ({
           <div className="flex items-center gap-2">
             <span className="font-medium text-gray-800 dark:text-white/90 truncate">
               {name}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "category_name",
+      header: "Category",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        placeholder: "Search Category",
+        exportable: true,
+        exportHeader: "Category",
+        exportValue: (row) => row.category_name || "—",
+        widthClass: "w-[160px] min-w-[140px] max-w-[200px]",
+        minWidth: "140px",
+        maxWidth: "200px"
+      },
+      cell: ({ row }) => {
+        const category = row.getValue("category_name") as string;
+        return (
+          <div className="px-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate block">
+              {category || "—"}
             </span>
           </div>
         );

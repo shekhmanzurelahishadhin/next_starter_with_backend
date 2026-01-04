@@ -7,7 +7,7 @@ import { Category } from "@/services/categoryService";
 
 interface CategoryModalProps {
   isOpen: boolean;
-  status: { value: string; label: string }[];
+  status: { value: number; label: string }[];
   category: Category | null;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;

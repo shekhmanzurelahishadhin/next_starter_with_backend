@@ -26,7 +26,7 @@ class SubCategoryController extends Controller
     {
         try {
             $perPage    = $request->get('per_page');
-            $filters    = $request->only('status','name','category_name','created_at','created_by');
+            $filters    = $request->only('status','name','category_name','created_at','created_by','updated_at');
             $categoryId = $request->query('category_id');
 
             $subCategories = $subCategoryService->getSubCategories($filters, $perPage, $categoryId);

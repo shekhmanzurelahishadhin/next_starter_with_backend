@@ -8,10 +8,9 @@ export interface SubCategory {
   id: number;
   name: string;
   category_id: number;
-  categiory_name: string;
+  category_name: string;
   slug: string;
-  description: string;
-  status: string;
+  status: number;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

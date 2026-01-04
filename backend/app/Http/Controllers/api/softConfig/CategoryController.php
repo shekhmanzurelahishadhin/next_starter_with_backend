@@ -30,21 +30,23 @@ class CategoryController extends Controller
         try {
             $perPage = $request->get('per_page');
             $filters = $request->only('search','status','name', 'slug', 'description','created_by','created_at');
-
-            $categories = $categoryService->getCategories($filters, $perPage);
+            $columns = $request->get('columns', CategoryService::defaultColumns);
+            $categories = $categoryService->getCategories($filters, $perPage, $columns);
 
             if ($categories instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                $items = collect($categories->items())->map(fn($category) => new CategoryResource((object) $category, $columns));
                 // Paginated response
                 $data = [
-                    'data'         => CategoryResource::collection($categories->items()),
+                    'data'         => $items,
                     'total'        => $categories->total(),
                     'current_page' => $categories->currentPage(),
                     'per_page'     => $categories->perPage(),
                 ];
             }else {
                 // Collection response (no pagination)
+                $items = collect($categories)->map(fn($category) => new CategoryResource((object) $category, $columns));
                 $data = [
-                    'data'         => CategoryResource::collection($categories),
+                    'data'         => $items,
                     'total'        => $categories->count(),
                     'current_page' => 1,
                     'per_page'     => $categories->count(),

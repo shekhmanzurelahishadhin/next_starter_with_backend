@@ -14,7 +14,7 @@ export const useCategories = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState<{ value: string; label: string }[]>([]);
+  const [status, setStatus] = useState<{ value: number; label: string }[]>([]);
 
   // Modal state
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
