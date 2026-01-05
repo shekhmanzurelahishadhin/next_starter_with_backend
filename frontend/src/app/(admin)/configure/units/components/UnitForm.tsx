@@ -2,26 +2,27 @@
 import { Controller, useForm } from "react-hook-form";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
-import { Category } from "@/services/categoryService";
+import { Unit } from "@/services/unitService";
 import { useEffect } from "react";
 import Select from "@/components/form/Select";
 import { ChevronDownIcon } from "@/icons";
 
-interface CategoryFormData {
+interface UnitFormData {
   name: string;
+  code: string;
   status?: number;
 }
 
-interface CategoryFormProps {
-  status: { value: number; label: string }[];
-  category?: Category | null;
+interface UnitFormProps {
+  status: { value: string; label: string }[];
+  unit?: Unit | null;
   mode: 'create' | 'edit';
   saving: boolean;
-  onSubmit: (categoryData: CategoryFormData) => void;
+  onSubmit: (unitData: UnitFormData) => void;
   backendErrors?: Record<string, string>;
 }
 
-export function CategoryForm({ status, category, mode, saving, onSubmit, backendErrors }: CategoryFormProps) {
+export function UnitForm({ status, unit, mode, saving, onSubmit, backendErrors }: UnitFormProps) {
   const {
     register,
     handleSubmit,
@@ -30,10 +31,11 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
     setError,
     clearErrors,
     control,
-  } = useForm<CategoryFormData>({
+  } = useForm<UnitFormData>({
     mode: "onChange",
     defaultValues: {
       name: "",
+      code: "",
     }
   });
 
@@ -42,7 +44,7 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
     if (backendErrors) {
       clearErrors();
       Object.entries(backendErrors).forEach(([field, message]) => {
-        setError(field as keyof CategoryFormData, {
+        setError(field as keyof UnitFormData, {
           type: 'server',
           message: Array.isArray(message) ? message[0] : message
         });
@@ -51,41 +53,43 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
   }, [backendErrors, setError, clearErrors]);
 
   useEffect(() => {
-    if (mode === 'edit' && category) {
+    if (mode === 'edit' && unit) {
       reset({
-        name: category?.name ?? '',
-        status: Number(category?.status ?? 1),
+        name: unit?.name ?? '',
+        code: unit?.code ?? '',
+        status: Number(unit?.status ?? 1),
       });
     } else {
       reset({
         name: '',
+        code: '',
       });
     }
-  }, [category, reset, mode]);
+  }, [unit, reset, mode]);
 
-  const onFormSubmit = (data: CategoryFormData) => {
+  const onFormSubmit = (data: UnitFormData) => {
     onSubmit(data);
   };
 
 
   return (
-    <form id="category-form" onSubmit={handleSubmit(onFormSubmit)}>
+    <form id="unit-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-2">
         <div>
-          <Label htmlFor="name" required>Category Name</Label>
+          <Label htmlFor="name" required>Unit Name</Label>
           <Input
             id="name"
             type="text"
-            placeholder="Enter category name."
+            placeholder="Enter unit name."
             register={register("name", {
-              required: "Category name is required",
+              required: "Unit name is required",
               minLength: {
                 value: 2,
-                message: "Category name must be at least 2 characters"
+                message: "Unit name must be at least 2 characters"
               },
               maxLength: {
                 value: 50,
-                message: "Category name must not exceed 50 characters"
+                message: "Unit name must not exceed 50 characters"
               },
             })}
             error={errors.name?.message}
@@ -93,6 +97,27 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
           />
         </div>
 
+        <div>
+          <Label htmlFor="code" required>Code</Label>
+          <Input
+            id="code"
+            type="text"
+            placeholder="Enter code."
+            register={register("code", {
+              required: "Code is required",
+              minLength: {
+                value: 2,
+                message: "Code must be at least 2 characters"
+              },
+              maxLength: {
+                value: 50,
+                message: "Code must not exceed 50 characters"
+              },
+            })}
+            error={errors.code?.message}
+            disabled={saving}
+          />
+        </div>
         {/* Show status field only in edit mode */}
         {mode === "edit" && (
           <div>

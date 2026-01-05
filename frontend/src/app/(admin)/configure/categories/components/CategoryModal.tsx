@@ -12,7 +12,7 @@ interface CategoryModalProps {
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
-  onSave: (categoryData: { name: string, description: string }) => void;
+  onSave: (categoryData: { name: string }) => void;
   backendErrors?: Record<string, string>; // Add this prop
   formatDate: (dateString?: string) => string;
 }

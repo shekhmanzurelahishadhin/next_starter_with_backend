@@ -162,7 +162,7 @@ export const useCategories = () => {
     }
   }, [categories, loadCategories]);
 
-  const handleSave = useCallback(async (categoryData: { name: string, description: string }) => {
+  const handleSave = useCallback(async (categoryData: { name: string, status: string }) => {
     try {
       setSaving(true);
       setBackendErrors({});

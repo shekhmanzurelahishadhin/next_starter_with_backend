@@ -8,7 +8,6 @@ export interface Category {
   id: number;
   name: string;
   slug: string;
-  description: string;
   status: string;
   created_at?: string;
   updated_at?: string;
@@ -29,7 +28,6 @@ export interface CategoryFilters {
   per_page?: number;
   name?: string;
   slug?: string;
-  description?: string;
   status?: string;
   created_at?: string;
   updated_at?: string;
@@ -76,7 +74,6 @@ class CategoryService {
     // Specific filter fields
     if (filters.name) params.append('name', filters.name);
     if (filters.slug) params.append('slug', filters.slug);
-    if (filters.description) params.append('description', filters.description);
     if (filters.status) params.append('status', filters.status);
     if (filters.created_at) params.append('created_at', filters.created_at);
     if (filters.updated_at) params.append('updated_at', filters.updated_at);
@@ -87,13 +84,13 @@ class CategoryService {
     return result;
   }
 
-  async createCategory(categoryData: { name: string, description: string }): Promise<Category> {
+  async createCategory(categoryData: { name: string}): Promise<Category> {
 
     const response = await api.post('/configure/categories', categoryData);
     return response.data.data;
   }
 
-  async updateCategory(id: number, categoryData: { name: string, description: string }): Promise<Category> {
+  async updateCategory(id: number, categoryData: { name: string, status: string }): Promise<Category> {
 
     const response = await api.put(`/configure/categories/${id}`, categoryData);
     return response.data.data;

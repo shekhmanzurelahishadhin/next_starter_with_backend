@@ -1,43 +1,39 @@
 "use client";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
-import { SubCategoryForm } from "./SubCategoryForm";
-import { SubCategoryDetailView } from "./SubCategoryDetailView";
-import { SubCategory } from "@/services/subCategoryService";
+import { UnitForm } from "./UnitForm";
+import { UnitDetailView } from "./UnitDetailView";
+import { Unit } from "@/services/unitService";
 
-interface SubCategoryModalProps {
+interface UnitModalProps {
   isOpen: boolean;
-  status: { value: number; label: string }[];
-  subCategory: SubCategory | null;
-  categories: { value: number; label: string }[];
-  loadingCategories: boolean;
+  status: { value: string; label: string }[];
+  unit: Unit | null;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
-  onSave: (categoryData: { name: string }) => void;
+  onSave: (unitData: { name: string }) => void;
   backendErrors?: Record<string, string>; // Add this prop
   formatDate: (dateString?: string) => string;
 }
 
-export function SubCategoryModal({
+export function UnitModal({
   isOpen,
   status,
-  subCategory,
-  categories,
-  loadingCategories,
+  unit,
   mode,
   saving,
   onClose,
   onSave,
   backendErrors, // Add this prop
   formatDate,
-}: SubCategoryModalProps) {
+}: UnitModalProps) {
   const getTitle = () => {
     switch (mode) {
-      case 'view': return 'Sub-Category Details';
-      case 'edit': return 'Edit Sub-Category';
-      case 'create': return 'Add New Sub-Category';
-      default: return 'Sub-Category';
+      case 'view': return 'Unit Details';
+      case 'edit': return 'Edit Unit';
+      case 'create': return 'Add New Unit';
+      default: return 'Unit';
     }
   };
 
@@ -56,16 +52,14 @@ export function SubCategoryModal({
           {getTitle()}
         </h4>
 
-        {mode === 'view' && subCategory && (
-          <SubCategoryDetailView subCategory={subCategory} formatDate={formatDate} />
+        {mode === 'view' && unit && (
+          <UnitDetailView unit={unit} formatDate={formatDate} />
         )}
 
         {(mode === 'create' || mode === 'edit') && (
-          <SubCategoryForm
+          <UnitForm
           status={status}
-            subCategory={mode === 'edit' ? subCategory : null}
-            categories={categories}
-            loadingCategories={loadingCategories}
+            unit={mode === 'edit' ? unit : null}
             mode={mode}
             saving={saving}
             onSubmit={onSave}
@@ -96,7 +90,7 @@ export function SubCategoryModal({
               </Button>
               <Button
                 type="submit"
-                form="sub-category-form"
+                form="unit-form"
                 size="sm"
                 disabled={saving}
               >

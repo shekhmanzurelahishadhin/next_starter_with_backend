@@ -29,21 +29,24 @@ class UnitController extends Controller
         try{
             $perPage = $request->get('per_page');
             $filters = $request->only('search','status','name','code','created_at','created_by');
+            $columns = $request->get('columns', UnitService::defaultColumns);
 
-            $units = $unitService->getUnits($filters, $perPage);
+            $units = $unitService->getUnits($filters, $perPage, $columns);
 
             if ($units instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                $items = collect($units->items())->map(fn($unit) => new UnitResource((object) $unit, $columns));
                 // Paginated response
                 $data =[
-                    'data'         => UnitResource::collection($units->items()),
+                    'data'         => $items,
                     'total'        => $units->total(),
                     'current_page' => $units->currentPage(),
                     'per_page'     => $units->perPage(),
                 ];
             }else{
                 // Collection response (no pagination)
+                $items = collect($units)->map(fn($unit) => new UnitResource((object) $unit, $columns));
                 $data = [
-                    'data'         => UnitResource::collection($units),
+                    'data'         => $items,
                     'total'        => $units->count(),
                     'current_page' => 1,
                     'per_page'     => $units->count(),

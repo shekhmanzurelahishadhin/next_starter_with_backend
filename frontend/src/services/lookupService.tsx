@@ -101,13 +101,13 @@ class LookupService {
     return data;
 }
 
-    async createLookup(lookupData: { name: string, description: string }): Promise<Lookup> {
+    async createLookup(lookupData: { name: string}): Promise<Lookup> {
 
         const response = await api.post('/configure/lookups', lookupData);
         return response.data.data;
     }
 
-    async updateLookup(id: number, lookupData: { name: string, description: string }): Promise<Lookup> {
+    async updateLookup(id: number, lookupData: { name: string }): Promise<Lookup> {
 
         const response = await api.put(`/configure/lookups/${id}`, lookupData);
         return response.data.data;

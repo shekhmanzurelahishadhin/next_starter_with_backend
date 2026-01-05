@@ -2,19 +2,23 @@
 
 namespace App\Http\Resources\softConfig\unit;
 
+use App\Services\softConfig\UnitService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UnitResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
+    protected $columns;
+
+    public function __construct($resource, $columns = null)
+    {
+        parent::__construct($resource);
+        $this->columns = $columns;
+    }
+
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
@@ -28,5 +32,11 @@ class UnitResource extends JsonResource
             'deleted_at' => $this->deleted_at,
 
         ];
+
+         if (!empty($this->columns) && is_array($this->columns) && $this->columns !== [UnitService::defaultColumns]) {
+             return array_intersect_key($data, array_flip($this->columns));
+         }
+
+        return $data;
     }
 }
