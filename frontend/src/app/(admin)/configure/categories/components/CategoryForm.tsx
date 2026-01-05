@@ -10,7 +10,6 @@ import { ChevronDownIcon } from "@/icons";
 
 interface CategoryFormData {
   name: string;
-  description: string;
   status?: number;
 }
 
@@ -36,7 +35,6 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
     mode: "onChange",
     defaultValues: {
       name: "",
-      description: "",
     }
   });
 
@@ -57,13 +55,11 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
     if (mode === 'edit' && category) {
       reset({
         name: category?.name ?? '',
-        description: category?.description ?? '',
         status: Number(category?.status ?? 1),
       });
     } else {
       reset({
         name: '',
-        description: '',
       });
     }
   }, [category, reset, mode]);
@@ -95,32 +91,6 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
             })}
             error={errors.name?.message}
             disabled={saving}
-          />
-        </div>
-
-        <div>
-          <Label>Description</Label>
-
-          <Controller
-            name="description"
-            control={control}
-            rules={{
-              maxLength: {
-                value: 255,
-                message: "Max length is 255 characters",
-              },
-            }}
-            render={({ field }) => (
-              <TextArea
-                id="description"
-                placeholder="Enter category description."
-                value={field.value || ""}
-                onChange={field.onChange}
-                error={errors.description?.message}
-                disabled={saving}
-                rows={3}
-              />
-            )}
           />
         </div>
 

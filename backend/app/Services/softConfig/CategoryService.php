@@ -12,7 +12,6 @@ class CategoryService
         'id',
         'name',
         'slug',
-        'description',
         'status',
         'created_by',
         'created_at',
@@ -40,9 +39,6 @@ class CategoryService
             )
             ->when($filters['slug'] ?? null, fn($q, $slug) =>
             $q->where('slug', 'like', "%{$slug}%")
-            )
-            ->when($filters['description'] ?? null, fn($q, $desc) =>
-            $q->where('description', 'like', "%{$desc}%")
             )
             ->when($filters['created_by'] ?? null, fn($q, $createdBy) =>
             $q->whereHas('createdBy', fn($sub) =>

@@ -28,14 +28,6 @@ export function CategoryDetailView({ category, formatDate }: CategoryDetailViewP
                 {category.name}
               </TableCell>
             </TableRow>
-            <TableRow>
-              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Description
-              </TableCell>
-              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
-                {category.description}
-              </TableCell>
-            </TableRow>
 
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">

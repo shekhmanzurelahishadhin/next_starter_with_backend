@@ -84,30 +84,6 @@ export const useCategoryColumns = ({
         );
       },
     },
-
-    {
-      accessorKey: "description",
-      header: "Description",
-      enableSorting: true,
-      meta: {
-        filterVariant: "text",
-        placeholder: "Search descriptions",
-        exportable: true,
-        exportHeader: "Description",
-        exportValue: (row) => row.description,
-        widthClass: "w-[200px]"
-      },
-      cell: ({ row }) => {
-        const description = row.getValue("description") as string;
-        return (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
-              {description}
-            </span>
-          </div>
-        );
-      },
-    },
     {
       accessorKey: "status",
       header: "Status",

@@ -29,7 +29,7 @@ class CategoryController extends Controller
     {
         try {
             $perPage = $request->get('per_page');
-            $filters = $request->only('search','status','name', 'slug', 'description','created_by','created_at');
+            $filters = $request->only('search','status','name', 'slug', 'created_by','created_at');
             $columns = $request->get('columns', CategoryService::defaultColumns);
             $categories = $categoryService->getCategories($filters, $perPage, $columns);
 
