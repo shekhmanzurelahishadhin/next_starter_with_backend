@@ -3,6 +3,7 @@
 namespace App\Http\Requests\softConfig\subCategory;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateSubCategoryRequest extends FormRequest
 {
@@ -26,7 +27,15 @@ class UpdateSubCategoryRequest extends FormRequest
         return [
             'category_id' => 'required|exists:categories,id',
             'name'        => 'required|string|max:255',
-            'slug'        => 'nullable|string|max:255|unique:sub_categories,slug,' . $id,
+           // 'slug'        => 'nullable|string|max:255|unique:sub_categories,slug,' . $id,
+            'slug'        => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('sub_categories', 'slug')
+                    ->ignore($this->route('subCategory'))
+                    ->where('category_id', $this->category_id),
+            ],
             'status'      => 'boolean',
         ];
     }

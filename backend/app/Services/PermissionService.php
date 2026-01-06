@@ -65,14 +65,8 @@ class PermissionService
 
         return $permission;
     }
-
     public function deletePermission($permission)
     {
-        try {
-            return $permission->delete();
-        }catch (\Exception $e){
-            return $e->getMessage();
-        }
-
+        return $permission->delete();
     }
 }

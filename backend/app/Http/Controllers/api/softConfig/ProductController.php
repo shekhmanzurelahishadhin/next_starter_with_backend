@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\api\softConfig;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\softConfig\product\CreateProductRequest;
 use App\Http\Requests\softConfig\product\UpdateProductRequest;
 use App\Http\Resources\softConfig\product\ProductResource;
-use App\Models\softconfig\Product;
+use App\Models\softConfig\Product;
 use App\Services\softConfig\ProductService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -22,43 +24,55 @@ class ProductController extends Controller
 
     public function index(Request $request, ProductService $productService)
     {
-        $perPage = $request->get('per_page');
-        $filters = $request->only('search','status','name','code','category_name','sub_category_name','brand_name','model_name','unit_name','selling_price','purchase_price','reorder_level','created_at','created_by');
-        $categoryId = $request->query('category_id');
-        $subCategoryId = $request->query('sub_category_id');
-        $brandId = $request->query('brand_id');
-        $modelId = $request->query('model_id');
-        $products = $productService->getProducts($filters, $perPage, $categoryId, $subCategoryId, $brandId, $modelId);
+        try {
+            $perPage = $request->get('per_page');
+            $filters = $request->only('search','status','name','code','category_name','sub_category_name','brand_name','model_name','unit_name','selling_price','purchase_price','reorder_level','created_at','created_by');
+            $categoryId = $request->query('category_id');
+            $subCategoryId = $request->query('sub_category_id');
+            $brandId = $request->query('brand_id');
+            $modelId = $request->query('model_id');
+            $products = $productService->getProducts($filters, $perPage, $categoryId, $subCategoryId, $brandId, $modelId);
 
-        if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            // Paginated response
-            return response()->json([
-                'data' => ProductResource::collection($products->items()),
-                'total' => $products->total(),
-                'current_page' => $products->currentPage(),
-                'per_page' => $products->perPage(),
-            ]);
+            if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'data' => ProductResource::collection($products->items()),
+                    'total' => $products->total(),
+                    'current_page' => $products->currentPage(),
+                    'per_page' => $products->perPage(),
+                ];
+            }else{
+                // Collection response (no pagination)
+                $data = [
+                    'data' => ProductResource::collection($products),
+                    'total' => $products->count(),
+                    'current_page' => 1,
+                    'per_page' => $products->count(),
+                ];
+            }
+
+            return ApiResponse::success($data, 'Products retrieved successfully');
+        }catch (\Exception $exception){
+            return ApiResponse::serverError('Failed to retrieve Products');
         }
-
-        // Collection response (no pagination)
-        return response()->json([
-            'data' => ProductResource::collection($products),
-            'total' => $products->count(),
-            'current_page' => 1,
-            'per_page' => $products->count(),
-        ]);
     }
 
     public function store(CreateProductRequest $request, ProductService $productService)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $product = $productService->createProduct($validatedData);
+            $product = $productService->createProduct($validatedData);
 
-        return response()->json([
-            'message' => 'Product created successfully',
-            'data' => new ProductResource($product),
-        ]);
+            return ApiResponse::success(
+                new ProductResource($product),
+                'Product created successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to create Product');
+        }
     }
 
     /**
@@ -66,7 +80,18 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $product = Product::find($id);
+
+            return ApiResponse::success(
+                new ProductResource($product),
+                'Product retrieved successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieved Product');
+        }
     }
 
     /**
@@ -74,13 +99,17 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, ProductService $productService, Product $product)
     {
+        try {
+            $product = $productService->updateProduct($product, $request->validated());
 
-        $product = $productService->updateProduct($product, $request->validated());
+            return ApiResponse::success(
+                new ProductResource($product),
+                'Product updated successfully'
+            );
 
-        return response()->json([
-            'message' => 'Product updated successfully',
-            'data' => new ProductResource($product),
-        ]);
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to update product');
+        }
     }
 
     /**
@@ -90,24 +119,37 @@ class ProductController extends Controller
     // Soft delete (move to trash)
     public function trash(Product $product, ProductService $productService)
     {
-        $productService->softDeleteProduct($product);
+        try {
+            $productService->softDeleteProduct($product);
 
-        return response()->json([
-            'message' => 'Product moved to trash successfully',
-        ]);
+            return ApiResponse::success(
+                null,
+                'Product moved to trash successfully'
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to move product to trash');
+        }
     }
 
     // Restore soft-deleted brand
     public function restore($id, ProductService $productService)
     {
-        $product = Product::withTrashed()->findOrFail($id);
+        try {
+            $product = Product::withTrashed()->findOrFail($id);
 
-        $product = $productService->restoreProduct($product);
+            $product = $productService->restoreProduct($product);
 
-        return response()->json([
-            'message' => 'Product restored successfully',
-            'data' => $product,
-        ]);
+            return ApiResponse::success(
+                new ProductResource($product),
+                'Product restored successfully'
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::notFound('Product not found');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to restore product');
+        }
     }
 
     // Force delete permanently

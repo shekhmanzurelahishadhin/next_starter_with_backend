@@ -17,45 +17,57 @@ class CreateProductRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
-            'category_id'      => 'required|exists:categories,id',
-            'sub_category_id'  => 'nullable|exists:sub_categories,id',
-            'brand_id'         => 'nullable|exists:brands,id',
-            'model_id'         => 'nullable|exists:product_models,id',
-            'unit_id'          => 'required|exists:units,id',
+            // Required relations
+            'product_category_id' => 'required|exists:categories,id',
+            'sub_category_id'     => 'nullable|exists:sub_categories,id',
+            'brand_id'            => 'required|exists:brands,id',
+            'unit_id'             => 'nullable|exists:units,id',
+            'company_id'          => 'nullable|exists:companies,id',
+            'vehicle_brand_id'    => 'nullable|exists:vehicle_brands,id',
+            'country_id'          => 'nullable|exists:countries,id',
 
-            'name'             => 'required|string|max:255|unique:products,name',
-            'slug'             => 'nullable|string|max:255|unique:products,slug',
-            'code'             => 'nullable|string|max:100|unique:products,code',
-            'description'      => 'nullable|string',
+            // Basic product info
+            'name'                => 'required|string|max:255',
+            'part_number'         => 'required|string|max:255|unique:products,part_number',
 
-            'purchase_price'   => 'required|numeric|min:0',
-            'selling_price'    => 'required|numeric|min:0',
-            'reorder_level'    => 'nullable|numeric|min:0',
+            // Inventory
+            'alert_qty'           => 'nullable|integer|min:0',
+            'short_list_qty'      => 'nullable|numeric|min:0',
+
+            // Specifications
+            'unit_weight'         => 'nullable|string|max:100',
+            'model'               => 'nullable|string|max:255',
+            'model_year'          => 'nullable|string|max:50',
+            'engine'              => 'nullable|string|max:255',
+            'chassis'             => 'nullable|string|max:255',
+
+            // Status
+            'status'              => 'nullable|in:0,1',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'category_id.required'     => 'Please select a category.',
-            'category_id.exists'       => 'Selected category is invalid.',
-            'unit_id.required'         => 'Please select a unit.',
-            'unit_id.exists'           => 'Selected unit is invalid.',
+            'product_category_id.required' => 'Please select a product category.',
+            'product_category_id.exists'   => 'Selected product category is invalid.',
 
-            'name.required'            => 'Product name is required.',
-            'name.unique'              => 'This product name already exists.',
-            'code.unique'              => 'This product code already exists.',
+            'brand_id.required'            => 'Please select a brand.',
+            'brand_id.exists'              => 'Selected brand is invalid.',
 
-            'purchase_price.required'  => 'Please enter a purchase price.',
-            'purchase_price.numeric'   => 'Purchase price must be a number.',
-            'selling_price.required'   => 'Please enter a selling price.',
+            'name.required'                => 'Product name is required.',
+            'part_number.required'         => 'Part number is required.',
+            'part_number.unique'           => 'This part number already exists.',
 
-            'reorder_level.numeric'    => 'Reorder level must be numeric.',
+            'alert_qty.integer'             => 'Alert quantity must be an integer.',
+            'short_list_qty.numeric'        => 'Short list quantity must be numeric.',
+
+            'status.in'                     => 'Status must be Active or Inactive.',
         ];
     }
 }

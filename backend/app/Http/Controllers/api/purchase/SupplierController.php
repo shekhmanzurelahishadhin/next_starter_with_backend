@@ -9,7 +9,8 @@ use App\Http\Resources\purchase\SupplierResource;
 use App\Models\purchase\Supplier;
 use App\Services\purchase\SupplierService;
 use Illuminate\Http\Request;
-
+use App\Helpers\ApiResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class SupplierController extends Controller
 {
     public function __construct()
@@ -22,42 +23,53 @@ class SupplierController extends Controller
 
     public function index(Request $request, SupplierService $supplierService)
     {
-        $perPage = $request->get('per_page');
-        $filters = $request->only('search','status','name','code','company_name','address','opening_balance','opening_balance_type','phone','email','created_at','created_by');
+        try {
+            $perPage = $request->get('per_page');
+            $filters = $request->only('search','status','name','code','company_name','address','opening_balance','opening_balance_type','phone','email','created_at','created_by');
 
-        $companyId = $request->query('company_id');
+            $companyId = $request->query('company_id');
 
-        $suppliers = $supplierService->getSuppliers($filters, $perPage, $companyId);
+            $suppliers = $supplierService->getSuppliers($filters, $perPage, $companyId);
 
-        if ($suppliers instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            // Paginated response
-            return response()->json([
-                'data' => SupplierResource::collection($suppliers->items()),
-                'total' => $suppliers->total(),
-                'current_page' => $suppliers->currentPage(),
-                'per_page' => $suppliers->perPage(),
-            ]);
+            if ($suppliers instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'data'         => SupplierResource::collection($suppliers->items()),
+                    'total'        => $suppliers->total(),
+                    'current_page' => $suppliers->currentPage(),
+                    'per_page'     => $suppliers->perPage(),
+                ];
+            }else{
+                // Collection response (no pagination)
+                $data = [
+                    'data'         => SupplierResource::collection($suppliers),
+                    'total'        => $suppliers->count(),
+                    'current_page' => 1,
+                    'per_page'     => $suppliers->count(),
+                ];
+            }
+                return ApiResponse::success($data, 'Supplier retrieved successfully');
+
+        }catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve suppliers');
         }
-
-        // Collection response (no pagination)
-        return response()->json([
-            'data' => SupplierResource::collection($suppliers),
-            'total' => $suppliers->count(),
-            'current_page' => 1,
-            'per_page' => $suppliers->count(),
-        ]);
     }
 
     public function store(CreateSupplierRequest $request, SupplierService $supplierService)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
+            $supplier      = $supplierService->createSupplier($validatedData);
 
-        $supplier = $supplierService->createSupplier($validatedData);
+            return ApiResponse::success(
+                new SupplierResource($supplier),
+                'Supplier created successfully',
+                201
+            );
 
-        return response()->json([
-            'message' => 'Supplier created successfully',
-            'data' => new SupplierResource($supplier),
-        ]);
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to create supplier');
+        }
     }
 
     /**
@@ -65,7 +77,18 @@ class SupplierController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $supplier  = Supplier::withTrashed()->findOrFail($id);
+
+            return ApiResponse::success(
+                new SupplierResource($supplier),
+                'Supplier retrieve successfully',
+                201
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve Supplier');
+        }
     }
 
     /**
@@ -73,12 +96,17 @@ class SupplierController extends Controller
      */
     public function update(UpdateSupplierRequest $request, SupplierService $supplierService, Supplier $supplier)
     {
-        $supplier  = $supplierService->updateSupplier($supplier , $request->validated());
+        try {
+            $supplier  = $supplierService->updateSupplier($supplier , $request->validated());
 
-        return response()->json([
-            'message' => 'Supplier updated successfully',
-            'data' => new SupplierResource($supplier),
-        ]);
+            return ApiResponse::success(
+                new SupplierResource($supplier),
+                'Supplier updated successfully'
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to update Supplier');
+        }
     }
 
     /**
@@ -88,24 +116,37 @@ class SupplierController extends Controller
     // Soft delete (move to trash)
     public function trash(Supplier $supplier , SupplierService $supplierService)
     {
-        $supplierService->softDeleteSupplier($supplier);
+        try {
+            $supplierService->softDeleteSupplier($supplier);
 
-        return response()->json([
-            'message' => 'Supplier moved to trash successfully',
-        ]);
+            return ApiResponse::success(
+                null,
+                'Supplier moved to trash successfully'
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to move supplier to trash');
+        }
     }
 
     // Restore soft-deleted store
     public function restore($id, SupplierService $supplierService)
     {
-        $supplier  = Supplier::withTrashed()->findOrFail($id);
+        try {
+            $supplier  = Supplier::withTrashed()->findOrFail($id);
 
-        $supplier  = $supplierService->restoreSupplier($supplier);
+            $supplier  = $supplierService->restoreSupplier($supplier);
 
-        return response()->json([
-            'message' => 'Supplier restored successfully',
-            'data' => $supplier ,
-        ]);
+            return ApiResponse::success(
+                new SupplierResource($supplier),
+                'Supplier restored successfully'
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::notFound('Supplier not found');
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to restore supplier');
+        }
     }
 
     // Force delete permanently

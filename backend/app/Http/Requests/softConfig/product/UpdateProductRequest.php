@@ -26,36 +26,23 @@ class UpdateProductRequest extends FormRequest
         $productId = $this->route('product'); // assuming route like /products/{product}
 
         return [
-            'category_id'      => 'required|exists:categories,id',
-            'sub_category_id'  => 'nullable|exists:sub_categories,id',
-            'brand_id'         => 'nullable|exists:brands,id',
-            'model_id'         => 'nullable|exists:product_models,id',
-            'unit_id'          => 'required|exists:units,id',
-
-            'name'             => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('products', 'name')->ignore($productId),
-            ],
-            'slug'             => [
-                'nullable',
-                'string',
-                'max:255',
-                Rule::unique('products', 'slug')->ignore($productId),
-            ],
-            'code'             => [
-                'nullable',
-                'string',
-                'max:100',
-                Rule::unique('products', 'code')->ignore($productId),
-            ],
-            'description'      => 'nullable|string',
-
-            'purchase_price'   => 'required|numeric|min:0',
-            'selling_price'    => 'required|numeric|min:0',
-            'reorder_level'    => 'nullable|numeric|min:0',
-            'status' => 'boolean',
+            'product_category_id' => 'required|exists:categories,id',
+            'sub_category_id'     => 'nullable|exists:sub_categories,id',
+            'brand_id'            => 'required|exists:brands,id',
+            'unit_id'             => 'nullable|exists:units,id',
+            'company_id'          => 'nullable|exists:companies,id',
+            'vehicle_brand_id'    => 'nullable|exists:vehicle_brands,id',
+            //'country_id'          => 'nullable|exists:countries,id',
+            'name'                => 'required|string|max:255',
+            'part_number'         => ['nullable', 'string', 'max:100', Rule::unique('products')->ignore($productId)],
+            'alert_qty'           => 'nullable|integer|min:0',
+            'short_list_qty'      => 'nullable|numeric|min:0',
+            'unit_weight'         => 'nullable|string|max:100',
+            'model'               => 'nullable|string|max:255',
+            'model_year'          => 'nullable|string|max:50',
+            'engine'              => 'nullable|string|max:255',
+            'chassis'             => 'nullable|string|max:255',
+            'status'              => 'nullable|in:0,1',
         ];
     }
 
@@ -65,21 +52,10 @@ class UpdateProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'category_id.required'     => 'Please select a category.',
-            'category_id.exists'       => 'Selected category is invalid.',
-            'unit_id.required'         => 'Please select a unit.',
-            'unit_id.exists'           => 'Selected unit is invalid.',
-
-            'name.required'            => 'Product name is required.',
-            'name.unique'              => 'This product name already exists.',
-            'code.unique'              => 'This product code already exists.',
-
-            'purchase_price.required'  => 'Please enter a purchase price.',
-            'purchase_price.numeric'   => 'Purchase price must be a number.',
-            'selling_price.required'   => 'Please enter a selling price.',
-
-            'reorder_level.numeric'    => 'Reorder level must be numeric.',
-            'status.boolean' => 'The active status must be true or false.',
+            'product_category_id.*' => 'Please select a valid category.',
+            'brand_id.*'            => 'Please select a valid brand.',
+            'name.required'         => 'Product name is required.',
+            'part_number.unique'    => 'This part number is already in use.',
         ];
     }
 }

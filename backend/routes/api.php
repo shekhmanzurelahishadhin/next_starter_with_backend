@@ -16,8 +16,15 @@ use App\Http\Controllers\api\softConfig\UnitController;
 use App\Http\Controllers\api\softConfig\StoreController;
 use App\Http\Controllers\api\softConfig\LocationController;
 use App\Http\Controllers\api\purchase\SupplierController;
+use App\Http\Controllers\api\purchase\PurchaseController;
 use App\Http\Controllers\api\sales\CustomerController;
+use App\Http\Controllers\api\sales\CustomersContactController;
+use App\Http\Controllers\api\sales\SellPriceController;
+use App\Http\Controllers\api\sales\SaleController;
+use App\Http\Controllers\api\sales\SaleDetailController;
 use App\Http\Controllers\api\softConfig\ProductController;
+use App\Http\Controllers\api\softConfig\PurchasePriceController;
+use App\Helpers\ApiResponse;
 
 
 Route::prefix('v1')->group(function () {
@@ -127,15 +134,15 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{id}', [BrandController::class, 'destroy']); // force delete
             });
 
-            // Models Route
-            Route::prefix('models')->group(function () {
-                Route::get('/', [ProductModelController::class, 'index']);
-                Route::post('/', [ProductModelController::class, 'store']);
-                Route::get('/{product_model}', [ProductModelController::class, 'show']);
-                Route::put('/{product_model}', [ProductModelController::class, 'update']);
-                Route::post('trash/{product_model}', [ProductModelController::class, 'trash']); // soft delete
-                Route::post('/restore/{id}', [ProductModelController::class, 'restore']);
-                Route::delete('/{id}', [ProductModelController::class, 'destroy']); // force delete
+            // Product Route
+            Route::prefix('products')->group(function () {
+                Route::get('/', [ProductController::class, 'index']);
+                Route::post('/', [ProductController::class, 'store']);
+                Route::get('/{product}', [ProductController::class, 'show']);
+                Route::put('/{product}', [ProductController::class, 'update']);
+                Route::post('trash/{product}', [ProductController::class, 'trash']); // soft delete
+                Route::post('/restore/{id}', [ProductController::class, 'restore']);
+                Route::delete('/{id}', [ProductController::class, 'destroy']); // force delete
             });
 
             // Units Route
@@ -194,12 +201,54 @@ Route::prefix('v1')->group(function () {
                 Route::post('/restore/{id}', [SupplierController::class, 'restore']);
                 Route::delete('/{id}', [SupplierController::class, 'destroy']); // force delete
             });
+
+            // Purchase Prices Routes
+            Route::prefix('purchase-prices')->group(function () {
+                Route::get('/', [PurchasePriceController::class, 'index']);
+                Route::post('/', [PurchasePriceController::class, 'store']);
+                Route::post('/bulk-import', [PurchasePriceController::class, 'bulkImport']);
+                Route::get('/summary-by-product', [PurchasePriceController::class, 'summaryByProduct']);
+                Route::get('/product-history/{productId}', [PurchasePriceController::class, 'productHistory']);
+                Route::get('/monthly-summary', [PurchasePriceController::class, 'monthlySummary']);
+                Route::get('/latest-prices', [PurchasePriceController::class, 'latestPrices']);
+
+                Route::prefix('{id}')->group(function () {
+                    Route::get('/', [PurchasePriceController::class, 'show']);
+                    Route::put('/', [PurchasePriceController::class, 'update']);
+                    Route::patch('/', [PurchasePriceController::class, 'update']);
+                    Route::delete('/', [PurchasePriceController::class, 'destroy']);
+                    Route::post('/restore', [PurchasePriceController::class, 'restore']);
+                    Route::delete('/force', [PurchasePriceController::class, 'forceDelete']);
+                });
+            });
+
+            Route::get('/', [PurchaseController::class, 'index']);
+            Route::post('/', [PurchaseController::class, 'store']);
+            Route::get('/{id}', [PurchaseController::class, 'show']);
+            Route::put('/{id}', [PurchaseController::class, 'update']);
+            Route::delete('/{id}', [PurchaseController::class, 'destroy']);
+            Route::get('/generate-po-number', [PurchaseController::class, 'generatePoNumber']);
+
         });
 
         // Sales Route
         Route::prefix('sales')->group(function () {
 
-            // Supplier Route
+            Route::get('/', [SaleController::class, 'index']);
+            Route::post('/', [SaleController::class, 'store']);
+            Route::get('/{id}', [SaleController::class, 'show']);
+            Route::put('/{id}', [SaleController::class, 'update']);
+            Route::delete('/{id}', [SaleController::class, 'destroy']);
+            Route::patch('/{id}/restore', [SaleController::class, 'restore']);
+
+            Route::post('{id}/approve', [SaleController::class, 'approve']);
+
+            Route::get('/today', [SaleController::class, 'getTodaySales']);
+            Route::get('/by-date-range', [SaleController::class, 'getByDateRange']);
+            Route::get('/by-customer/{customerId}', [SaleController::class, 'getByCustomer']);
+
+
+            // Customer Route
             Route::prefix('customers')->group(function () {
                 Route::get('/', [CustomerController::class, 'index']);
                 Route::post('/', [CustomerController::class, 'store']);
@@ -209,10 +258,39 @@ Route::prefix('v1')->group(function () {
                 Route::post('/restore/{id}', [CustomerController::class, 'restore']);
                 Route::delete('/{id}', [CustomerController::class, 'destroy']); // force delete
             });
+
+            Route::apiResource('customers-contacts', CustomersContactController::class);
+
+            // Sell Price
+            Route::apiResource('sell-prices', SellPriceController::class);
+            Route::prefix('sell-prices')->group(function () {
+                Route::get('product/{productId}', [SellPriceController::class, 'productPrices']);
+                Route::get('product/{productId}/current', [SellPriceController::class, 'currentPrice']);
+                Route::get('product/{productId}/calculate-discount', [SellPriceController::class, 'calculateDiscount']);
+                Route::put('{id}/restore', [SellPriceController::class, 'restore']);
+            });
+        });
+        // Sale Details Routes
+        Route::prefix('sale-details')->group(function () {
+            Route::get('/by-sale/{saleId}', [SaleDetailController::class, 'getBySale']);
+            Route::get('/{id}', [SaleDetailController::class, 'show']);
+            Route::post('/', [SaleDetailController::class, 'store']);
+            Route::put('/{id}', [SaleDetailController::class, 'update']);
+            Route::delete('/{id}', [SaleDetailController::class, 'destroy']);
+        });
+
+        // Alternative nested route
+        Route::prefix('sales/{saleId}/details')->group(function () {
+            Route::get('/', [SaleDetailController::class, 'getBySale']);
+            Route::post('/', [SaleDetailController::class, 'store']);
         });
     });
 
     Route::get('/test-cors', function () {
         return response()->json(['message' => 'CORS is working!']);
     });
+
+    Route::fallback(function () {
+        return ApiResponse::notFound('Endpoint not found');
+    })->where('any', '.*');
 });

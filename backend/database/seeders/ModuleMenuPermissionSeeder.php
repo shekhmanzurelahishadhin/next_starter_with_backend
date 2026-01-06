@@ -602,7 +602,7 @@ class ModuleMenuPermissionSeeder extends Seeder
             ['slug' => 'customers']
         );
 
-        // Customer
+        // Company
         Permission::updateOrCreate(
             ['name' => 'customer.create', 'guard_name' => 'web'],
             [

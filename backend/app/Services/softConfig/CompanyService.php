@@ -112,4 +112,34 @@ class CompanyService
         }
         return false;
     }
+    /**
+     * Get company code by ID
+     */
+    public function getCompanyCodeById(int $id): ?string
+    {
+        return Company::where('id', $id)->value('code');
+    }
+
+    /**
+     * Get company short code by ID (assuming 'code' is the short code)
+     * If you need both short code and full code, you can modify accordingly
+     */
+    public function getCompanyShortCodeById(int $id): ?string
+    {
+        return Company::where('id', $id)->value('code');
+    }
+
+    /**
+     * You can add more company-related methods here as needed
+     * For example:
+     */
+    public function findCompany(int $id): ?Company
+    {
+        return Company::find($id);
+    }
+
+    public function getCompanyById(int $id, array $columns = ['*']): ?Company
+    {
+        return Company::select($columns)->find($id);
+    }
 }

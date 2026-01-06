@@ -7,6 +7,7 @@ use App\Traits\SetSlugAndAuditing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use function Carbon\this;
 
 class Product extends Model
 {
@@ -19,9 +20,6 @@ class Product extends Model
     }
     public function unit(){
         return $this->hasOne(Unit::class,'id', 'unit_id');
-    }
-    public function productModel(){
-        return $this->hasOne(ProductModel::class,'id', 'model_id');
     }
     public function category(){
         return $this->hasOne(Category::class,'id', 'category_id');
