@@ -9,36 +9,35 @@ use Illuminate\Support\Facades\Auth;
 
 class BrandService
 {
-    public function getBrands(array $filters = [], $perPage = null)
+    const defaultColumns = [
+        'id',
+        'name',
+        'slug',
+        'status',
+        'created_by',
+        'created_at',
+        'deleted_at',
+        'updated_at'
+    ];
+    public function getBrands(array $filters = [], $perPage = null, $columns = self::defaultColumns)
     {
-        $query = Brand::query()->select(
-            'id',
-            'name',
-            'status',
-            'created_by',
-            'created_at',
-            'deleted_at'
-        );
+        $query = Brand::query()->select($columns);
 
         // Handle status / trash logic
         if (($filters['status'] ?? '') === 'trash') {
             $query->onlyTrashed();
         } elseif (isset($filters['status']) && $filters['status'] !== '') {
             $query->where('status', $filters['status']);
-        } else {
-            $query->withTrashed();
         }
+//        else {
+//            $query->withTrashed();
+//        }
 
         // Apply filters
         $query
             ->when($filters['name'] ?? null, fn($q, $name) => $q->where('name', 'like', "%{$name}%"))
             ->when($filters['created_by'] ?? null, fn($q, $createdBy) => $q->whereHas('createdBy', fn($sub) => $sub->where('name', 'like', "%{$createdBy}%")))
-            ->when($filters['created_at'] ?? null, fn($q, $createdAt) => $q->whereDate('created_at', date('Y-m-d', strtotime($createdAt))))
-            ->when($filters['search'] ?? null, fn($q, $term) => $q->where(function ($sub) use ($term) {
-                $sub->where('name', 'like', "%{$term}%")
-                    ->orWhereHas('createdBy', fn($user) => $user->where('name', 'like', "%{$term}%"));
-            })
-            );
+            ->when($filters['created_at'] ?? null, fn($q, $createdAt) => $q->whereDate('created_at', date('Y-m-d', strtotime($createdAt))));
 
         // Eager load common relations
         $query->with([

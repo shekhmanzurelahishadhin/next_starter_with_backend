@@ -26,22 +26,25 @@ class BrandController extends Controller
     {
         try {
             $perPage = $request->get('per_page');
-            $filters = $request->only('search','status','name','created_at','created_by');
+            $filters = $request->only('search','status','name','created_at','updated_at','created_by');
+            $columns = $request->get('columns', BrandService::defaultColumns);
 
-            $brands = $brandService->getBrands($filters, $perPage);
+            $brands = $brandService->getBrands($filters, $perPage, $columns);
 
             if ($brands instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                $items = collect($brands->items())->map(fn($brand) => new BrandResource((object) $brand, $columns));
                 // Paginated response
                 $data = [
-                    'data'         => BrandResource::collection($brands->items()),
+                    'data'         => $items,
                     'total'        => $brands->total(),
                     'current_page' => $brands->currentPage(),
                     'per_page'     => $brands->perPage(),
                 ];
             }else{
+                $items = collect($brands)->map(fn($brand) => new BrandResource((object) $brand, $columns));
                 // Collection response (no pagination)
                 $data = [
-                    'data'         => BrandResource::collection($brands),
+                    'data'         => $items,
                     'total'        => $brands->count(),
                     'current_page' => 1,
                     'per_page'     => $brands->count(),
