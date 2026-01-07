@@ -118,7 +118,7 @@ export const useRoleColumns = ({
     },
     {
       accessorKey: "created_at",
-      header: "Created At",
+      header: "Created at",
       enableSorting: true,
       meta: {
         exportable: true,
@@ -148,7 +148,7 @@ export const useRoleColumns = ({
     },
     {
       accessorKey: "updated_at",
-      header: "Updated At",
+      header: "Updated at",
       enableSorting: true,
       meta: {
         exportable: true,

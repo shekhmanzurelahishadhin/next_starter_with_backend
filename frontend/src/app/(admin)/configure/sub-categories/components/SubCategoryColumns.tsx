@@ -147,7 +147,7 @@ export const useSubCategoryColumns = ({
     },
     {
       accessorKey: "created_at",
-      header: "Created",
+      header: "Created at",
       enableSorting: true,
       meta: {
         exportable: true,
@@ -171,7 +171,7 @@ export const useSubCategoryColumns = ({
     },
     {
       accessorKey: "updated_at",
-      header: "Updated",
+      header: "Updated at",
       enableSorting: true,
       meta: {
         exportable: true,
