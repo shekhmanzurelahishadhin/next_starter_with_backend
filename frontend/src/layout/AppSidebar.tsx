@@ -132,6 +132,7 @@ const navItems: NavItem[] = [
       { name: "Sub-Category", path: "/configure/sub-categories", requiredPermissions: ["sub-category.view", "sub-category.create", "sub-category.edit", "sub-category.delete"] },
       { name: "Units", path: "/configure/units", requiredPermissions: ["unit.view", "unit.create", "unit.edit", "unit.delete"] },
       { name: "Brands", path: "/configure/brands", requiredPermissions: ["brand.view", "brand.create", "brand.edit", "brand.delete"] },
+      { name: "Lookups", path: "/configure/lookups", requiredPermissions: ["lookup.view", "lookup.create", "lookup.edit", "lookup.delete"] },
     ],
   },
 ];
