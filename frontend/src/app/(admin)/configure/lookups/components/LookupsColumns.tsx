@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import ActionButtons from "@/components/ui/button/ActionButton";
 import { FiEye, FiEdit, FiTrash } from "@/icons/index";
-import { SubCategory } from "@/services/subCategoryService";
+import { Lookup } from "@/services/lookupService";
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
@@ -16,10 +16,10 @@ declare module '@tanstack/react-table' {
   }
 }
 
-interface UseSubCategoryColumnsProps {
+interface UseLookupColumnsProps {
   hasPermission: (permission: string) => boolean;
-  onView: (subCategory: SubCategory) => void;
-  onEdit: (subCategory: SubCategory) => void;
+  onView: (lookup: Lookup) => void;
+  onEdit: (lookup: Lookup) => void;
   handleSoftDelete: (id: number) => void;
   handleForceDelete: (id: number) => void;
   handleRestore: (id: number) => void;
@@ -29,7 +29,7 @@ interface UseSubCategoryColumnsProps {
   status: { value: number; label: string }[];
 }
 
-export const useSubCategoryColumns = ({
+export const useLookupColumns = ({
   hasPermission,
   onView,
   onEdit,
@@ -39,8 +39,8 @@ export const useSubCategoryColumns = ({
   pageSize,
   formatDate,
   status,
-}: UseSubCategoryColumnsProps): ColumnDef<SubCategory>[] => {
-  return useMemo((): ColumnDef<SubCategory>[] => [
+}: UseLookupColumnsProps): ColumnDef<Lookup>[] => {
+  return useMemo((): ColumnDef<Lookup>[] => [
     {
       id: "sl",
       header: "SL",
@@ -63,13 +63,13 @@ export const useSubCategoryColumns = ({
     },
     {
       accessorKey: "name",
-      header: "Sub-Category Name",
+      header: "Lookup Name",
       enableSorting: true,
       meta: {
         filterVariant: "text",
         placeholder: "Search names",
         exportable: true,
-        exportHeader: "SubCategory Name",
+        exportHeader: "Lookup Name",
         exportValue: (row) => row.name,
         widthClass: "w-[200px]"
       },
@@ -85,25 +85,46 @@ export const useSubCategoryColumns = ({
       },
     },
     {
-      accessorKey: "category_name",
-      header: "Category",
+      accessorKey: "type",
+      header: "Lookup Type",
       enableSorting: true,
       meta: {
         filterVariant: "text",
-        placeholder: "Search Category",
+        placeholder: "Search types",
         exportable: true,
-        exportHeader: "Category",
-        exportValue: (row) => row.category_name || "—",
-        widthClass: "w-[160px] min-w-[140px] max-w-[200px]",
-        minWidth: "140px",
-        maxWidth: "200px"
+        exportHeader: "Lookup Type",
+        exportValue: (row) => row.type,
+        widthClass: "w-[200px]"
       },
       cell: ({ row }) => {
-        const category = row.getValue("category_name") as string;
+        const name = row.getValue("type") as string;
         return (
-          <div className="px-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate block">
-              {category || "—"}
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {name}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "code",
+      header: "Lookup Code",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        placeholder: "Search codes",
+        exportable: true,
+        exportHeader: "Lookup Code",
+        exportValue: (row) => row.code,
+        widthClass: "w-[200px]"
+      },
+      cell: ({ row }) => {
+        const name = row.getValue("code") as string;
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {name}
             </span>
           </div>
         );
@@ -203,34 +224,34 @@ export const useSubCategoryColumns = ({
         widthClass: "w-[150px]"
       },
       cell: ({ row }) => {
-        const subCategory = row.original;
+        const lookup = row.original;
         return (
           <ActionButtons
-            row={subCategory}
+            row={lookup}
             buttons={[
               {
                 icon: FiEye,
-                onClick: (row) => onView(row as SubCategory),
+                onClick: (row) => onView(row as Lookup),
                 variant: "success",
                 size: "sm",
                 tooltip: "View",
-                show: () => hasPermission("sub-category.view"),
+                show: () => hasPermission("lookup.view"),
               },
               {
                 icon: FiEdit,
-                onClick: (row) => onEdit(row as SubCategory),
+                onClick: (row) => onEdit(row as Lookup),
                 variant: "primary",
                 size: "sm",
                 tooltip: "Edit",
-                show: () => hasPermission("sub-category.edit"),
+                show: () => hasPermission("lookup.edit"),
               },
               {
                 icon: FiTrash,
-                onClick: (row) => handleSoftDelete((row as SubCategory).id),
+                onClick: (row) => handleSoftDelete((row as Lookup).id),
                 variant: "danger",
                 size: "sm",
                 tooltip: "Move to Trash",
-                show: () => hasPermission("sub-category.delete"),
+                show: () => hasPermission("lookup.delete"),
               },
             ]}
           />

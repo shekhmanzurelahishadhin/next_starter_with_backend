@@ -6,14 +6,14 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { SubCategory } from "@/services/subCategoryService";
+import { Lookup } from "@/services/lookupService";
 
-interface SubCategoryDetailViewProps {
-  subCategory: SubCategory;
+interface LookupDetailViewProps {
+  lookup: Lookup;
   formatDate: (dateString?: string) => string;
 }
 
-export function SubCategoryDetailView({ subCategory, formatDate }: SubCategoryDetailViewProps) {
+export function LookupDetailView({ lookup, formatDate }: LookupDetailViewProps) {
  
   return (
     <div className="space-y-4 py-4">
@@ -22,18 +22,26 @@ export function SubCategoryDetailView({ subCategory, formatDate }: SubCategoryDe
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Sub-Category Name
+                Lookup Name
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
-                {subCategory.name}
+                {lookup.name}
               </TableCell>
             </TableRow>
               <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Category Name
+                Type
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
-                {subCategory.category_name}
+                {lookup.type}
+              </TableCell>
+            </TableRow>
+              <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Code
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {lookup.code}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -44,17 +52,17 @@ export function SubCategoryDetailView({ subCategory, formatDate }: SubCategoryDe
                 <Badge
                   size="sm"
                   color={
-                    subCategory.status == 1
+                    lookup.status == 1
                       ? "success"
-                      : subCategory.status == 0
+                      : lookup.status == 0
                         ? "warning"
                         : "warning"
                   }
                   variant="light"
                 >
-                  {subCategory.status == 1
+                  {lookup.status == 1
                     ? "Active"
-                    : subCategory.status == 0
+                    : lookup.status == 0
                       ? "Inactive"
                       : "Unknown"}
                 </Badge>
@@ -66,7 +74,7 @@ export function SubCategoryDetailView({ subCategory, formatDate }: SubCategoryDe
                 Created At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(subCategory.created_at)}
+                {formatDate(lookup.created_at)}
               </TableCell>
             </TableRow>
 
@@ -75,7 +83,7 @@ export function SubCategoryDetailView({ subCategory, formatDate }: SubCategoryDe
                 Updated At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(subCategory.updated_at)}
+                {formatDate(lookup.updated_at)}
               </TableCell>
             </TableRow>
           </TableBody>
