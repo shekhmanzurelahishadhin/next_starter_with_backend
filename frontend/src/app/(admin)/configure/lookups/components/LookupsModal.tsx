@@ -1,15 +1,14 @@
 "use client";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
-import { SubCategoryForm } from "./SubCategoryForm";
-import { SubCategoryDetailView } from "./SubCategoryDetailView";
-import { SubCategory } from "@/services/subCategoryService";
+import { LookupForm } from "./LookupForm";
+import { LookupDetailView } from "./LookupDetailView";
+import { Lookup } from "@/services/lookupService";
 
-interface SubCategoryModalProps {
+interface LookupModalProps {
   isOpen: boolean;
   status: { value: number; label: string }[];
-  subCategory: SubCategory | null;
-  categories: { value: number; label: string }[];
+  lookup: Lookup | null;
   loadingCategories: boolean;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
@@ -19,25 +18,23 @@ interface SubCategoryModalProps {
   formatDate: (dateString?: string) => string;
 }
 
-export function SubCategoryModal({
+export function LookupModal({
   isOpen,
   status,
-  subCategory,
-  categories,
-  loadingCategories,
+  lookup,
   mode,
   saving,
   onClose,
   onSave,
   backendErrors, // Add this prop
   formatDate,
-}: SubCategoryModalProps) {
+}: LookupModalProps) {
   const getTitle = () => {
     switch (mode) {
-      case 'view': return 'Sub-Category Details';
-      case 'edit': return 'Edit Sub-Category';
-      case 'create': return 'Add New Sub-Category';
-      default: return 'Sub-Category';
+      case 'view': return 'Lookup Details';
+      case 'edit': return 'Edit Lookup';
+      case 'create': return 'Add New Lookup';
+      default: return 'Lookup';
     }
   };
 
@@ -56,16 +53,14 @@ export function SubCategoryModal({
           {getTitle()}
         </h4>
 
-        {mode === 'view' && subCategory && (
-          <SubCategoryDetailView subCategory={subCategory} formatDate={formatDate} />
+        {mode === 'view' && lookup && (
+          <LookupDetailView lookup={lookup} formatDate={formatDate} />
         )}
 
         {(mode === 'create' || mode === 'edit') && (
-          <SubCategoryForm
+          <LookupForm
           status={status}
-            subCategory={mode === 'edit' ? subCategory : null}
-            categories={categories}
-            loadingCategories={loadingCategories}
+            lookup={mode === 'edit' ? lookup : null}
             mode={mode}
             saving={saving}
             onSubmit={onSave}

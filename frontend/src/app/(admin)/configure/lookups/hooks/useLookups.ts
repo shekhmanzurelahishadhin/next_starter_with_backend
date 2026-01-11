@@ -1,23 +1,22 @@
 // hooks/useRoles.ts
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { categoryService, Category, CategoryFilters, PaginatedResponse } from '@/services/categoryService';
-import { lookupService } from '@/services/lookupService';
+import { lookupService, Lookup, LookupFilters, PaginatedResponse } from '@/services/lookupService';
 import { useAlert } from '@/hooks/useAlert';
 import { useModal } from '@/hooks/useModal';
 import { useDebounce } from '@/hooks/useDebounce';
-export const useCategories = () => {
+export const useLookups = () => {
   const { confirm } = useAlert();
   const { isOpen, openModal, closeModal } = useModal();
 
   // Data state
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [lookups, setLookups] = useState<Lookup[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<{ value: number; label: string }[]>([]);
 
   // Modal state
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedLookup, setSelectedLookup] = useState<Lookup | null>(null);
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>('create');
   const [backendErrors, setBackendErrors] = useState<Record<string, string>>({});
 
@@ -32,22 +31,22 @@ export const useCategories = () => {
 
   // Search state
 
-  // Load categories
-  const loadCategories = useCallback(async () => {
+  // Load lookups
+  const loadLookups = useCallback(async () => {
     try {
       setLoading(true);
-      const apiFilters: CategoryFilters = {
+      const apiFilters: LookupFilters = {
         page: pagination.pageIndex + 1,
         per_page: pagination.pageSize,
         ...debouncedFilters,
       };
 
-      const response: PaginatedResponse<Category> = await categoryService.getCategories(apiFilters);
-      setCategories(response.data);
+      const response: PaginatedResponse<Lookup> = await lookupService.getLookups(apiFilters);
+      setLookups(response.data);
       setTotal(response.total);
     } catch (err) {
-      toast.error('Failed to load categories');
-      console.error('Error loading categories:', err);
+      toast.error('Failed to load lookups');
+      console.error('Error loading lookups:', err);
     } finally {
       setLoading(false);
     }
@@ -65,8 +64,8 @@ export const useCategories = () => {
   };
 
   useEffect(() => {
-    loadCategories();
-  }, [loadCategories]);
+    loadLookups();
+  }, [loadLookups]);
 
   // for active status lookup
   useEffect(() => {
@@ -75,22 +74,22 @@ export const useCategories = () => {
 
 
   // Modal operations
-  const handleView = useCallback((category: Category) => {
-    setSelectedCategory(category);
+  const handleView = useCallback((lookup: Lookup) => {
+    setSelectedLookup(lookup);
     setMode('view');
     setBackendErrors({});
     openModal();
   }, [openModal]);
 
-  const handleEdit = useCallback((category: Category) => {
-    setSelectedCategory(category);
+  const handleEdit = useCallback((lookup: Lookup) => {
+    setSelectedLookup(lookup);
     setMode('edit');
     setBackendErrors({});
     openModal();
   }, [openModal]);
 
   const handleCreate = useCallback(() => {
-    setSelectedCategory(null);
+    setSelectedLookup(null);
     setMode('create');
     setBackendErrors({});
     openModal();
@@ -98,7 +97,7 @@ export const useCategories = () => {
 
   const handleCloseModal = useCallback(() => {
     closeModal();
-    setSelectedCategory(null);
+    setSelectedLookup(null);
     setMode('create');
     setBackendErrors({});
   }, [closeModal]);
@@ -107,77 +106,77 @@ export const useCategories = () => {
   const handleSoftDelete = useCallback(async (id: number) => {
     const result = await confirm({
       title: 'Move to Trash?',
-      text: 'Are you sure you want to move this category to trash? This action cannot be undone.',
+      text: 'Are you sure you want to move this lookup to trash? This action cannot be undone.',
     });
 
     if (!result.isConfirmed) return;
-    let previousCategories: Category[] = [];
+    let previousLookups: Lookup[] = [];
     try {
       // Optimistic update
-      previousCategories = [...categories];
-      setCategories(prev => prev.filter(category => category.id !== id));
+      previousLookups = [...lookups];
+      setLookups(prev => prev.filter(lookup => lookup.id !== id));
 
-      await categoryService.softDeleteCategory(id);
-      toast.success('Category moved to trashed!');
-      await loadCategories();
+      await lookupService.softDeleteLookup(id);
+      toast.success('Lookup moved to trashed!');
+      await loadLookups();
     } catch (err) {
       // Revert on error
-      setCategories(previousCategories);
-      toast.error('Failed to delete category');
+      setLookups(previousLookups);
+      toast.error('Failed to delete lookup');
     }
-  }, [confirm, categories, loadCategories]);
+  }, [confirm, lookups, loadLookups]);
 
   const handleForceDelete = useCallback(async (id: number) => {
     const result = await confirm({
-      title: 'Delete Category?',
-      text: 'Are you sure you want to delete this category? This action cannot be undone.',
+      title: 'Delete Lookup?',
+      text: 'Are you sure you want to delete this lookup? This action cannot be undone.',
     });
 
     if (!result.isConfirmed) return;
 
-    let previousCategories: Category[] = [];
+    let previousLookups: Lookup[] = [];
     try {
       // Optimistic update
-      previousCategories = [...categories];
-      setCategories(prev => prev.filter(category => category.id !== id));
+      previousLookups = [...lookups];
+      setLookups(prev => prev.filter(lookup => lookup.id !== id));
 
-      await categoryService.forceDeleteCategory(id);
-      toast.success('Category deleted successfully!');
-      await loadCategories();
+      await lookupService.forceDeleteLookup(id);
+      toast.success('Lookup deleted successfully!');
+      await loadLookups();
     } catch (err) {
       // Revert on error
-      setCategories(previousCategories);
-      toast.error('Failed to delete category');
+      setLookups(previousLookups);
+      toast.error('Failed to delete lookup');
     }
-  }, [confirm, categories, loadCategories]);
+  }, [confirm, lookups, loadLookups]);
 
   const handleRestore = useCallback(async (id: number) => {
     try {
-      await categoryService.restoreCategory(id);
-      toast.success('Category restored successfully!');
-      await loadCategories();
+      await lookupService.restoreLookup(id);
+      toast.success('Lookup restored successfully!');
+      await loadLookups();
     } catch (err) {
       // Revert on error
-      toast.error('Failed to restore category');
+      toast.error('Failed to restore lookup');
     }
-  }, [categories, loadCategories]);
+  }, [lookups, loadLookups]);
 
-  const handleSave = useCallback(async (categoryData: { name: string, status: string }) => {
+  const handleSave = useCallback(async (lookupData: { name: string, status: string }) => {
     try {
       setSaving(true);
       setBackendErrors({});
 
-      if (mode === 'edit' && selectedCategory) {
-        await categoryService.updateCategory(selectedCategory.id, categoryData);
-        toast.success('Category updated successfully!');
+      if (mode === 'edit' && selectedLookup) {
+        await lookupService.updateLookup(selectedLookup.id, lookupData);
+        toast.success('Lookup updated successfully!');
       } else {
-        await categoryService.createCategory(categoryData);
-        toast.success('Category created successfully!');
+        await lookupService.createLookup(lookupData);
+        toast.success('Lookup created successfully!');
         setPagination(prev => ({ ...prev, pageIndex: 0 }));
       }
 
       handleCloseModal();
-      await loadCategories();
+      await loadLookups();
       return true;
     } catch (err: any) {
       if (err?.response?.data?.errors) {
@@ -187,13 +186,13 @@ export const useCategories = () => {
         });
         setBackendErrors(errors);
       } else {
-        toast.error(err?.response?.data?.message || 'Failed to save category');
+        toast.error(err?.response?.data?.message || 'Failed to save lookup');
       }
       return false;
     } finally {
       setSaving(false);
     }
-  }, [mode, selectedCategory, loadCategories, handleCloseModal]);
+  }, [mode, selectedLookup, loadLookups, handleCloseModal]);
 
   // Filter and search operations
   const handleFilterChange = useCallback((name: string, value: string | number) => {
@@ -211,11 +210,11 @@ export const useCategories = () => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, []);
 
-  // Function to export all categories
-  const exportAllCategories = async () => {
+  // Function to export all lookups
+  const exportAllLookups = async () => {
     try {
       // Call API without pagination to get all data
-      const response = await categoryService.getCategories({});
+      const response = await lookupService.getLookups({});
       return response.data;
     } catch (error) {
       console.error('Error exporting all roles:', error);
@@ -236,11 +235,11 @@ export const useCategories = () => {
   };
   return {
     // State
-    categories,
+    lookups,
     loading,
     saving,
     isOpen,
-    selectedCategory,
+    selectedLookup,
     mode,
     backendErrors,
     pagination,
@@ -260,8 +259,8 @@ export const useCategories = () => {
     handleFilterChange,
     clearBackendErrors,
     resetToFirstPage,
-    loadCategories,
-    exportAllCategories,
+    loadLookups,
+    exportAllLookups,
     formatDate,
   };
 };

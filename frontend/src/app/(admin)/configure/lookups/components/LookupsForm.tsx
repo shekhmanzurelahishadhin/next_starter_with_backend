@@ -2,30 +2,30 @@
 import { Controller, useForm } from "react-hook-form";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
-import { SubCategory } from "@/services/subCategoryService";
+import { Lookup } from "@/services/lookupService";
 import { useEffect } from "react";
 import Select from "@/components/form/Select";
 import { ChevronDownIcon } from "@/icons";
 import ReactSelect from "@/components/form/ReactSelect";
 
-interface SubCategoryFormData {
+interface LookupFormData {
   name: string;
-  category_id?: number | null;
+  type: string;
+  code: string;
   status?: number ;
 }
 
-interface SubCategoryFormProps {
+interface LookupFormProps {
   status: { value: number; label: string }[];
-  subCategory?: SubCategory | null;
-  categories?: { value: number; label: string }[];
+  lookup?: Lookup | null;
   loadingCategories: boolean;
   mode: 'create' | 'edit';
   saving: boolean;
-  onSubmit: (subCategoryData: SubCategoryFormData) => void;
+  onSubmit: (lookupData: LookupFormData) => void;
   backendErrors?: Record<string, string>;
 }
 
-export function SubCategoryForm({ status, subCategory, categories, loadingCategories, mode, saving, onSubmit, backendErrors }: SubCategoryFormProps) {
+export function LookupForm({ status, lookup, mode, saving, onSubmit, backendErrors }: LookupFormProps) {
   const {
     register,
     handleSubmit,
@@ -34,11 +34,12 @@ export function SubCategoryForm({ status, subCategory, categories, loadingCatego
     setError,
     clearErrors,
     control,
-  } = useForm<SubCategoryFormData>({
+  } = useForm<LookupFormData>({
     mode: "onChange",
     defaultValues: {
       name: "",
-      category_id: null,
+      type: "",
+      code: "",
     }
   });
 
@@ -47,7 +48,7 @@ export function SubCategoryForm({ status, subCategory, categories, loadingCatego
     if (backendErrors) {
       clearErrors();
       Object.entries(backendErrors).forEach(([field, message]) => {
-        setError(field as keyof SubCategoryFormData, {
+        setError(field as keyof LookupFormData, {
           type: 'server',
           message: Array.isArray(message) ? message[0] : message
         });
@@ -56,21 +57,23 @@ export function SubCategoryForm({ status, subCategory, categories, loadingCatego
   }, [backendErrors, setError, clearErrors]);
 
   useEffect(() => {
-    if (mode === 'edit' && subCategory) {
+    if (mode === 'edit' && lookup) {
       reset({
-        name: subCategory?.name ?? '',
-        category_id: subCategory?.category_id ?? null,
-        status: subCategory?.status ?? 1,
+        name: lookup?.name ?? '',
+        type: lookup?.type ?? '',
+        code: lookup?.code ?? '',
+        status: lookup?.status ?? 1,
       });
     } else {
       reset({
         name: '',
-        category_id: undefined,
+        type: '',
+        code: '',
       });
     }
-  }, [subCategory, reset, mode]);
+  }, [lookup, reset, mode]);
 
-  const onFormSubmit = (data: SubCategoryFormData) => {
+  const onFormSubmit = (data: LookupFormData) => {
     onSubmit(data);
   };
 
@@ -78,46 +81,22 @@ export function SubCategoryForm({ status, subCategory, categories, loadingCatego
   return (
     <form id="sub-category-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-2">
-           <div>
-          <Label htmlFor="category_id" required>
-            Category
-          </Label>
-          <Controller
-            control={control}
-            name="category_id"
-            rules={{
-              required: {
-                value: true,
-                message: "Please select a category"
-              }
-            }}
-            render={({ field, fieldState }) => (
-              <ReactSelect
-                {...field}
-                options={categories || []}
-                placeholder="Select category"
-                isLoading={loadingCategories}
-                error={fieldState.error?.message}
-                isDisabled={saving}
-              />
-            )}
-          />
-        </div>
+    
         <div>
-          <Label htmlFor="name" required>Sub-Category Name</Label>
+          <Label htmlFor="name" required>Lookup Name</Label>
           <Input
             id="name"
             type="text"
-            placeholder="Enter sub-category name."
+            placeholder="Enter lookup name."
             register={register("name", {
-              required: "Sub-Category name is required",
+              required: "Lookup name is required",
               minLength: {
                 value: 2,
-                message: "Sub-Category name must be at least 2 characters"
+                message: "Lookup name must be at least 2 characters"
               },
               maxLength: {
                 value: 50,
-                message: "Sub-Category name must not exceed 50 characters"
+                message: "Lookup name must not exceed 50 characters"
               },
             })}
             error={errors.name?.message}
