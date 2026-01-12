@@ -86,8 +86,8 @@ export default function SubCategories() {
               onColumnFilterChange={handleFilterChange}
               total={total}
               loading={loading}
-              exportFilename="categories"
-              exportAllData={exportAllSubCategories} // Provide exportAllCategoris function
+              exportFilename="sub-categories"
+              exportAllData={exportAllSubCategories} // Provide exportAllSubCategories function
               showExportAllOption={false} // Disable "Export All" option
             />
           </ComponentCard>

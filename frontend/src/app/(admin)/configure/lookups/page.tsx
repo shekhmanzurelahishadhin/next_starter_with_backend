@@ -12,11 +12,9 @@ import { useEffect } from "react";
 export default function Lookups() {
   const { hasPermission } = useAuth();
 
-  // Single hook for all subCategory operations
+  // Single hook for all lookup operations
   const {
-    subCategories,
-    categories,
-    loadingCategories,
+    lookups,
     loading,
     saving,
     isOpen,
@@ -57,36 +55,36 @@ export default function Lookups() {
   });
 
   useEffect(() => {
-    document.title = "Sub-Category | Inventory Management System";
+    document.title = "Lookup | Inventory Management System";
   }, []);
 
   return (
-    <AccessRoute requiredPermissions={["sub-category.view", "sub-category.create", "sub-category.update", "sub-category.delete"]}>
+    <AccessRoute requiredPermissions={["lookup.view", "lookup.create", "lookup.update", "lookup.delete"]}>
       <div>
          <PageBreadcrumb
           items={[
             { title: "Configure" }, // add href if needed links like href: "/admin/authorization/permissions"
-            { title: "Sub-Category Management" }
+            { title: "Lookup Management" }
           ]}
         />
         <div className="space-y-6">
           <ComponentCard
-            title="Sub-Category Management"
-            desc="Manage sub sub-category in the system"
-            showAddButton={hasPermission("sub-category.create")}
+            title="Lookup Management"
+            desc="Manage lookups in the system"
+            showAddButton={hasPermission("lookup.create")}
             buttonLabel="Add New"
             openModal={handleCreate}
           >
             <DataTable
               columns={columns}
-              data={subCategories}
+              data={lookups}
               searchKey="name"
               pagination={pagination}
               onPaginationChange={setPagination}
               onColumnFilterChange={handleFilterChange}
               total={total}
               loading={loading}
-              exportFilename="categories"
+              exportFilename="lookups"
               exportAllData={exportAllLookups} // Provide exportAllLookups function
               showExportAllOption={false} // Disable "Export All" option
             />
@@ -95,9 +93,7 @@ export default function Lookups() {
           <LookupModal
             isOpen={isOpen}
             status={status}
-            subCategory={selectedLookup}
-            categories={categories}
-            loadingCategories={loadingCategories}
+            lookup={selectedLookup}
             mode={mode}
             saving={saving}
             onClose={handleCloseModal}
