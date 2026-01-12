@@ -26,7 +26,7 @@ class BrandController extends Controller
     {
         try {
             $perPage = $request->get('per_page');
-            $filters = $request->only('search','status','name','created_at','updated_at','created_by');
+            $filters = $request->only('status','name','created_at','updated_at','created_by');
             $columns = $request->get('columns', BrandService::defaultColumns);
 
             $brands = $brandService->getBrands($filters, $perPage, $columns);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\softConfig;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\softConfig\lookup\StoreLookupRequest;
 use App\Http\Requests\softConfig\lookup\UpdateLookupRequest;
@@ -23,37 +24,46 @@ class LookupController extends Controller
 
     public function index(Request $request, LookupService $lookupService)
     {
-        $perPage = $request->get('per_page'); // can be null
-        $filters = $request->only('search','status','name','type','code','created_by','created_at');
+        try {
+            $perPage = $request->get('per_page'); // can be null
+            $filters = $request->only('status', 'name', 'type', 'code', 'created_by', 'created_at','updated_at');
 
-        $lookups = $lookupService->getLookups($filters, $perPage);
+            $lookups = $lookupService->getLookups($filters, $perPage);
 
-        // Check if paginated
-        if ($lookups instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            return response()->json([
-                'data' => LookupResource::collection($lookups),
-                'total' => $lookups->total(),
-                'current_page' => $lookups->currentPage(),
-                'per_page' => $lookups->perPage(),
-            ]);
+            if ($lookups instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                // Paginated response
+                $data = [
+                    'data' => LookupResource::collection($lookups->items()),
+                    'total' => $lookups->total(),
+                    'current_page' => $lookups->currentPage(),
+                    'per_page' => $lookups->perPage(),
+                ];
+            } else {
+                // Collection response (no pagination)
+                $data = [
+                    'data' => LookupResource::collection($lookups),
+                    'total' => $lookups->count(),
+                    'current_page' => 1,
+                    'per_page' => $lookups->count(),
+                ];
+            }
+            return ApiResponse::success($data, 'Brand retrieved successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('Failed to retrieve Brand');
         }
-
-        // Not paginated, return all
-        return response()->json([
-            'data' => LookupResource::collection($lookups),
-            'total' => $lookups->count(),
-            'current_page' => 1,
-            'per_page' => $lookups->count(),
-        ]);
     }
+
     public function store(StoreLookupRequest $request, LookupService $lookupService)
     {
         return $lookupService->store($request);
     }
 
-    public function update(UpdateLookupRequest $request,Lookup $lookup ,LookupService $lookupService){
+    public function update(UpdateLookupRequest $request, Lookup $lookup, LookupService $lookupService)
+    {
         return $lookupService->update($request, $lookup);
     }
+
     // Soft delete (move to trash)
     public function trash(Lookup $lookup, LookupService $lookupService)
     {
@@ -93,7 +103,9 @@ class LookupController extends Controller
             'message' => 'Lookup is not in trash',
         ], 400);
     }
-    public function getLookupTypeLists(){
+
+    public function getLookupTypeLists()
+    {
         $types = Lookup::groupBy('type')->pluck('type')->map(fn($type) => [
             'value' => $type,
             'label' => $type,
@@ -101,10 +113,11 @@ class LookupController extends Controller
 
         return response()->json($types);
     }
+
     public function getLookupListByType($type)
     {
 
-        $values = Lookup::where('type',$type)->where('status',1)->get()->map(fn($value) => [
+        $values = Lookup::where('type', $type)->where('status', 1)->get()->map(fn($value) => [
             'value' => $value->code,
             'label' => $value->name,
         ]);
@@ -113,14 +126,13 @@ class LookupController extends Controller
 
     }
 
-    public function getLookupNameByCode($type,$code)
+    public function getLookupNameByCode($type, $code)
     {
 
-        $value = Lookup::where('type',$type)->where('code',$code)->first();
-        if ($value){
+        $value = Lookup::where('type', $type)->where('code', $code)->first();
+        if ($value) {
             return $value->name;
-        }
-        else{
+        } else {
             return 'Not Defined';
         }
     }

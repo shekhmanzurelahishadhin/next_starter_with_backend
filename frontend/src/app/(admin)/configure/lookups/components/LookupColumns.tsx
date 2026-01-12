@@ -86,7 +86,7 @@ export const useLookupColumns = ({
     },
     {
       accessorKey: "type",
-      header: "Lookup Type",
+      header: "Type",
       enableSorting: true,
       meta: {
         filterVariant: "text",
@@ -109,7 +109,7 @@ export const useLookupColumns = ({
     },
     {
       accessorKey: "code",
-      header: "Lookup Code",
+      header: "Code",
       enableSorting: true,
       meta: {
         filterVariant: "text",
