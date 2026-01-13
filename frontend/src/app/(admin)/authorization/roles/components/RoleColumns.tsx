@@ -213,7 +213,7 @@ export const useRoleColumns = ({
                 variant: "primary",
                 size: "sm",
                 tooltip: "Edit",
-                show: () => hasPermission("role.edit"),
+                show: (r) => !r.name?.includes("Super Admin") && hasPermission("role.edit"),
               },
               {
                 icon: FiTrash,
@@ -221,7 +221,7 @@ export const useRoleColumns = ({
                 variant: "danger",
                 size: "sm",
                 tooltip: "Delete",
-                show: () => hasPermission("role.delete"),
+                show: (r) => !r.name?.includes("Super Admin") && hasPermission("role.delete"),
               },
             ]}
           />
