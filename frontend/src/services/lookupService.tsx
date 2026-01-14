@@ -10,6 +10,10 @@ export interface Lookup {
     type: string;
     code: string;
     status: number;
+    is_new: string;
+    type_write: string;
+    type_select: string;
+    status_label: string;
     status_text: string;
     created_at?: string;
     updated_at?: string;

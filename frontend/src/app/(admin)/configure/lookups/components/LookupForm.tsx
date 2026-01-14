@@ -12,20 +12,33 @@ interface LookupFormData {
   name: string;
   type: string;
   code: string;
-  status?: number ;
+  status?: number;
+  is_new?: string;
+  type_write?: string;
+  type_select?: string;
 }
 
 interface LookupFormProps {
   status: { value: number; label: string }[];
+  lookupTypes?: { value: string; label: string }[];
+  lookupTypesLoading?: boolean;
   lookup?: Lookup | null;
-  loadingCategories: boolean;
   mode: 'create' | 'edit';
   saving: boolean;
   onSubmit: (lookupData: LookupFormData) => void;
   backendErrors?: Record<string, string>;
 }
 
-export function LookupForm({ status, lookup, mode, saving, onSubmit, backendErrors }: LookupFormProps) {
+export function LookupForm({ 
+  status, 
+  lookup, 
+  lookupTypes, 
+  lookupTypesLoading, 
+  mode, 
+  saving, 
+  onSubmit, 
+  backendErrors 
+}: LookupFormProps) {
   const {
     register,
     handleSubmit,
@@ -34,14 +47,21 @@ export function LookupForm({ status, lookup, mode, saving, onSubmit, backendErro
     setError,
     clearErrors,
     control,
+    watch,
+    setValue,
   } = useForm<LookupFormData>({
     mode: "onChange",
     defaultValues: {
       name: "",
       type: "",
       code: "",
+      status: 1,
+      is_new: '1',
+      type_write: '',
+      type_select: '',
     }
   });
+  const isNewType = watch("is_new");
 
   // Handle backend errors
   useEffect(() => {
@@ -63,12 +83,19 @@ export function LookupForm({ status, lookup, mode, saving, onSubmit, backendErro
         type: lookup?.type ?? '',
         code: lookup?.code ?? '',
         status: lookup?.status ?? 1,
+        is_new: lookup?.is_new ?? '1',
+        type_write: lookup?.type_write ?? '',
+        type_select: lookup?.type_select ?? '',
       });
     } else {
       reset({
         name: '',
         type: '',
         code: '',
+        status: 1,
+        is_new: '1',
+        type_write: '',
+        type_select: '',
       });
     }
   }, [lookup, reset, mode]);
@@ -77,11 +104,19 @@ export function LookupForm({ status, lookup, mode, saving, onSubmit, backendErro
     onSubmit(data);
   };
 
+  useEffect(() => {
+    if (isNewType === '1') {
+      setValue("type_select", "");
+      clearErrors("type_select");
+    } else if (isNewType === '0') {
+      setValue("type_write", "");
+      clearErrors("type_write");
+    }
+  }, [isNewType, setValue, clearErrors]);
 
   return (
     <form id="sub-category-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-2">
-    
         <div>
           <Label htmlFor="name" required>Lookup Name</Label>
           <Input
@@ -103,6 +138,89 @@ export function LookupForm({ status, lookup, mode, saving, onSubmit, backendErro
             disabled={saving}
           />
         </div>
+        <div>
+          <Label htmlFor="is_new" required>Is New Type</Label>
+
+          <Controller
+            name="is_new"
+            control={control}
+            rules={{ required: "Type is required" }}
+            render={({ field }) => (
+              <div className="relative">
+                <Select
+                  id="is_new"
+                  options={[{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }]}
+                  value={field.value?.toString() ?? ""}
+                  placeholder="Select Type"
+                  onChange={(e) => field.onChange(e.target.value)}
+                  disabled={saving}
+                />
+                <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+                  <ChevronDownIcon />
+                </span>
+              </div>
+            )}
+          />
+          {errors.is_new?.message && (
+            <p className="mt-1.5 text-xs text-error-500">
+              {errors.is_new.message}
+            </p>
+          )}
+        </div>
+        {isNewType === '1' && (
+          <div>
+            <Label htmlFor="type_write" required>
+              Lookup Type
+            </Label>
+            <Input
+              id="type_write"
+              type="text"
+              placeholder="Enter lookup type."
+              register={register("type_write", {
+                required: "Lookup type is required",
+                minLength: {
+                  value: 2,
+                  message: "Lookup type must be at least 2 characters",
+                },
+                maxLength: {
+                  value: 50,
+                  message: "Lookup type must not exceed 50 characters",
+                },
+              })}
+              error={errors.type_write?.message}
+              disabled={saving}
+            />
+          </div>
+        )}
+
+
+        {isNewType === '0' && (
+          <div>
+            <Label htmlFor="type_select" required>
+              Lookup Type
+            </Label>
+            <Controller
+              control={control}
+              name="type_select"
+              rules={{
+                required: {
+                  value: true,
+                  message: "Please select Lookup Type",
+                },
+              }}
+              render={({ field, fieldState }) => (
+                <ReactSelect
+                  {...field}
+                  options={lookupTypes || []}
+                  placeholder="Select lookup type"
+                  error={fieldState.error?.message}
+                  isDisabled={saving}
+                  isLoading={lookupTypesLoading}
+                />
+              )}
+            />
+          </div>
+        )}
 
         {/* Show status field only in edit mode */}
         {mode === "edit" && (

@@ -8,8 +8,9 @@ import { Lookup } from "@/services/lookupService";
 interface LookupModalProps {
   isOpen: boolean;
   status: { value: number; label: string }[];
+  lookupTypes: { value: string; label: string }[];
   lookup: Lookup | null;
-  loadingCategories: boolean;
+  lookupTypesLoading?: boolean;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
@@ -21,6 +22,8 @@ interface LookupModalProps {
 export function LookupModal({
   isOpen,
   status,
+  lookupTypes,
+  lookupTypesLoading,
   lookup,
   mode,
   saving,
@@ -59,7 +62,9 @@ export function LookupModal({
 
         {(mode === 'create' || mode === 'edit') && (
           <LookupForm
-          status={status}
+            status={status}
+            lookupTypes={lookupTypes}
+            lookupTypesLoading={lookupTypesLoading}
             lookup={mode === 'edit' ? lookup : null}
             mode={mode}
             saving={saving}

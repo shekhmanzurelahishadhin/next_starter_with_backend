@@ -5,6 +5,7 @@ import { lookupService, Lookup, LookupFilters, PaginatedResponse } from '@/servi
 import { useAlert } from '@/hooks/useAlert';
 import { useModal } from '@/hooks/useModal';
 import { useDebounce } from '@/hooks/useDebounce';
+import { api } from '@/lib/api';
 export const useLookups = () => {
   const { confirm } = useAlert();
   const { isOpen, openModal, closeModal } = useModal();
@@ -28,6 +29,9 @@ export const useLookups = () => {
     pageSize: 10,
   });
   const [total, setTotal] = useState(0);
+
+  const [lookupTypes, setLookupTypes] = useState<{ value: string; label: string }[]>([]);
+  const [lookupTypesLoading, setLookupTypesLoading] = useState(false);
 
   // Search state
 
@@ -56,10 +60,23 @@ export const useLookups = () => {
     try {
       const type = "active_status";
       const res = await lookupService.getLookupByType(type);
-      console.log("Lookups fetched:", res);
       setStatus(res);
     } catch (error) {
       console.error("Failed to fetch lookups", error);
+    }
+  };
+  const fetchLookupsTypes = async () => {
+    try {
+      setLookupTypesLoading(true);
+      const res = await api.get("/configure/get-lookup-type/lists");
+
+      setLookupTypes(
+        res.data.map((m: any) => ({ value: m.value, label: m.label }))
+      );
+    } catch (error) {
+      console.error("Failed to fetch lookupTypes", error);
+    } finally {
+      setLookupTypesLoading(false);
     }
   };
 
@@ -93,6 +110,7 @@ export const useLookups = () => {
     setMode('create');
     setBackendErrors({});
     openModal();
+    fetchLookupsTypes();
   }, [openModal]);
 
   const handleCloseModal = useCallback(() => {
@@ -245,6 +263,8 @@ export const useLookups = () => {
     pagination,
     total,
     status,
+    lookupTypes,
+    lookupTypesLoading,
 
     // Actions
     setPagination,

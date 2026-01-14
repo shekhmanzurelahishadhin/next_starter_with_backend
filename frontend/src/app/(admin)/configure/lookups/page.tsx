@@ -24,6 +24,8 @@ export default function Lookups() {
     pagination,
     total,
     status,
+    lookupTypes,
+    lookupTypesLoading,
 
     // Actions
     setPagination,
@@ -93,6 +95,8 @@ export default function Lookups() {
           <LookupModal
             isOpen={isOpen}
             status={status}
+            lookupTypes={lookupTypes}
+            lookupTypesLoading={lookupTypesLoading}
             lookup={selectedLookup}
             mode={mode}
             saving={saving}
