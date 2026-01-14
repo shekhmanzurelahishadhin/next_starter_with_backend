@@ -29,15 +29,15 @@ interface LookupFormProps {
   backendErrors?: Record<string, string>;
 }
 
-export function LookupForm({ 
-  status, 
-  lookup, 
-  lookupTypes, 
-  lookupTypesLoading, 
-  mode, 
-  saving, 
-  onSubmit, 
-  backendErrors 
+export function LookupForm({
+  status,
+  lookup,
+  lookupTypes,
+  lookupTypesLoading,
+  mode,
+  saving,
+  onSubmit,
+  backendErrors
 }: LookupFormProps) {
   const {
     register,
@@ -138,87 +138,91 @@ export function LookupForm({
             disabled={saving}
           />
         </div>
-        <div>
-          <Label htmlFor="is_new" required>Is New Type</Label>
+        {mode === "create" && (
+          <div>
+            <div>
+              <Label htmlFor="is_new" required>Is New Type</Label>
 
-          <Controller
-            name="is_new"
-            control={control}
-            rules={{ required: "Type is required" }}
-            render={({ field }) => (
-              <div className="relative">
-                <Select
-                  id="is_new"
-                  options={[{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }]}
-                  value={field.value?.toString() ?? ""}
-                  placeholder="Select Type"
-                  onChange={(e) => field.onChange(e.target.value)}
+              <Controller
+                name="is_new"
+                control={control}
+                rules={{ required: "Type is required" }}
+                render={({ field }) => (
+                  <div className="relative">
+                    <Select
+                      id="is_new"
+                      options={[{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }]}
+                      value={field.value?.toString() ?? ""}
+                      placeholder="Select Type"
+                      onChange={(e) => field.onChange(e.target.value)}
+                      disabled={saving}
+                    />
+                    <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+                      <ChevronDownIcon />
+                    </span>
+                  </div>
+                )}
+              />
+              {errors.is_new?.message && (
+                <p className="mt-1.5 text-xs text-error-500">
+                  {errors.is_new.message}
+                </p>
+              )}
+            </div>
+            {isNewType === '1' && (
+              <div>
+                <Label htmlFor="type_write" required>
+                  Lookup Type
+                </Label>
+                <Input
+                  id="type_write"
+                  type="text"
+                  placeholder="Enter lookup type."
+                  register={register("type_write", {
+                    required: "Lookup type is required",
+                    minLength: {
+                      value: 2,
+                      message: "Lookup type must be at least 2 characters",
+                    },
+                    maxLength: {
+                      value: 50,
+                      message: "Lookup type must not exceed 50 characters",
+                    },
+                  })}
+                  error={errors.type_write?.message}
                   disabled={saving}
                 />
-                <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-                  <ChevronDownIcon />
-                </span>
               </div>
             )}
-          />
-          {errors.is_new?.message && (
-            <p className="mt-1.5 text-xs text-error-500">
-              {errors.is_new.message}
-            </p>
-          )}
-        </div>
-        {isNewType === '1' && (
-          <div>
-            <Label htmlFor="type_write" required>
-              Lookup Type
-            </Label>
-            <Input
-              id="type_write"
-              type="text"
-              placeholder="Enter lookup type."
-              register={register("type_write", {
-                required: "Lookup type is required",
-                minLength: {
-                  value: 2,
-                  message: "Lookup type must be at least 2 characters",
-                },
-                maxLength: {
-                  value: 50,
-                  message: "Lookup type must not exceed 50 characters",
-                },
-              })}
-              error={errors.type_write?.message}
-              disabled={saving}
-            />
-          </div>
-        )}
 
 
-        {isNewType === '0' && (
-          <div>
-            <Label htmlFor="type_select" required>
-              Lookup Type
-            </Label>
-            <Controller
-              control={control}
-              name="type_select"
-              rules={{
-                required: {
-                  value: true,
-                  message: "Please select Lookup Type",
-                },
-              }}
-              render={({ field, fieldState }) => (
-                <ReactSelect
-                  {...field}
-                  options={lookupTypes || []}
-                  placeholder="Select lookup type"
-                  error={fieldState.error?.message}
-                  isDisabled={saving}
-                  isLoading={lookupTypesLoading}
+            {isNewType === '0' && (
+              <div>
+                <Label htmlFor="type_select" required>
+                  Lookup Type
+                </Label>
+                <Controller
+                  control={control}
+                  name="type_select"
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "Please select Lookup Type",
+                    },
+                  }}
+                  render={({ field, fieldState }) => (
+                    <ReactSelect
+                      {...field}
+                      options={lookupTypes || []}
+                      placeholder="Select lookup type"
+                      error={fieldState.error?.message}
+                      isDisabled={saving}
+                      isLoading={lookupTypesLoading}
+                    />
+                  )}
                 />
-              )}
-            />
+              </div>
+            )}
           </div>
         )}
 

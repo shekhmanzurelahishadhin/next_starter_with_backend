@@ -29,7 +29,9 @@ class StoreLookupRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique('lookups', 'name')->where(function ($query) {
-                    return $query->where('type', $this->input('type_select'));
+                    $query
+                        ->where('type', $this->input('type_select'))
+                        ->whereNull('deleted_at'); // ignore trash
                 }),
             ],
             'is_new' => 'required'
@@ -37,7 +39,13 @@ class StoreLookupRequest extends FormRequest
 
         // Conditional rules
         if ($this->is_new == 1) {
-            $rules['type_write'] = 'required|string|max:255|unique:lookups,type';
+            $rules['type_write'] = [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('lookups', 'type')
+                    ->whereNull('deleted_at'), // ignore trash data
+            ];
         } else {
             $rules['type_select'] = 'required';
         }
