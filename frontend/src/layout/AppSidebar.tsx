@@ -128,6 +128,7 @@ const navItems: NavItem[] = [
     icon: <FiSettings />,
     name: "Soft Configure",
     subItems: [
+      { name: "Company", path: "/configure/companies", requiredPermissions: ["company.view", "company.create", "company.edit", "company.delete"] },
       { name: "Category", path: "/configure/categories", requiredPermissions: ["category.view", "category.create", "category.edit", "category.delete"] },
       { name: "Sub-Category", path: "/configure/sub-categories", requiredPermissions: ["sub-category.view", "sub-category.create", "sub-category.edit", "sub-category.delete"] },
       { name: "Units", path: "/configure/units", requiredPermissions: ["unit.view", "unit.create", "unit.edit", "unit.delete"] },
