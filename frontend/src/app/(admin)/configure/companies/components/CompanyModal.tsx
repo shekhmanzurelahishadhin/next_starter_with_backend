@@ -1,39 +1,39 @@
 "use client";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
-import { CategoryForm } from "./CategoryForm";
-import { CategoryDetailView } from "./CategoryDetailView";
-import { Category } from "@/services/categoryService";
+import { CompanyForm } from "./CompanyForm";
+import { CompanyDetailView } from "./CompanyDetailView";
+import { Company } from "@/services/companyService";
 
-interface CategoryModalProps {
+interface CompanyModalProps {
   isOpen: boolean;
   status: { value: number; label: string }[];
-  category: Category | null;
+  company: Company | null;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
-  onSave: (categoryData: { name: string }) => void;
+  onSave: (companyData: { name: string }) => void;
   backendErrors?: Record<string, string>; // Add this prop
   formatDate: (dateString?: string) => string;
 }
 
-export function CategoryModal({
+export function CompanyModal({
   isOpen,
   status,
-  category,
+  company,
   mode,
   saving,
   onClose,
   onSave,
   backendErrors, // Add this prop
   formatDate,
-}: CategoryModalProps) {
+}: CompanyModalProps) {
   const getTitle = () => {
     switch (mode) {
-      case 'view': return 'Category Details';
-      case 'edit': return 'Edit Category';
-      case 'create': return 'Add New Category';
-      default: return 'Category';
+      case 'view': return 'Company Details';
+      case 'edit': return 'Edit Company';
+      case 'create': return 'Add New Company';
+      default: return 'Company';
     }
   };
 
@@ -52,14 +52,14 @@ export function CategoryModal({
           {getTitle()}
         </h4>
 
-        {mode === 'view' && category && (
-          <CategoryDetailView category={category} formatDate={formatDate} />
+        {mode === 'view' && company && (
+          <CompanyDetailView company={company} formatDate={formatDate} />
         )}
 
         {(mode === 'create' || mode === 'edit') && (
-          <CategoryForm
+          <CompanyForm
           status={status}
-            category={mode === 'edit' ? category : null}
+            company={mode === 'edit' ? company : null}
             mode={mode}
             saving={saving}
             onSubmit={onSave}
@@ -90,7 +90,7 @@ export function CategoryModal({
               </Button>
               <Button
                 type="submit"
-                form="category-form"
+                form="company-form"
                 size="sm"
                 disabled={saving}
               >

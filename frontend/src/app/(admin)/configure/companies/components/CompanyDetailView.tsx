@@ -6,14 +6,14 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { Category } from "@/services/categoryService";
+import { Company } from "@/services/companyService";
 
-interface CategoryDetailViewProps {
-  category: Category;
+interface CompanyDetailViewProps {
+  company: Company;
   formatDate: (dateString?: string) => string;
 }
 
-export function CategoryDetailView({ category, formatDate }: CategoryDetailViewProps) {
+export function CompanyDetailView({ company, formatDate }: CompanyDetailViewProps) {
  
   return (
     <div className="space-y-4 py-4">
@@ -22,10 +22,10 @@ export function CategoryDetailView({ category, formatDate }: CategoryDetailViewP
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Category Name
+                Company Name
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
-                {category.name}
+                {company.name}
               </TableCell>
             </TableRow>
 
@@ -37,17 +37,17 @@ export function CategoryDetailView({ category, formatDate }: CategoryDetailViewP
                 <Badge
                   size="sm"
                   color={
-                    category.status == "1"
+                    company.status == "1"
                       ? "success"
-                      : category.status == "0"
+                      : company.status == "0"
                         ? "warning"
                         : "warning"
                   }
                   variant="light"
                 >
-                  {category.status == "1"
+                  {company.status == "1"
                     ? "Active"
-                    : category.status == "0"
+                    : company.status == "0"
                       ? "Inactive"
                       : "Unknown"}
                 </Badge>
@@ -59,7 +59,7 @@ export function CategoryDetailView({ category, formatDate }: CategoryDetailViewP
                 Created At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(category.created_at)}
+                {formatDate(company.created_at)}
               </TableCell>
             </TableRow>
 
@@ -68,7 +68,7 @@ export function CategoryDetailView({ category, formatDate }: CategoryDetailViewP
                 Updated At
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 dark:text-white/90">
-                {formatDate(category.updated_at)}
+                {formatDate(company.updated_at)}
               </TableCell>
             </TableRow>
           </TableBody>

@@ -1,24 +1,24 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
-import { useCategories } from "./hooks/useCategories";
+import { useCompanies } from "./hooks/useCompanies";
 import AccessRoute from "@/routes/AccessRoute";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import { DataTable } from "@/components/tables/DataTable";
-import { CategoryModal } from "./components/CategoryModal";
-import { useCategoryColumns } from "./components/CategoryColumns";
+import { CompanyModal } from "./components/CompanyModal";
+import { useCompanyColumns } from "./components/CompanyColumns";
 import { useEffect } from "react";
 
-export default function Categories() {
+export default function Companies() {
   const { hasPermission } = useAuth();
 
-  // Single hook for all category operations
+  // Single hook for all company operations
   const {
-    categories,
+    companies,
     loading,
     saving,
     isOpen,
-    selectedCategory,
+    selectedCompany,
     mode,
     backendErrors,
     pagination,
@@ -36,12 +36,12 @@ export default function Categories() {
     handleRestore,
     handleSave,
     handleFilterChange,
-    exportAllCategories,
+    exportAllCompanies,
     formatDate,
-  } = useCategories();
+  } = useCompanies();
 
   // Memoized columns
-  const columns = useCategoryColumns({
+  const columns = useCompanyColumns({
     hasPermission,
     onView: handleView,
     onEdit: handleEdit,
@@ -55,45 +55,45 @@ export default function Categories() {
   });
 
   useEffect(() => {
-    document.title = "Category | Inventory Management System";
+    document.title = "Company | Inventory Management System";
   }, []);
 
   return (
-    <AccessRoute requiredPermissions={["category.view", "category.create", "category.update", "category.delete"]}>
+    <AccessRoute requiredPermissions={["company.view", "company.create", "company.update", "company.delete"]}>
       <div>
          <PageBreadcrumb
           items={[
             { title: "Configure" }, // add href if needed links like href: "/admin/authorization/permissions"
-            { title: "Category Management" }
+            { title: "Company Management" }
           ]}
         />
         <div className="space-y-6">
           <ComponentCard
-            title="Category Management"
-            desc="Manage category in the system"
-            showAddButton={hasPermission("category.create")}
+            title="Company Management"
+            desc="Manage company in the system"
+            showAddButton={hasPermission("company.create")}
             buttonLabel="Add New"
             openModal={handleCreate}
           >
             <DataTable
               columns={columns}
-              data={categories}
+              data={companies}
               searchKey="name"
               pagination={pagination}
               onPaginationChange={setPagination}
               onColumnFilterChange={handleFilterChange}
               total={total}
               loading={loading}
-              exportFilename="categories"
-              exportAllData={exportAllCategories} // Provide exportAllCategoris function
+              exportFilename="companies"
+              exportAllData={exportAllCompanies} // Provide exportAllCategoris function
               showExportAllOption={false} // Disable "Export All" option
             />
           </ComponentCard>
 
-          <CategoryModal
+          <CompanyModal
             isOpen={isOpen}
             status={status}
-            category={selectedCategory}
+            company={selectedCompany}
             mode={mode}
             saving={saving}
             onClose={handleCloseModal}

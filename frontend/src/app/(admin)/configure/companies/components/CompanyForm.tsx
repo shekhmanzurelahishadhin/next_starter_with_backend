@@ -2,26 +2,26 @@
 import { Controller, useForm } from "react-hook-form";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
-import { Category } from "@/services/categoryService";
+import { Company } from "@/services/companyService";
 import { useEffect } from "react";
 import Select from "@/components/form/Select";
 import { ChevronDownIcon } from "@/icons";
 
-interface CategoryFormData {
+interface CompanyFormData {
   name: string;
   status?: number;
 }
 
-interface CategoryFormProps {
+interface CompanyFormProps {
   status: { value: number; label: string }[];
-  category?: Category | null;
+  company?: Company | null;
   mode: 'create' | 'edit';
   saving: boolean;
-  onSubmit: (categoryData: CategoryFormData) => void;
+  onSubmit: (companyData: CompanyFormData) => void;
   backendErrors?: Record<string, string>;
 }
 
-export function CategoryForm({ status, category, mode, saving, onSubmit, backendErrors }: CategoryFormProps) {
+export function CompanyForm({ status, company, mode, saving, onSubmit, backendErrors }: CompanyFormProps) {
   const {
     register,
     handleSubmit,
@@ -30,7 +30,7 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
     setError,
     clearErrors,
     control,
-  } = useForm<CategoryFormData>({
+  } = useForm<CompanyFormData>({
     mode: "onChange",
     defaultValues: {
       name: "",
@@ -42,7 +42,7 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
     if (backendErrors) {
       clearErrors();
       Object.entries(backendErrors).forEach(([field, message]) => {
-        setError(field as keyof CategoryFormData, {
+        setError(field as keyof CompanyFormData, {
           type: 'server',
           message: Array.isArray(message) ? message[0] : message
         });
@@ -51,41 +51,41 @@ export function CategoryForm({ status, category, mode, saving, onSubmit, backend
   }, [backendErrors, setError, clearErrors]);
 
   useEffect(() => {
-    if (mode === 'edit' && category) {
+    if (mode === 'edit' && company) {
       reset({
-        name: category?.name ?? '',
-        status: Number(category?.status ?? 1),
+        name: company?.name ?? '',
+        status: Number(company?.status ?? 1),
       });
     } else {
       reset({
         name: '',
       });
     }
-  }, [category, reset, mode]);
+  }, [company, reset, mode]);
 
-  const onFormSubmit = (data: CategoryFormData) => {
+  const onFormSubmit = (data: CompanyFormData) => {
     onSubmit(data);
   };
 
 
   return (
-    <form id="category-form" onSubmit={handleSubmit(onFormSubmit)}>
+    <form id="company-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-2">
         <div>
-          <Label htmlFor="name" required>Category Name</Label>
+          <Label htmlFor="name" required>Company Name</Label>
           <Input
             id="name"
             type="text"
-            placeholder="Enter category name."
+            placeholder="Enter company name."
             register={register("name", {
-              required: "Category name is required",
+              required: "Company name is required",
               minLength: {
                 value: 2,
-                message: "Category name must be at least 2 characters"
+                message: "Company name must be at least 2 characters"
               },
               maxLength: {
                 value: 50,
-                message: "Category name must not exceed 50 characters"
+                message: "Company name must not exceed 50 characters"
               },
             })}
             error={errors.name?.message}

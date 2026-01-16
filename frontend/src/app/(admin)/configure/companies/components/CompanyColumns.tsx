@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import ActionButtons from "@/components/ui/button/ActionButton";
 import { FiEye, FiEdit, FiTrash } from "@/icons/index";
-import { Category } from "@/services/categoryService";
+import { Company } from "@/services/companyService";
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
@@ -16,10 +16,10 @@ declare module '@tanstack/react-table' {
   }
 }
 
-interface UseCategoryColumnsProps {
+interface UseCompanyColumnsProps {
   hasPermission: (permission: string) => boolean;
-  onView: (category: Category) => void;
-  onEdit: (category: Category) => void;
+  onView: (company: Company) => void;
+  onEdit: (company: Company) => void;
   handleSoftDelete: (id: number) => void;
   handleForceDelete: (id: number) => void;
   handleRestore: (id: number) => void;
@@ -29,7 +29,7 @@ interface UseCategoryColumnsProps {
   status: { value: number; label: string }[];
 }
 
-export const useCategoryColumns = ({
+export const useCompanyColumns = ({
   hasPermission,
   onView,
   onEdit,
@@ -39,8 +39,8 @@ export const useCategoryColumns = ({
   pageSize,
   formatDate,
   status,
-}: UseCategoryColumnsProps): ColumnDef<Category>[] => {
-  return useMemo((): ColumnDef<Category>[] => [
+}: UseCompanyColumnsProps): ColumnDef<Company>[] => {
+  return useMemo((): ColumnDef<Company>[] => [
     {
       id: "sl",
       header: "SL",
@@ -63,13 +63,13 @@ export const useCategoryColumns = ({
     },
     {
       accessorKey: "name",
-      header: "Category Name",
+      header: "Company Name",
       enableSorting: true,
       meta: {
         filterVariant: "text",
         placeholder: "Search names",
         exportable: true,
-        exportHeader: "Category Name",
+        exportHeader: "Company Name",
         exportValue: (row) => row.name,
         widthClass: "w-[200px]"
       },
@@ -178,34 +178,34 @@ export const useCategoryColumns = ({
         widthClass: "w-[150px]"
       },
       cell: ({ row }) => {
-        const category = row.original;
+        const company = row.original;
         return (
           <ActionButtons
-            row={category}
+            row={company}
             buttons={[
               {
                 icon: FiEye,
-                onClick: (row) => onView(row as Category),
+                onClick: (row) => onView(row as Company),
                 variant: "success",
                 size: "sm",
                 tooltip: "View",
-                show: () => hasPermission("category.view"),
+                show: () => hasPermission("company.view"),
               },
               {
                 icon: FiEdit,
-                onClick: (row) => onEdit(row as Category),
+                onClick: (row) => onEdit(row as Company),
                 variant: "primary",
                 size: "sm",
                 tooltip: "Edit",
-                show: () => hasPermission("category.edit"),
+                show: () => hasPermission("company.edit"),
               },
               {
                 icon: FiTrash,
-                onClick: (row) => handleSoftDelete((row as Category).id),
+                onClick: (row) => handleSoftDelete((row as Company).id),
                 variant: "danger",
                 size: "sm",
                 tooltip: "Move to Trash",
-                show: () => hasPermission("category.delete"),
+                show: () => hasPermission("company.delete"),
               },
             ]}
           />

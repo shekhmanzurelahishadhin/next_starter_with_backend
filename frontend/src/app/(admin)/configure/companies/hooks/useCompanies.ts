@@ -1,23 +1,23 @@
 // hooks/useRoles.ts
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { categoryService, Category, CategoryFilters, PaginatedResponse } from '@/services/categoryService';
+import { companyService, Company, CompanyFilters, PaginatedResponse } from '@/services/companyService';
 import { lookupService } from '@/services/lookupService';
 import { useAlert } from '@/hooks/useAlert';
 import { useModal } from '@/hooks/useModal';
 import { useDebounce } from '@/hooks/useDebounce';
-export const useCategories = () => {
+export const useCompanies = () => {
   const { confirm } = useAlert();
   const { isOpen, openModal, closeModal } = useModal();
 
   // Data state
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<{ value: number; label: string }[]>([]);
 
   // Modal state
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>('create');
   const [backendErrors, setBackendErrors] = useState<Record<string, string>>({});
 
@@ -32,22 +32,22 @@ export const useCategories = () => {
 
   // Search state
 
-  // Load categories
-  const loadCategories = useCallback(async () => {
+  // Load companies
+  const loadCompanies = useCallback(async () => {
     try {
       setLoading(true);
-      const apiFilters: CategoryFilters = {
+      const apiFilters: CompanyFilters = {
         page: pagination.pageIndex + 1,
         per_page: pagination.pageSize,
         ...debouncedFilters,
       };
 
-      const response: PaginatedResponse<Category> = await categoryService.getCategories(apiFilters);
-      setCategories(response.data);
+      const response: PaginatedResponse<Company> = await companyService.getCompanies(apiFilters);
+      setCompanies(response.data);
       setTotal(response.total);
     } catch (err) {
-      toast.error('Failed to load categories');
-      console.error('Error loading categories:', err);
+      toast.error('Failed to load companies');
+      console.error('Error loading companies:', err);
     } finally {
       setLoading(false);
     }
@@ -65,8 +65,8 @@ export const useCategories = () => {
   };
 
   useEffect(() => {
-    loadCategories();
-  }, [loadCategories]);
+    loadCompanies();
+  }, [loadCompanies]);
 
   // for active status lookup
   useEffect(() => {
@@ -75,22 +75,22 @@ export const useCategories = () => {
 
 
   // Modal operations
-  const handleView = useCallback((category: Category) => {
-    setSelectedCategory(category);
+  const handleView = useCallback((company: Company) => {
+    setSelectedCompany(company);
     setMode('view');
     setBackendErrors({});
     openModal();
   }, [openModal]);
 
-  const handleEdit = useCallback((category: Category) => {
-    setSelectedCategory(category);
+  const handleEdit = useCallback((company: Company) => {
+    setSelectedCompany(company);
     setMode('edit');
     setBackendErrors({});
     openModal();
   }, [openModal]);
 
   const handleCreate = useCallback(() => {
-    setSelectedCategory(null);
+    setSelectedCompany(null);
     setMode('create');
     setBackendErrors({});
     openModal();
@@ -98,7 +98,7 @@ export const useCategories = () => {
 
   const handleCloseModal = useCallback(() => {
     closeModal();
-    setSelectedCategory(null);
+    setSelectedCompany(null);
     setMode('create');
     setBackendErrors({});
   }, [closeModal]);
@@ -107,77 +107,87 @@ export const useCategories = () => {
   const handleSoftDelete = useCallback(async (id: number) => {
     const result = await confirm({
       title: 'Move to Trash?',
-      text: 'Are you sure you want to move this category to trash? This action cannot be undone.',
+      text: 'Are you sure you want to move this company to trash? This action cannot be undone.',
     });
 
     if (!result.isConfirmed) return;
-    let previousCategories: Category[] = [];
+    let previousCompanies: Company[] = [];
     try {
       // Optimistic update
-      previousCategories = [...categories];
-      setCategories(prev => prev.filter(category => category.id !== id));
+      previousCompanies = [...companies];
+      setCompanies(prev => prev.filter(company => company.id !== id));
 
-      await categoryService.softDeleteCategory(id);
-      toast.success('Category moved to trashed!');
-      await loadCategories();
+      await companyService.softDeleteCompany(id);
+      toast.success('Company moved to trashed!');
+      await loadCompanies();
     } catch (err) {
       // Revert on error
-      setCategories(previousCategories);
-      toast.error('Failed to delete category');
+      setCompanies(previousCompanies);
+      toast.error('Failed to delete company');
     }
-  }, [confirm, categories, loadCategories]);
+  }, [confirm, companies, loadCompanies]);
 
   const handleForceDelete = useCallback(async (id: number) => {
     const result = await confirm({
-      title: 'Delete Category?',
-      text: 'Are you sure you want to delete this category? This action cannot be undone.',
+      title: 'Delete Company?',
+      text: 'Are you sure you want to delete this company? This action cannot be undone.',
     });
 
     if (!result.isConfirmed) return;
 
-    let previousCategories: Category[] = [];
+    let previousCompanies: Company[] = [];
     try {
       // Optimistic update
-      previousCategories = [...categories];
-      setCategories(prev => prev.filter(category => category.id !== id));
+      previousCompanies = [...companies];
+      setCompanies(prev => prev.filter(company => company.id !== id));
 
-      await categoryService.forceDeleteCategory(id);
-      toast.success('Category deleted successfully!');
-      await loadCategories();
+      await companyService.forceDeleteCompany(id);
+      toast.success('Company deleted successfully!');
+      await loadCompanies();
     } catch (err) {
       // Revert on error
-      setCategories(previousCategories);
-      toast.error('Failed to delete category');
+      setCompanies(previousCompanies);
+      toast.error('Failed to delete company');
     }
-  }, [confirm, categories, loadCategories]);
+  }, [confirm, companies, loadCompanies]);
 
   const handleRestore = useCallback(async (id: number) => {
     try {
-      await categoryService.restoreCategory(id);
-      toast.success('Category restored successfully!');
-      await loadCategories();
+      await companyService.restoreCompany(id);
+      toast.success('Company restored successfully!');
+      await loadCompanies();
     } catch (err) {
       // Revert on error
-      toast.error('Failed to restore category');
+      toast.error('Failed to restore company');
     }
-  }, [categories, loadCategories]);
+  }, [companies, loadCompanies]);
 
-  const handleSave = useCallback(async (categoryData: { name: string, status: string }) => {
+  const handleSave = useCallback(async (companyData: { 
+    name: string, 
+    code: string, 
+    phone: string, 
+    address: string, 
+    logo: string,
+    default_currency: string, 
+    timezone: string,
+    email: string, 
+    status: string 
+  }) => {
     try {
       setSaving(true);
       setBackendErrors({});
 
-      if (mode === 'edit' && selectedCategory) {
-        await categoryService.updateCategory(selectedCategory.id, categoryData);
-        toast.success('Category updated successfully!');
+      if (mode === 'edit' && selectedCompany) {
+        await companyService.updateCompany(selectedCompany.id, companyData);
+        toast.success('Company updated successfully!');
       } else {
-        await categoryService.createCategory(categoryData);
-        toast.success('Category created successfully!');
+        await companyService.createCompany(companyData);
+        toast.success('Company created successfully!');
         setPagination(prev => ({ ...prev, pageIndex: 0 }));
       }
 
       handleCloseModal();
-      await loadCategories();
+      await loadCompanies();
       return true;
     } catch (err: any) {
       if (err?.response?.data?.errors) {
@@ -187,13 +197,13 @@ export const useCategories = () => {
         });
         setBackendErrors(errors);
       } else {
-        toast.error(err?.response?.data?.message || 'Failed to save category');
+        toast.error(err?.response?.data?.message || 'Failed to save company');
       }
       return false;
     } finally {
       setSaving(false);
     }
-  }, [mode, selectedCategory, loadCategories, handleCloseModal]);
+  }, [mode, selectedCompany, loadCompanies, handleCloseModal]);
 
   // Filter and search operations
   const handleFilterChange = useCallback((name: string, value: string | number) => {
@@ -211,11 +221,11 @@ export const useCategories = () => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, []);
 
-  // Function to export all categories
-  const exportAllCategories = async () => {
+  // Function to export all companies
+  const exportAllCompanies = async () => {
     try {
       // Call API without pagination to get all data
-      const response = await categoryService.getCategories({});
+      const response = await companyService.getCompanies({});
       return response.data;
     } catch (error) {
       console.error('Error exporting all roles:', error);
@@ -236,11 +246,11 @@ export const useCategories = () => {
   };
   return {
     // State
-    categories,
+    companies,
     loading,
     saving,
     isOpen,
-    selectedCategory,
+    selectedCompany,
     mode,
     backendErrors,
     pagination,
@@ -260,8 +270,8 @@ export const useCategories = () => {
     handleFilterChange,
     clearBackendErrors,
     resetToFirstPage,
-    loadCategories,
-    exportAllCategories,
+    loadCompanies,
+    exportAllCompanies,
     formatDate,
   };
 };
