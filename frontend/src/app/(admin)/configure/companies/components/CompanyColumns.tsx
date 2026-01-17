@@ -85,6 +85,75 @@ export const useCompanyColumns = ({
       },
     },
     {
+      accessorKey: "email",
+      header: "Email",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        placeholder: "Search emails",
+        exportable: true,
+        exportHeader: "Company Email",
+        exportValue: (row) => row.email,
+        widthClass: "w-[200px]"
+      },
+      cell: ({ row }) => {
+        const email = row.getValue("email") as string;
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {email}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "phone",
+      header: "Phone",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        placeholder: "Search phones",
+        exportable: true,
+        exportHeader: "Company Phone",
+        exportValue: (row) => row.phone,
+        widthClass: "w-[200px]"
+      },
+      cell: ({ row }) => {
+        const phone = row.getValue("phone") as string;
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {phone}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "address",
+      header: "Address",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        placeholder: "Search addresses",
+        exportable: true,
+        exportHeader: "Company Address",
+        exportValue: (row) => row.address,
+        widthClass: "w-[200px]"
+      },
+      cell: ({ row }) => {
+        const address = row.getValue("address") as string;
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {address}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "status",
       header: "Status",
       enableSorting: true,
