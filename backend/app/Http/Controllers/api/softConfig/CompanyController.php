@@ -27,31 +27,31 @@ class CompanyController extends Controller
     public function index(Request $request, CompanyService $companyService)
     {
         try {
-        $perPage = $request->get('per_page');
-        $filters = $request->only('search','status','name','email','code','address','created_at','created_by');
-        $columns = $request->get('columns', ['*']); // Default all columns
+            $perPage = $request->get('per_page');
+            $filters = $request->only('search','status','name','email','code','address','created_at','created_by');
+            $columns = $request->get('columns', CompanyService::defaultColumns);
 
-        $companies = $companyService->getCompanies($filters, $perPage, $columns);
+            $companies = $companyService->getCompanies($filters, $perPage, $columns);
 
-        if ($companies instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            $items = collect($companies->items())->map(fn($company) => new CompanyResource((object) $company, $columns));
-            // Paginated response
-            $data = [
-                'items' => $items,
-                'total' => $companies->total(),
-                'current_page' => $companies->currentPage(),
-                'per_page' => $companies->perPage(),
-            ];
-        }else {
-            // Collection response (no pagination)
-            $items = collect($companies)->map(fn($company) => new CompanyResource((object) $company, $columns));
-            $data = [
-                'items' => $items,
-                'total' => $companies->count(),
-                'current_page' => 1,
-                'per_page' => $companies->count(),
-            ];
-        }
+            if ($companies instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                $items = collect($companies->items())->map(fn($company) => new CompanyResource((object) $company, $columns));
+                // Paginated response
+                $data = [
+                    'data' => $items,
+                    'total' => $companies->total(),
+                    'current_page' => $companies->currentPage(),
+                    'per_page' => $companies->perPage(),
+                ];
+            }else {
+                // Collection response (no pagination)
+                $items = collect($companies)->map(fn($company) => new CompanyResource((object) $company, $columns));
+                $data = [
+                    'data' => $items,
+                    'total' => $companies->count(),
+                    'current_page' => 1,
+                    'per_page' => $companies->count(),
+                ];
+            }
 
             return ApiResponse::success($data, 'Companies retrieved successfully');
 

@@ -12,8 +12,24 @@ use Illuminate\Support\Facades\Auth;
 class CompanyService
 {
     use FileUploader;
-
-    public function getCompanies(array $filters = [], $perPage = null, $columns = ['*'])
+    const defaultColumns = [
+        'id',
+        'name',
+        'slug',
+        'code',
+        'email',
+        'phone',
+        'address',
+        'logo',
+        'default_currency',
+        'timezone',
+        'status',
+        'created_by',
+        'created_at',
+        'deleted_at',
+        'updated_at'
+    ];
+    public function getCompanies(array $filters = [], $perPage = null, $columns = self::defaultColumns)
     {
         $query = Company::query()->select($columns);
         // Restrict data if user is not superadmin and has a company_id
@@ -25,9 +41,10 @@ class CompanyService
             $query->onlyTrashed();
         } elseif (isset($filters['status']) && $filters['status'] !== '') {
             $query->where('status', $filters['status']);
-        } else {
-            $query->withTrashed();
         }
+//        else {
+//            $query->withTrashed();
+//        }
 
         // Apply filters
         $query
