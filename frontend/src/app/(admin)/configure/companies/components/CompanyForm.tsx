@@ -6,9 +6,14 @@ import { Company } from "@/services/companyService";
 import { useEffect } from "react";
 import Select from "@/components/form/Select";
 import { ChevronDownIcon } from "@/icons";
+import TextArea from "@/components/form/input/TextArea";
 
 interface CompanyFormData {
   name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  logo?: string;
   status?: number;
 }
 
@@ -92,7 +97,71 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
             disabled={saving}
           />
         </div>
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="Enter company email."
+            register={register("email", {
+              minLength: {
+                value: 2,
+                message: "Company email must be at least 2 characters"
+              },
+              maxLength: {
+                value: 50,
+                message: "Company email must not exceed 50 characters"
+              },
+            })}
+            error={errors.email?.message}
+            disabled={saving}
+          />
+        </div>
+        <div>
+          <Label htmlFor="phone">Phone</Label>
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="Enter company phone."
+            register={register("phone", {
+              minLength: {
+                value: 2,
+                message: "Company phone must be at least 2 characters"
+              },
+              maxLength: {
+                value: 50,
+                message: "Company phone must not exceed 50 characters"
+              },
+            })}
+            error={errors.phone?.message}
+            disabled={saving}
+          />
+        </div>
+        <div>
+          <Label>Address</Label>
 
+          <Controller
+            name="address"
+            control={control}
+            rules={{
+              maxLength: {
+                value: 255,
+                message: "Max length is 255 characters",
+              },
+            }}
+            render={({ field }) => (
+              <TextArea
+                id="address"
+                placeholder="Enter company address."
+                value={field.value || ""}
+                onChange={field.onChange}
+                error={errors.address?.message}
+                disabled={saving}
+                rows={3}
+              />
+            )}
+          />
+        </div>
         {/* Show status field only in edit mode */}
         {mode === "edit" && (
           <div>
