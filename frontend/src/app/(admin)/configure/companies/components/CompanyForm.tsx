@@ -7,13 +7,14 @@ import { useEffect } from "react";
 import Select from "@/components/form/Select";
 import { ChevronDownIcon } from "@/icons";
 import TextArea from "@/components/form/input/TextArea";
+import FileInput from "@/components/form/input/FileInput";
 
 interface CompanyFormData {
   name: string;
   email?: string;
   phone?: string;
   address?: string;
-  logo?: string;
+  logo?: File | null;
   status?: number;
 }
 
@@ -138,7 +139,7 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
           />
         </div>
         <div>
-          <Label>Address</Label>
+          <Label htmlFor="address">Address</Label>
 
           <Controller
             name="address"
@@ -162,6 +163,41 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
             )}
           />
         </div>
+        <div>
+          <Label htmlFor="logo" required>
+            Upload file
+          </Label>
+
+          <Controller
+            name="logo"
+            control={control}
+            rules={{
+              required: "Logo is required",
+              validate: {
+                fileSize: (file) =>
+                  !file || file.size <= 2 * 1024 * 1024 || "Max file size is 2MB",
+
+                fileType: (file) =>
+                  !file ||
+                  ["image/png", "image/jpeg", "image/jpg"].includes(file.type) ||
+                  "Only PNG or JPG images are allowed",
+              },
+            }}
+            render={({ field }) => (
+              <FileInput
+                id="logo"
+                accept="image/*"
+                disabled={saving}
+                error={errors.logo?.message}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  field.onChange(file); // store File in RHF
+                }}
+              />
+            )}
+          />
+        </div>
+
         {/* Show status field only in edit mode */}
         {mode === "edit" && (
           <div>
