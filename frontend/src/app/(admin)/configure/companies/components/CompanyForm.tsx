@@ -23,7 +23,7 @@ interface CompanyFormProps {
   company?: Company | null;
   mode: 'create' | 'edit';
   saving: boolean;
-  onSubmit: (companyData: CompanyFormData) => void;
+  onSubmit: (companyData: CompanyFormData | FormData) => void; // CHANGED: Accept both FormData and regular object
   backendErrors?: Record<string, string>;
 }
 
@@ -40,6 +40,10 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
     mode: "onChange",
     defaultValues: {
       name: "",
+      email: "", 
+      phone: "", 
+      address: "", 
+      status: 1,
     }
   });
 
@@ -60,19 +64,41 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
     if (mode === 'edit' && company) {
       reset({
         name: company?.name ?? '',
+        email: company?.email ?? '', 
+        phone: company?.phone ?? '', 
+        address: company?.address ?? '', 
         status: Number(company?.status ?? 1),
       });
     } else {
       reset({
         name: '',
+        email: '', 
+        phone: '', 
+        address: '', 
+        status: 1,
       });
     }
   }, [company, reset, mode]);
 
   const onFormSubmit = (data: CompanyFormData) => {
-    onSubmit(data);
+    // CHANGED: Convert data to FormData for file upload
+    const formData = new FormData();
+    
+    // Append all form fields to FormData
+    formData.append('name', data.name);
+    
+    if (data.email) formData.append('email', data.email);
+    if (data.phone) formData.append('phone', data.phone);
+    if (data.address) formData.append('address', data.address);
+    if (data.status !== undefined) formData.append('status', data.status.toString());
+    
+    // Append file if it exists
+    if (data.logo instanceof File) {
+      formData.append('logo', data.logo);
+    }
+    
+    onSubmit(formData);
   };
-
 
   return (
     <form id="company-form" onSubmit={handleSubmit(onFormSubmit)}>

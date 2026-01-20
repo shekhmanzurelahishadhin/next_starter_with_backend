@@ -85,7 +85,7 @@ class CompanyService
     {
         // handle logo upload if present
         if (isset($data['logo']) && $data['logo'] instanceof \Illuminate\Http\UploadedFile) {
-            $data['logo'] = $this->fileUpload($data['logo'], 'companyLogos');
+            $data['logo'] = $this->fileUpload($data['logo'], 'logos');
         }
 
         $data['code'] = generateCode('CMP', 'companies', 'code');
