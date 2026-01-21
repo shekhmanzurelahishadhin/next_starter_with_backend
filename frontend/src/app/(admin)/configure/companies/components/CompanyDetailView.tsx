@@ -64,16 +64,6 @@ export function CompanyDetailView({ company, formatDate }: CompanyDetailViewProp
                         unoptimized={true} // Add this if you're having issues with external images
                       />
                     </div>
-                    <div className="ml-4">
-                      <a 
-                        href={logoUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 break-all"
-                      >
-                        View Logo
-                      </a>
-                    </div>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
