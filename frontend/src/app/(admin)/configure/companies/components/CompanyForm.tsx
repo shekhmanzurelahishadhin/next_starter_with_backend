@@ -23,7 +23,7 @@ interface CompanyFormProps {
   company?: Company | null;
   mode: 'create' | 'edit';
   saving: boolean;
-  onSubmit: (companyData: CompanyFormData | FormData) => void; // CHANGED: Accept both FormData and regular object
+  onSubmit: (companyData: CompanyFormData | FormData) => void;
   backendErrors?: Record<string, string>;
 }
 
@@ -36,6 +36,7 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
     setError,
     clearErrors,
     control,
+    watch,
   } = useForm<CompanyFormData>({
     mode: "onChange",
     defaultValues: {
@@ -46,6 +47,9 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
       status: 1,
     }
   });
+
+  // Watch the logo field to conditionally apply validation
+  const logoFile = watch('logo');
 
   // Handle backend errors
   useEffect(() => {
@@ -81,7 +85,6 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
   }, [company, reset, mode]);
 
   const onFormSubmit = (data: CompanyFormData) => {
-    // CHANGED: Convert data to FormData for file upload
     const formData = new FormData();
     
     // Append all form fields to FormData
@@ -92,16 +95,22 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
     if (data.address) formData.append('address', data.address);
     if (data.status !== undefined) formData.append('status', data.status.toString());
     
-    // Append file if it exists
+    // Append file if it exists (only for create or if new file selected)
     if (data.logo instanceof File) {
       formData.append('logo', data.logo);
     }
     
+    // For update, if no file is selected but we have an existing company,
+    // we might want to send a flag to keep the existing logo
+    if (mode === 'edit') {
+       formData.append("_method", "PUT");
+    }
+    
     onSubmit(formData);
   };
-
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000/storage/';
   return (
-    <form id="company-form" onSubmit={handleSubmit(onFormSubmit)}>
+    <form id="company-form" onSubmit={handleSubmit(onFormSubmit)} encType="multipart/form-data">
       <div className="space-y-2">
         <div>
           <Label htmlFor="name" required>Company Name</Label>
@@ -166,7 +175,6 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
         </div>
         <div>
           <Label htmlFor="address">Address</Label>
-
           <Controller
             name="address"
             control={control}
@@ -189,37 +197,69 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
             )}
           />
         </div>
+        
         <div>
-          <Label htmlFor="logo" required>
-            Upload file
+          <Label htmlFor="logo" required={mode === 'create'}>
+            Upload file {mode === 'create' ? '' : '(Optional)'}
           </Label>
 
           <Controller
             name="logo"
             control={control}
             rules={{
-              required: "Logo is required",
+              // Logo is required only for create mode
+              required: mode === 'create' ? "Logo is required" : false,
               validate: {
-                fileSize: (file) =>
-                  !file || file.size <= 2 * 1024 * 1024 || "Max file size is 2MB",
-
-                fileType: (file) =>
-                  !file ||
-                  ["image/png", "image/jpeg", "image/jpg"].includes(file.type) ||
-                  "Only PNG or JPG images are allowed",
+                fileSize: (file) => {
+                  if (!file) return true; // No file is allowed in edit mode
+                  return file.size <= 2 * 1024 * 1024 || "Max file size is 2MB";
+                },
+                fileType: (file) => {
+                  if (!file) return true; // No file is allowed in edit mode
+                  return ["image/png", "image/jpeg", "image/jpg"].includes(file.type) ||
+                    "Only PNG or JPG images are allowed";
+                },
               },
             }}
             render={({ field }) => (
-              <FileInput
-                id="logo"
-                accept="image/*"
-                disabled={saving}
-                error={errors.logo?.message}
-                onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  field.onChange(file); // store File in RHF
-                }}
-              />
+              <div>
+                <FileInput
+                  id="logo"
+                  accept="image/*"
+                  disabled={saving}
+                  error={errors.logo?.message}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    field.onChange(file);
+                  }}
+                />
+                {/* Show existing logo preview in edit mode */}
+                {mode === 'edit' && company?.logo && !logoFile && (
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500 mb-1">Current logo:</p>
+                    <div className="relative w-20 h-20 border rounded overflow-hidden">
+                      <img 
+                        src={baseUrl + company.logo} 
+                        alt={`${company.name} logo`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
+                {/* Show new logo preview */}
+                {logoFile && (
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500 mb-1">New logo preview:</p>
+                    <div className="relative w-20 h-20 border rounded overflow-hidden">
+                      <img 
+                        src={URL.createObjectURL(logoFile)} 
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           />
         </div>
@@ -228,7 +268,6 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
         {mode === "edit" && (
           <div>
             <Label htmlFor="status">Status</Label>
-
             <Controller
               name="status"
               control={control}
@@ -255,7 +294,6 @@ export function CompanyForm({ status, company, mode, saving, onSubmit, backendEr
             )}
           </div>
         )}
-
       </div>
     </form>
   );

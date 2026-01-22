@@ -107,7 +107,7 @@ class CompanyService {
 
     async updateCompany(id: number, companyData: { name: string, code: string, email: string, phone: string, address: string, logo: string, status: string }): Promise<Company> {
 
-        const response = await api.put(`/configure/companies/${id}`, companyData);
+        const response = await api.post(`/configure/companies/${id}`, companyData, { headers: { "Content-Type": "multipart/form-data" } });
         return response.data.data;
     }
 
