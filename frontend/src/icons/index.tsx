@@ -90,6 +90,7 @@ import {
   FiRefreshCw,
   FiClock,
   FiKey,
+  FiShoppingCart,
 } from 'react-icons/fi';
 
 import {
@@ -217,6 +218,7 @@ export {
   FaUserTag,
   FaTrashRestore,
   FaUndo,
+  FiShoppingCart,
   
   // React Icons - Heroicons
   HiOutlineDocument,
