@@ -17,7 +17,8 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
-  FiUser
+  FiUser,
+  FiShoppingCart
 } from "../icons/index";
 import { useAuth } from "@/context/AuthContext";
 
@@ -79,6 +80,25 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    icon: <FiSettings />,
+    name: "Soft Configure",
+    subItems: [
+      { name: "Company", path: "/configure/companies", requiredPermissions: ["company.view", "company.create", "company.edit", "company.delete"] },
+      { name: "Category", path: "/configure/categories", requiredPermissions: ["category.view", "category.create", "category.edit", "category.delete"] },
+      { name: "Sub-Category", path: "/configure/sub-categories", requiredPermissions: ["sub-category.view", "sub-category.create", "sub-category.edit", "sub-category.delete"] },
+      { name: "Units", path: "/configure/units", requiredPermissions: ["unit.view", "unit.create", "unit.edit", "unit.delete"] },
+      { name: "Brands", path: "/configure/brands", requiredPermissions: ["brand.view", "brand.create", "brand.edit", "brand.delete"] },
+      { name: "Lookups", path: "/configure/lookups", requiredPermissions: ["lookup.view", "lookup.create", "lookup.edit", "lookup.delete"] },
+    ],
+  },
+  {
+    name: "Purchases",
+    icon: <FiShoppingCart />,
+    subItems: [
+      { name: "Supplier", path: "/purchases/suppliers", requiredPermissions: ["supplier.view", "supplier.create", "supplier.edit", "supplier.delete"] },
+    ],
+  },
+  {
     icon: <CalenderIcon />,
     name: "Calendar",
     path: "/calendar",
@@ -122,18 +142,6 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Blank Page", path: "/blank" },
       { name: "404 Error", path: "/error-404" },
-    ],
-  },
-  {
-    icon: <FiSettings />,
-    name: "Soft Configure",
-    subItems: [
-      { name: "Company", path: "/configure/companies", requiredPermissions: ["company.view", "company.create", "company.edit", "company.delete"] },
-      { name: "Category", path: "/configure/categories", requiredPermissions: ["category.view", "category.create", "category.edit", "category.delete"] },
-      { name: "Sub-Category", path: "/configure/sub-categories", requiredPermissions: ["sub-category.view", "sub-category.create", "sub-category.edit", "sub-category.delete"] },
-      { name: "Units", path: "/configure/units", requiredPermissions: ["unit.view", "unit.create", "unit.edit", "unit.delete"] },
-      { name: "Brands", path: "/configure/brands", requiredPermissions: ["brand.view", "brand.create", "brand.edit", "brand.delete"] },
-      { name: "Lookups", path: "/configure/lookups", requiredPermissions: ["lookup.view", "lookup.create", "lookup.edit", "lookup.delete"] },
     ],
   },
 ];
