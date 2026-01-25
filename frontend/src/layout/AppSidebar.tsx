@@ -18,7 +18,8 @@ import {
   TableIcon,
   UserCircleIcon,
   FiUser,
-  FiShoppingCart
+  FiShoppingCart,
+  FiShoppingBag,
 } from "../icons/index";
 import { useAuth } from "@/context/AuthContext";
 
@@ -96,6 +97,13 @@ const navItems: NavItem[] = [
     icon: <FiShoppingCart />,
     subItems: [
       { name: "Supplier", path: "/purchases/suppliers", requiredPermissions: ["supplier.view", "supplier.create", "supplier.edit", "supplier.delete"] },
+    ],
+  },
+  {
+    name: "Sales",
+    icon: <FiShoppingBag />,
+    subItems: [
+      { name: "Customers", path: "/purchases/customers", requiredPermissions: ["customer.view", "customer.create", "customer.edit", "customer.delete"] },
     ],
   },
   {
