@@ -25,6 +25,7 @@ class SupplierService
             'status',
             'created_by',
             'created_at',
+            'updated_at',
             'deleted_at'
         );
         // Handle status / trash logic
@@ -32,9 +33,10 @@ class SupplierService
             $query->onlyTrashed();
         } elseif (isset($filters['status']) && $filters['status'] !== '') {
             $query->where('status', $filters['status']);
-        } else {
-            $query->withTrashed();
         }
+//        else {
+//            $query->withTrashed();
+//        }
 
         // Apply filters
         $query
@@ -46,18 +48,7 @@ class SupplierService
             ->when($filters['opening_balance'] ?? null, fn($q, $opening_balance) => $q->where('opening_balance', 'like', "%{$opening_balance}%"))
             ->when($filters['opening_balance_type'] ?? null, fn($q, $opening_balance_type) => $q->where('opening_balance_type',  $opening_balance_type))
             ->when($filters['created_by'] ?? null, fn($q, $createdBy) => $q->whereHas('createdBy', fn($sub) => $sub->where('name', 'like', "%{$createdBy}%")))
-            ->when($filters['created_at'] ?? null, fn($q, $createdAt) => $q->whereDate('created_at', date('Y-m-d', strtotime($createdAt))))
-            ->when($filters['search'] ?? null, fn($q, $term) => $q->where(function ($sub) use ($term) {
-                $sub->where('name', 'like', "%{$term}%")
-                    ->orWhere('code', 'like', "%{$term}%")
-                    ->orWhere('phone', 'like', "%{$term}%")
-                    ->orWhere('email', 'like', "%{$term}%")
-                    ->orWhere('address', 'like', "%{$term}%")
-                    ->orWhere('opening_balance', 'like', "%{$term}%")
-                    ->orWhereHas('balanceType', fn($type) => $type->where('name', 'like', "%{$term}%"))
-                    ->orWhereHas('createdBy', fn($user) => $user->where('name', 'like', "%{$term}%"));
-            })
-            );
+            ->when($filters['created_at'] ?? null, fn($q, $createdAt) => $q->whereDate('created_at', date('Y-m-d', strtotime($createdAt))));
 
         // Eager load common relations
         $query->with([

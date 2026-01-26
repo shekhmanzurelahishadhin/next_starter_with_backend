@@ -25,7 +25,7 @@ class SupplierController extends Controller
     {
         try {
             $perPage = $request->get('per_page');
-            $filters = $request->only('search','status','name','code','address','opening_balance','opening_balance_type','phone','email','created_at','created_by');
+            $filters = $request->only('status','name','code','address','opening_balance','opening_balance_type','phone','email','created_at','created_by');
 
             $suppliers = $supplierService->getSuppliers($filters, $perPage);
 
