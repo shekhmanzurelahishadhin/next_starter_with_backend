@@ -22,7 +22,6 @@ class CreateSupplierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_id' => 'required|exists:companies,id',
             'slug' => 'nullable|string|max:255|unique:suppliers,slug',
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',

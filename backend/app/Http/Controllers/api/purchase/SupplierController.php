@@ -25,11 +25,9 @@ class SupplierController extends Controller
     {
         try {
             $perPage = $request->get('per_page');
-            $filters = $request->only('search','status','name','code','company_name','address','opening_balance','opening_balance_type','phone','email','created_at','created_by');
+            $filters = $request->only('search','status','name','code','address','opening_balance','opening_balance_type','phone','email','created_at','created_by');
 
-            $companyId = $request->query('company_id');
-
-            $suppliers = $supplierService->getSuppliers($filters, $perPage, $companyId);
+            $suppliers = $supplierService->getSuppliers($filters, $perPage);
 
             if ($suppliers instanceof \Illuminate\Pagination\LengthAwarePaginator) {
                 // Paginated response
@@ -48,7 +46,7 @@ class SupplierController extends Controller
                     'per_page'     => $suppliers->count(),
                 ];
             }
-                return ApiResponse::success($data, 'Supplier retrieved successfully');
+            return ApiResponse::success($data, 'Supplier retrieved successfully');
 
         }catch (\Exception $e) {
             return ApiResponse::serverError('Failed to retrieve suppliers');

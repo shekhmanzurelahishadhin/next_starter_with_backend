@@ -16,10 +16,6 @@ class Supplier extends Model
 
     protected $guarded = ['id'];
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');

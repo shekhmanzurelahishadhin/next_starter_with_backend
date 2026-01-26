@@ -23,8 +23,6 @@ class SupplierResource extends JsonResource
             'opening_balance_type' => (int) $this->opening_balance_type,
             'opening_type' => $this->balanceType?->name,
             'opening_balance' => $this->opening_balance,
-            'company_id' => $this->company?->id ?? null,
-            'company_name' => $this->company?->name ?? null,
             'slug' => $this->slug,
             'status' => $this->status,
             'address' => $this->address,
