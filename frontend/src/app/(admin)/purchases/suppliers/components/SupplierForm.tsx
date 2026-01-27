@@ -20,6 +20,7 @@ interface SupplierFormData {
 
 interface SupplierFormProps {
   status: { value: number; label: string }[];
+  openingBalanceType: { value: number; label: string }[];
   supplier?: Supplier | null;
   mode: 'create' | 'edit';
   saving: boolean;
@@ -27,7 +28,7 @@ interface SupplierFormProps {
   backendErrors?: Record<string, string>;
 }
 
-export function SupplierForm({ status, supplier, mode, saving, onSubmit, backendErrors }: SupplierFormProps) {
+export function SupplierForm({ status, openingBalanceType, supplier, mode, saving, onSubmit, backendErrors }: SupplierFormProps) {
   const {
     register,
     handleSubmit,
@@ -40,9 +41,9 @@ export function SupplierForm({ status, supplier, mode, saving, onSubmit, backend
     mode: "onChange",
     defaultValues: {
       name: "",
-      email: "", 
-      phone: "", 
-      address: "", 
+      email: "",
+      phone: "",
+      address: "",
       status: 1,
       opening_balance_type: 0,
       opening_balance: 0,
@@ -66,9 +67,9 @@ export function SupplierForm({ status, supplier, mode, saving, onSubmit, backend
     if (mode === 'edit' && supplier) {
       reset({
         name: supplier?.name ?? '',
-        email: supplier?.email ?? '', 
-        phone: supplier?.phone ?? '', 
-        address: supplier?.address ?? '', 
+        email: supplier?.email ?? '',
+        phone: supplier?.phone ?? '',
+        address: supplier?.address ?? '',
         status: Number(supplier?.status ?? 1),
         opening_balance_type: supplier?.opening_balance_type ?? 0,
         opening_balance: supplier?.opening_balance ?? 0,
@@ -76,9 +77,9 @@ export function SupplierForm({ status, supplier, mode, saving, onSubmit, backend
     } else {
       reset({
         name: '',
-        email: '', 
-        phone: '', 
-        address: '', 
+        email: '',
+        phone: '',
+        address: '',
         status: 1,
         opening_balance_type: 0,
         opening_balance: 0,
@@ -88,17 +89,17 @@ export function SupplierForm({ status, supplier, mode, saving, onSubmit, backend
 
   const onFormSubmit = (data: SupplierFormData) => {
     const formData = new FormData();
-    
+
     // Append all form fields to FormData
     formData.append('name', data.name);
-    
+
     if (data.email) formData.append('email', data.email);
     if (data.phone) formData.append('phone', data.phone);
     if (data.address) formData.append('address', data.address);
     if (data.opening_balance_type !== undefined) formData.append('opening_balance_type', data.opening_balance_type.toString());
     if (data.opening_balance !== undefined) formData.append('opening_balance', data.opening_balance.toString());
     if (data.status !== undefined) formData.append('status', data.status.toString());
-    
+
     onSubmit(formData);
   };
   return (
@@ -187,6 +188,74 @@ export function SupplierForm({ status, supplier, mode, saving, onSubmit, backend
                 rows={3}
               />
             )}
+          />
+        </div>
+        <div>
+          <Label htmlFor="opening_balance_type" required>Opening Balance Type</Label>
+          <Controller
+            name="opening_balance_type"
+            control={control}
+            rules={{ required: "Opening Balance Type is required" }}
+            render={({ field }) => (
+              <div className="relative">
+                <Select
+                  options={openingBalanceType}
+                  value={field.value?.toString() ?? ""}
+                  placeholder="Select Opening Balance Type"
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  disabled={saving}
+                />
+                <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+                  <ChevronDownIcon />
+                </span>
+              </div>
+            )}
+          />
+          {errors.status?.message && (
+            <p className="mt-1.5 text-xs text-error-500">
+              {errors.status.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <Label htmlFor="opening_balance" required>Opening Balance</Label>
+          <Input
+            id="opening_balance"
+            type="number"
+            placeholder="Enter supplier opening balance."
+            register={register("opening_balance", {
+              valueAsNumber: true,
+              min: {
+                value: 0,
+                message: "Opening balance cannot be negative"
+              },
+              max: {
+                value: 999999999.99,
+                message: "Opening balance is too large"
+              },
+              validate: (value) => {
+                // Handle null/undefined case
+                if (value === null || value === undefined) return true;
+
+                // Ensure it's a valid number
+                if (isNaN(value)) return "Please enter a valid number";
+
+                // Check decimal places
+                const stringValue = value.toString();
+                const decimalPart = stringValue.split('.')[1];
+                if (decimalPart && decimalPart.length > 2) {
+                  return "Maximum 2 decimal places allowed";
+                }
+
+                return true;
+              }
+            })}
+            error={errors.opening_balance?.message}
+            disabled={saving}
+            step={0.01}
+            min={"0"}
+            max={"999999999.99"}
+            onWheel={(e) => e.currentTarget.blur()}
           />
         </div>
         {/* Show status field only in edit mode */}

@@ -8,6 +8,7 @@ import { Supplier } from "@/services/supplierService";
 interface SupplierModalProps {
   isOpen: boolean;
   status: { value: number; label: string }[];
+  openingBalanceType: { value: number; label: string }[];
   supplier: Supplier | null;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
@@ -20,6 +21,7 @@ interface SupplierModalProps {
 export function SupplierModal({
   isOpen,
   status,
+  openingBalanceType,
   supplier,
   mode,
   saving,
@@ -58,7 +60,8 @@ export function SupplierModal({
 
         {(mode === 'create' || mode === 'edit') && (
           <SupplierForm
-          status={status}
+            status={status}
+            openingBalanceType={openingBalanceType}
             supplier={mode === 'edit' ? supplier : null}
             mode={mode}
             saving={saving}

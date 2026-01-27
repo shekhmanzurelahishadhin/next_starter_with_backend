@@ -15,11 +15,13 @@ interface InputProps {
   step?: number;
   disabled?: boolean;
   success?: boolean;
-  error?: string | boolean; // Changed to accept string for error messages
+  error?: string | boolean;
   hint?: string;
   required?: boolean;
   // Add React Hook Form registration props
   register?: UseFormRegisterReturn;
+  // Add onWheel prop
+  onWheel?: React.WheelEventHandler<HTMLInputElement>;
 }
 
 const Input: FC<InputProps> = ({
@@ -39,7 +41,8 @@ const Input: FC<InputProps> = ({
   error = false,
   hint,
   required = false,
-  register, // Add register prop
+  register,
+  onWheel, // Add onWheel prop
 }) => {
   // Determine input styles based on state (disabled, success, error)
   let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
@@ -74,6 +77,7 @@ const Input: FC<InputProps> = ({
         disabled={disabled}
         className={inputClasses}
         required={required}
+        onWheel={onWheel} // Pass onWheel prop to input
         // Spread register props if provided (includes ref, onChange, onBlur, etc.)
         {...register}
       />

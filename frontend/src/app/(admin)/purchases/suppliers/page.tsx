@@ -95,6 +95,7 @@ export default function Suppliers() {
           <SupplierModal
             isOpen={isOpen}
             status={status}
+            openingBalanceType={openingBalanceType}
             supplier={selectedSupplier}
             mode={mode}
             saving={saving}
