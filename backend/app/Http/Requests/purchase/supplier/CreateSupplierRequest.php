@@ -38,8 +38,6 @@ class CreateSupplierRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'company_id.required' => 'Company is required.',
-            'company_id.exists' => 'Selected company does not exist.',
             'slug.string' => 'The supplier slug must be a string.',
             'slug.max' => 'The supplier slug cannot exceed 255 characters.',
             'slug.unique' => 'This supplier slug already exists.',

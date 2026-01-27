@@ -108,8 +108,7 @@ class SupplierService {
     }
 
     async updateSupplier(id: number, supplierData: { name: string, code: string, email: string, phone: string, address: string, opening_balance_type: number, opening_balance: number, status: string }): Promise<Supplier> {
-
-        const response = await api.post(`/purchase/suppliers/${id}`, supplierData);
+        const response = await api.put(`/purchase/suppliers/${id}`, supplierData);
         return response.data.data;
     }
 

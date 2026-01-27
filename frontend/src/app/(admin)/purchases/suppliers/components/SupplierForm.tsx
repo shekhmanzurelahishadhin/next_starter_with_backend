@@ -45,7 +45,7 @@ export function SupplierForm({ status, openingBalanceType, supplier, mode, savin
       phone: "",
       address: "",
       status: 1,
-      opening_balance_type: 0,
+      opening_balance_type: 1,
       opening_balance: 0,
     }
   });
@@ -71,7 +71,7 @@ export function SupplierForm({ status, openingBalanceType, supplier, mode, savin
         phone: supplier?.phone ?? '',
         address: supplier?.address ?? '',
         status: Number(supplier?.status ?? 1),
-        opening_balance_type: supplier?.opening_balance_type ?? 0,
+        opening_balance_type: supplier?.opening_balance_type ?? 1,
         opening_balance: supplier?.opening_balance ?? 0,
       });
     } else {
@@ -81,29 +81,17 @@ export function SupplierForm({ status, openingBalanceType, supplier, mode, savin
         phone: '',
         address: '',
         status: 1,
-        opening_balance_type: 0,
+        opening_balance_type: 1,
         opening_balance: 0,
       });
     }
   }, [supplier, reset, mode]);
 
   const onFormSubmit = (data: SupplierFormData) => {
-    const formData = new FormData();
-
-    // Append all form fields to FormData
-    formData.append('name', data.name);
-
-    if (data.email) formData.append('email', data.email);
-    if (data.phone) formData.append('phone', data.phone);
-    if (data.address) formData.append('address', data.address);
-    if (data.opening_balance_type !== undefined) formData.append('opening_balance_type', data.opening_balance_type.toString());
-    if (data.opening_balance !== undefined) formData.append('opening_balance', data.opening_balance.toString());
-    if (data.status !== undefined) formData.append('status', data.status.toString());
-
-    onSubmit(formData);
+    onSubmit(data);
   };
   return (
-    <form id="supplier-form" onSubmit={handleSubmit(onFormSubmit)} encType="multipart/form-data">
+    <form id="supplier-form" onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-2">
         <div>
           <Label htmlFor="name" required>Supplier Name</Label>
@@ -211,9 +199,9 @@ export function SupplierForm({ status, openingBalanceType, supplier, mode, savin
               </div>
             )}
           />
-          {errors.status?.message && (
+          {errors.opening_balance_type?.message && (
             <p className="mt-1.5 text-xs text-error-500">
-              {errors.status.message}
+              {errors.opening_balance_type.message}
             </p>
           )}
         </div>
