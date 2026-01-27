@@ -28,7 +28,50 @@ export function SupplierDetailView({ supplier, formatDate }: SupplierDetailViewP
                 {supplier.name}
               </TableCell>
             </TableRow>
-
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Email
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {supplier.email ?? "-"}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Phone
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {supplier.phone ?? "-"}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Address
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {supplier.address ?? "-"}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Balance Type
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {supplier.opening_balance_type == 1
+                  ? "Debit"
+                  : supplier.opening_balance_type == 2
+                    ? "Credit"
+                    : "Unknown" }
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Opening Balance
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {supplier.opening_balance ?? "-"}
+              </TableCell>
+            </TableRow>
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                 Status
