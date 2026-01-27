@@ -15,6 +15,7 @@ export const useSuppliers = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<{ value: number; label: string }[]>([]);
+  const [openingBalanceType, setOpeningBalanceType] = useState<{ value: number; label: string }[]>([]);
 
   // Modal state
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
@@ -53,16 +54,22 @@ export const useSuppliers = () => {
     }
   }, [pagination.pageIndex, pagination.pageSize, debouncedFilters]);
 
-  const fetchLookups = async () => {
-    try {
-      const type = "active_status";
-      const res = await lookupService.getLookupByType(type);
-      console.log("Lookups fetched:", res);
-      setStatus(res);
-    } catch (error) {
-      console.error("Failed to fetch lookups", error);
-    }
-  };
+  
+  const fetchLookups = useCallback(async () => {
+  try {
+    const [status, openingBalanceType] = await Promise.all([
+      lookupService.getLookupByType("active_status"),
+      lookupService.getLookupByType("transaction_type"),
+    ]);
+
+    setStatus(status);
+    setOpeningBalanceType(openingBalanceType);
+
+  } catch (err) {
+    console.error("Failed to fetch lookups", err);
+    toast.error("Failed to load lookup data");
+  }
+}, []);
 
   useEffect(() => {
     loadSuppliers();
@@ -167,8 +174,8 @@ export const useSuppliers = () => {
     code: string, 
     phone: string, 
     address: string, 
-    logo: string,
-    default_currency: string, 
+    opening_balance_type: number, 
+    opening_balance: number, 
     timezone: string,
     email: string, 
     status: string 
@@ -256,6 +263,7 @@ export const useSuppliers = () => {
     pagination,
     total,
     status,
+    openingBalanceType,
 
     // Actions
     setPagination,

@@ -94,7 +94,7 @@ class LookupService {
         return result;
     }
 
-    async getLookupByType(type: string): Promise<Lookup[]> {
+    async getLookupByType(type: string): Promise<{value: number; label: string}[]> {
     const cacheKey = this.getCacheKey({ type });
     const cached = this.getCache(cacheKey);
     if (cached) {

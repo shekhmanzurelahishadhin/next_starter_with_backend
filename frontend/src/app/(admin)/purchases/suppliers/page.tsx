@@ -24,6 +24,7 @@ export default function Suppliers() {
     pagination,
     total,
     status,
+    openingBalanceType,
 
     // Actions
     setPagination,
@@ -52,6 +53,7 @@ export default function Suppliers() {
     pageSize: pagination.pageSize,
     formatDate,
     status,
+    openingBalanceType,
   });
 
   useEffect(() => {

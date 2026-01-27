@@ -27,6 +27,7 @@ interface UseSupplierColumnsProps {
   pageSize: number;
   formatDate: (dateString?: string) => string;
   status: { value: number; label: string }[];
+  openingBalanceType: { value: number; label: string }[];
 }
 
 export const useSupplierColumns = ({
@@ -39,6 +40,7 @@ export const useSupplierColumns = ({
   pageSize,
   formatDate,
   status,
+  openingBalanceType,
 }: UseSupplierColumnsProps): ColumnDef<Supplier>[] => {
   return useMemo((): ColumnDef<Supplier>[] => [
     {
@@ -50,14 +52,16 @@ export const useSupplierColumns = ({
         exportable: true,
         exportHeader: "SL",
         exportValue: (row, index) => (pageIndex * pageSize) + (index ?? 0) + 1,
-        widthClass: "w-[30px]"
+        widthClass: "w-[60px] min-w-[50px] max-w-[70px]"
       },
       cell: ({ row }) => {
         const serialNumber = (pageIndex * pageSize) + row.index + 1;
         return (
-          <span className="text-gray-600 dark:text-gray-400">
-            {serialNumber}
-          </span>
+          <div className="px-2 text-center">
+            <span className="text-gray-600 dark:text-gray-400">
+              {serialNumber}
+            </span>
+          </div>
         );
       },
     },
@@ -71,13 +75,13 @@ export const useSupplierColumns = ({
         exportable: true,
         exportHeader: "Supplier Name",
         exportValue: (row) => row.name,
-        widthClass: "w-[200px]"
+        widthClass: "min-w-[180px] max-w-[250px] flex-1"
       },
       cell: ({ row }) => {
         const name = row.getValue("name") as string;
         return (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+          <div className="px-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate block">
               {name}
             </span>
           </div>
@@ -94,13 +98,13 @@ export const useSupplierColumns = ({
         exportable: true,
         exportHeader: "Supplier Email",
         exportValue: (row) => row.email,
-        widthClass: "w-[200px]"
+        widthClass: "min-w-[180px] max-w-[250px] flex-1"
       },
       cell: ({ row }) => {
         const email = row.getValue("email") as string;
         return (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+          <div className="px-2">
+            <span className="text-gray-700 dark:text-gray-300 truncate block">
               {email}
             </span>
           </div>
@@ -117,13 +121,13 @@ export const useSupplierColumns = ({
         exportable: true,
         exportHeader: "Supplier Phone",
         exportValue: (row) => row.phone,
-        widthClass: "w-[200px]"
+        widthClass: "w-[140px] min-w-[130px] max-w-[160px]"
       },
       cell: ({ row }) => {
         const phone = row.getValue("phone") as string;
         return (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+          <div className="px-2">
+            <span className="text-gray-700 dark:text-gray-300">
               {phone}
             </span>
           </div>
@@ -140,15 +144,37 @@ export const useSupplierColumns = ({
         exportable: true,
         exportHeader: "Supplier Address",
         exportValue: (row) => row.address,
-        widthClass: "w-[200px]"
+        widthClass: "min-w-[100px] max-w-[200px] flex-2"
       },
       cell: ({ row }) => {
         const address = row.getValue("address") as string;
         return (
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+          <div className="px-2">
+            <span className="text-gray-700 dark:text-gray-300 line-clamp-2">
               {address}
             </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "opening_balance_type",
+      header: "Balance Type",
+      enableSorting: true,
+      meta: {
+        filterVariant: "select",
+        filterOptions: openingBalanceType.map((s) => ({ value: s.value.toString(), label: s.label })),
+        exportable: true,
+        exportHeader: "Opening Balance Type",
+        exportValue: (row) => row.opening_balance_type,
+        widthClass: "w-[120px] min-w-[100px] max-w-[130px]"
+      },
+      cell: ({ row }) => {
+        const openingBalanceType = row.getValue("opening_balance_type") as number;
+        const typeLabel = openingBalanceType === 1 ? "Debit" : openingBalanceType === 2 ? "Credit" : "N/A";
+        return (
+          <div className="px-2 text-center">
+              {typeLabel}
           </div>
         );
       },
@@ -161,9 +187,7 @@ export const useSupplierColumns = ({
         exportable: true,
         exportHeader: "Opening Balance",
         exportValue: (row) => row.opening_balance,
-        widthClass: "w-[150px] min-w-[130px] max-w-[170px]",
-        minWidth: "130px",
-        maxWidth: "170px"
+        widthClass: "w-[140px] min-w-[120px] max-w-[160px]"
       },
       cell: ({ row }) => {
         const rawValue = row.getValue("opening_balance");
@@ -171,13 +195,15 @@ export const useSupplierColumns = ({
 
         return (
           <div className="px-2 text-right">
-            <span className="text-gray-600 dark:text-gray-400 text-sm">
-              {openingBalance.toFixed(2)}
+            <span className="text-gray-800 dark:text-white font-medium">
+              {openingBalance.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })}
             </span>
           </div>
         );
       },
-
     },
     {
       accessorKey: "status",
@@ -189,23 +215,21 @@ export const useSupplierColumns = ({
         exportable: true,
         exportHeader: "Status",
         exportValue: (row) => (Number(row.status) === 1 ? "Active" : "Inactive"),
-        widthClass: "w-[100px] min-w-[90px] max-w-[110px]",
-        minWidth: "90px",
-        maxWidth: "110px"
+        widthClass: "w-[100px] min-w-[90px] max-w-[110px]"
       },
       cell: ({ row }) => {
         const status = row.getValue("status") as number;
         return (
-          <div className="px-2">
+          <div className="px-2 text-center">
             {row.original.deleted_at ? (
-              <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-gray-100 text-gray-800 dark:bg-red-800/30 dark:text-gray-400">
+              <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400">
                 Trashed
               </span>
             ) : (
               <span
-                className={`px-2 py-1 rounded-full text-[12px] font-medium ${status === 1
-                  ? "bg-success-100 text-success-800 dark:bg-success-900/30 dark:text-success-400"
-                  : "bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-400"
+                className={`px-2 py-1 rounded-full text-xs font-medium ${status === 1
+                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                  : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                   }`}
               >
                 {status === 1 ? "Active" : "Inactive"}
@@ -217,21 +241,19 @@ export const useSupplierColumns = ({
     },
     {
       accessorKey: "created_at",
-      header: "Created at",
+      header: "Created",
       enableSorting: true,
       meta: {
         exportable: true,
         exportHeader: "Created At",
         placeholder: "Search created",
         exportValue: (row) => formatDate(row.created_at),
-        widthClass: "w-[120px] min-w-[110px] max-w-[130px]",
-        minWidth: "110px",
-        maxWidth: "130px"
+        widthClass: "w-[120px] min-w-[110px] max-w-[130px]"
       },
       cell: ({ row }) => {
         const value = row.getValue("created_at") as string | undefined;
         return (
-          <div className="px-2">
+          <div className="px-2 text-center">
             <span className="text-gray-600 dark:text-gray-400 text-sm">
               {formatDate(value)}
             </span>
@@ -241,21 +263,19 @@ export const useSupplierColumns = ({
     },
     {
       accessorKey: "updated_at",
-      header: "Updated at",
+      header: "Updated",
       enableSorting: true,
       meta: {
         exportable: true,
         exportHeader: "Updated At",
         placeholder: "Search updated",
         exportValue: (row) => formatDate(row.updated_at),
-        widthClass: "w-[120px] min-w-[110px] max-w-[130px]",
-        minWidth: "110px",
-        maxWidth: "130px"
+        widthClass: "w-[120px] min-w-[110px] max-w-[130px]"
       },
       cell: ({ row }) => {
         const value = row.getValue("updated_at") as string | undefined;
         return (
-          <div className="px-2">
+          <div className="px-2 text-center">
             <span className="text-gray-600 dark:text-gray-400 text-sm">
               {formatDate(value)}
             </span>
@@ -264,48 +284,50 @@ export const useSupplierColumns = ({
       },
     },
     {
-      id: "Actions",
-      header: () => <div className="">Actions</div>,
+      id: "actions",
+      header: () => <div className="text-center">Actions</div>,
       enableSorting: false,
       meta: {
         filterVariant: "none",
         exportable: false,
-        widthClass: "w-[150px]"
+        widthClass: "w-[160px] min-w-[150px] max-w-[180px]"
       },
       cell: ({ row }) => {
         const supplier = row.original;
         return (
-          <ActionButtons
-            row={supplier}
-            buttons={[
-              {
-                icon: FiEye,
-                onClick: (row) => onView(row as Supplier),
-                variant: "success",
-                size: "sm",
-                tooltip: "View",
-                show: () => hasPermission("supplier.view"),
-              },
-              {
-                icon: FiEdit,
-                onClick: (row) => onEdit(row as Supplier),
-                variant: "primary",
-                size: "sm",
-                tooltip: "Edit",
-                show: () => hasPermission("supplier.edit"),
-              },
-              {
-                icon: FiTrash,
-                onClick: (row) => handleSoftDelete((row as Supplier).id),
-                variant: "danger",
-                size: "sm",
-                tooltip: "Move to Trash",
-                show: () => hasPermission("supplier.delete"),
-              },
-            ]}
-          />
+          <div className="flex justify-center px-2">
+            <ActionButtons
+              row={supplier}
+              buttons={[
+                {
+                  icon: FiEye,
+                  onClick: (row) => onView(row as Supplier),
+                  variant: "success",
+                  size: "sm",
+                  tooltip: "View",
+                  show: () => hasPermission("supplier.view"),
+                },
+                {
+                  icon: FiEdit,
+                  onClick: (row) => onEdit(row as Supplier),
+                  variant: "primary",
+                  size: "sm",
+                  tooltip: "Edit",
+                  show: () => hasPermission("supplier.edit"),
+                },
+                {
+                  icon: FiTrash,
+                  onClick: (row) => handleSoftDelete((row as Supplier).id),
+                  variant: "danger",
+                  size: "sm",
+                  tooltip: "Move to Trash",
+                  show: () => hasPermission("supplier.delete"),
+                },
+              ]}
+            />
+          </div>
         );
       },
     },
-  ], [hasPermission, onView, onEdit, handleForceDelete, handleSoftDelete, pageIndex, pageSize]);
+  ], [hasPermission, onView, onEdit, handleSoftDelete, pageIndex, pageSize, status, openingBalanceType]);
 };
