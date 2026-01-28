@@ -65,7 +65,7 @@ export default function Suppliers() {
       <div>
          <PageBreadcrumb
           items={[
-            { title: "Configure" }, // add href if needed links like href: "/admin/authorization/permissions"
+            { title: "Purchases" }, // add href if needed links like href: "/admin/authorization/permissions"
             { title: "Supplier Management" }
           ]}
         />
