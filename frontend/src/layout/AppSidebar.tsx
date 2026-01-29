@@ -103,7 +103,7 @@ const navItems: NavItem[] = [
     name: "Sales",
     icon: <FiShoppingBag />,
     subItems: [
-      { name: "Customers", path: "/purchases/customers", requiredPermissions: ["customer.view", "customer.create", "customer.edit", "customer.delete"] },
+      { name: "Customers", path: "/sales/customers", requiredPermissions: ["customer.view", "customer.create", "customer.edit", "customer.delete"] },
     ],
   },
   {
