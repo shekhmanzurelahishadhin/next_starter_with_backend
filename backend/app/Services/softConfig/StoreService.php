@@ -34,9 +34,10 @@ class StoreService
             $query->onlyTrashed();
         } elseif (isset($filters['status']) && $filters['status'] !== '') {
             $query->where('status', $filters['status']);
-        } else {
-            $query->withTrashed();
         }
+//        else {
+//            $query->withTrashed();
+//        }
 
         // Apply filters
         $query
@@ -53,16 +54,6 @@ class StoreService
             )
             )
             ->when($filters['created_at'] ?? null, fn($q, $createdAt) => $q->whereDate('created_at', date('Y-m-d', strtotime($createdAt)))
-            )
-            ->when($filters['search'] ?? null, fn($q, $term) => $q->where(function ($sub) use ($term) {
-                $sub->where('name', 'like', "%{$term}%")
-                    ->orWhere('code', 'like', "%{$term}%")
-                    ->orWhere('address', 'like', "%{$term}%")
-                    ->orWhereHas('company', fn($company) => $company->where('name', 'like', "%{$term}%")
-                    )
-                    ->orWhereHas('createdBy', fn($user) => $user->where('name', 'like', "%{$term}%")
-                    );
-            })
             );
 
         // Eager load common relations
