@@ -90,6 +90,7 @@ const navItems: NavItem[] = [
       { name: "Units", path: "/configure/units", requiredPermissions: ["unit.view", "unit.create", "unit.edit", "unit.delete"] },
       { name: "Brands", path: "/configure/brands", requiredPermissions: ["brand.view", "brand.create", "brand.edit", "brand.delete"] },
       { name: "Lookups", path: "/configure/lookups", requiredPermissions: ["lookup.view", "lookup.create", "lookup.edit", "lookup.delete"] },
+      { name: "Stores", path: "/configure/stores", requiredPermissions: ["store.view", "store.create", "store.edit", "store.delete"] },
     ],
   },
   {
