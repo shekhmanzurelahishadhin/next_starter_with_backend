@@ -7,10 +7,12 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 export interface Store {
   id: number;
   name: string;
-  category_id: number;
-  category_name: string;
+  company_id: number;
+  code: string;
   slug: string;
   status: number;
+  address: string;
+  company_name?: string;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
@@ -29,8 +31,11 @@ export interface StoreFilters {
   page?: number;
   per_page?: number;
   name?: string;
-  slug?: string;
+  code?: string;
   category_name?: string;
+  address?: string;
+  slug?: string;
+  company_name?: string;
   status?: string;
   created_at?: string;
   updated_at?: string;
@@ -69,7 +74,9 @@ class StoreService {
     // Specific filter fields
     if (filters.name) params.append('name', filters.name);
     if (filters.slug) params.append('slug', filters.slug);
-    if (filters.category_name) params.append('category_name', filters.category_name);
+    if (filters.company_name) params.append('company_name', filters.company_name);
+    if (filters.code) params.append('code', filters.code);
+    if (filters.address) params.append('address', filters.address);
     if (filters.status) params.append('status', filters.status);
     if (filters.created_at) params.append('created_at', filters.created_at);
     if (filters.updated_at) params.append('updated_at', filters.updated_at);
@@ -80,15 +87,15 @@ class StoreService {
     return result;
   }
 
-  async createStore(categoryData: { name: string, category_id: number }): Promise<Store> {
+  async createStore(storeData: { name: string, company_id: number, code?: string, address?: string }): Promise<Store> {
 
-    const response = await api.post('/configure/stores', categoryData);
+    const response = await api.post('/configure/stores', storeData);
     return response.data.data;
   }
 
-  async updateStore(id: number, categoryData: { name: string, category_id: number, status: string }): Promise<Store> {
+  async updateStore(id: number, storeData: { name: string, company_id: number, code?: string, address?: string, status?: string }): Promise<Store> {
 
-    const response = await api.put(`/configure/stores/${id}`, categoryData);
+    const response = await api.put(`/configure/stores/${id}`, storeData);
     return response.data.data;
   }
 
