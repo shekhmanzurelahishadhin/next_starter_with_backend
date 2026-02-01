@@ -15,8 +15,8 @@ export default function Stores() {
   // Single hook for all store operations
   const {
     stores,
-    categories,
-    loadingCategories,
+    companies,
+    loadingCompanies,
     loading,
     saving,
     isOpen,
@@ -96,8 +96,8 @@ export default function Stores() {
             isOpen={isOpen}
             status={status}
             store={selectedStore}
-            categories={categories}
-            loadingCategories={loadingCategories}
+            companies={companies}
+            loadingCompanies={loadingCompanies}
             mode={mode}
             saving={saving}
             onClose={handleCloseModal}

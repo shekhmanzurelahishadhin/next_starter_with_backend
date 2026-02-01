@@ -9,12 +9,12 @@ interface StoreModalProps {
   isOpen: boolean;
   status: { value: number; label: string }[];
   store: Store | null;
-  categories: { value: number; label: string }[];
-  loadingCategories: boolean;
+  companies: { value: number; label: string }[];
+  loadingCompanies: boolean;
   mode: 'view' | 'edit' | 'create';
   saving: boolean;
   onClose: () => void;
-  onSave: (categoryData: { name: string }) => void;
+  onSave: (storeData: { name: string, company_id?: number | null, address?: string, status?: number }) => void;
   backendErrors?: Record<string, string>; // Add this prop
   formatDate: (dateString?: string) => string;
 }
@@ -23,8 +23,8 @@ export function StoreModal({
   isOpen,
   status,
   store,
-  categories,
-  loadingCategories,
+  companies,
+  loadingCompanies,
   mode,
   saving,
   onClose,
@@ -64,8 +64,8 @@ export function StoreModal({
           <StoreForm
           status={status}
             store={mode === 'edit' ? store : null}
-            categories={categories}
-            loadingCategories={loadingCategories}
+            companies={companies}
+            loadingCompanies={loadingCompanies}
             mode={mode}
             saving={saving}
             onSubmit={onSave}

@@ -12,8 +12,8 @@ export const useStores = () => {
   const { isOpen, openModal, closeModal } = useModal();
 
   // Data state
-  const [categories, setCategories] = useState<{ value: number; label: string }[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [companies, setCompanies] = useState<{ value: number; label: string }[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(false);
   const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -49,8 +49,8 @@ export const useStores = () => {
       setStores(response.data);
       setTotal(response.total);
     } catch (err) {
-      toast.error('Failed to load sub categories');
-      console.error('Error loading sub categories:', err);
+      toast.error('Failed to load stores');
+      console.error('Error loading stores:', err);
     } finally {
       setLoading(false);
     }
@@ -66,16 +66,16 @@ export const useStores = () => {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchCompanies = async () => {
    
-    setLoadingCategories(true);
+    setLoadingCompanies(true);
     try {
-      const res = await api.get("/configure/categories", { params: { status: 1, per_page: null, columns: ['id','name'] } });
-      setCategories(res.data.data.data.map((cat) => ({ value: Number(cat.id), label: cat.name })));
-      setLoadingCategories(false);
+      const res = await api.get("/configure/companies", { params: { status: 1, per_page: null, columns: ['id','name'] } });
+      setCompanies(res.data.data.data.map((com) => ({ value: Number(com.id), label: com.name })));
+      setLoadingCompanies(false);
     } catch (error) {
-      console.error("Failed to fetch categories", error);
-      setLoadingCategories(false);
+      console.error("Failed to fetch companies", error);
+      setLoadingCompanies(false);
     }   
   };
 
@@ -101,7 +101,7 @@ export const useStores = () => {
     setSelectedStore(store);
     setMode('edit');
     setBackendErrors({});
-    fetchCategories();
+    fetchCompanies();
     openModal();
   }, [openModal]);
 
@@ -109,7 +109,7 @@ export const useStores = () => {
     setSelectedStore(null);
     setMode('create');
     setBackendErrors({});
-    fetchCategories();
+    fetchCompanies();
     openModal();
   }, [openModal]);
 
@@ -124,7 +124,7 @@ export const useStores = () => {
   const handleSoftDelete = useCallback(async (id: number) => {
     const result = await confirm({
       title: 'Move to Trash?',
-      text: 'Are you sure you want to move this Sub-Category to trash? This action cannot be undone.',
+      text: 'Are you sure you want to move this Store to trash? This action cannot be undone.',
     });
 
     if (!result.isConfirmed) return;
@@ -134,19 +134,19 @@ export const useStores = () => {
       previousStores = [...stores];
       setStores(prev => prev.filter(store => store.id !== id));
       await storeService.softDeleteStore(id);
-      toast.success('Sub-Category moved to trashed!');
+      toast.success('Store moved to trashed!');
       await loadStores();
     } catch (err) {
       // Revert on error
       setStores(previousStores);
-      toast.error('Failed to delete Sub-Category');
+      toast.error('Failed to delete Store');
     }
   }, [confirm, stores, loadStores]);
 
   const handleForceDelete = useCallback(async (id: number) => {
     const result = await confirm({
-      title: 'Delete Sub-Category?',
-      text: 'Are you sure you want to delete this Sub-Category? This action cannot be undone.',
+      title: 'Delete Store?',
+      text: 'Are you sure you want to delete this Store? This action cannot be undone.',
     });
 
     if (!result.isConfirmed) return;
@@ -157,40 +157,38 @@ export const useStores = () => {
       previousStores = [...stores];
       setStores(prev => prev.filter(store => store.id !== id));
       await storeService.forceDeleteStore(id);
-      toast.success('Sub-Category deleted successfully!');
+      toast.success('Store deleted successfully!');
       await loadStores();
     } catch (err) {
       // Revert on error
       setStores(previousStores);
-      toast.error('Failed to delete Sub-Category');
+      toast.error('Failed to delete Store');
     }
   }, [confirm, stores, loadStores]);
 
   const handleRestore = useCallback(async (id: number) => {
     try {
       await storeService.restoreStore(id);
-      toast.success('Sub-Category restored successfully!');
+      toast.success('Store restored successfully!');
       await loadStores();
     } catch (err) {
       // Revert on error
-      toast.error('Failed to restore Sub-Category');
+      toast.error('Failed to restore Store');
     }
   }, [stores, loadStores]);
 
-  const handleSave = useCallback(async (storeData: { name: string }) => {
+  const handleSave = useCallback(async (storeData: { name: string, company_id: number, code?: string, address?: string, status?: string }) => {
     try {
       setSaving(true);
       setBackendErrors({});
-
       if (mode === 'edit' && selectedStore) {
         await storeService.updateStore(selectedStore.id, storeData);
-        toast.success('Sub-Category updated successfully!');
+        toast.success('Store updated successfully!');
       } else {
         await storeService.createStore(storeData);
-        toast.success('Sub-Category created successfully!');
+        toast.success('Store created successfully!');
         setPagination(prev => ({ ...prev, pageIndex: 0 }));
       }
-
       handleCloseModal();
       await loadStores();
       return true;
@@ -202,13 +200,14 @@ export const useStores = () => {
         });
         setBackendErrors(errors);
       } else {
-        toast.error(err?.response?.data?.message || 'Failed to save Sub-Category');
+        toast.error(err?.response?.data?.message || 'Failed to save Store');
       }
       return false;
     } finally {
       setSaving(false);
     }
   }, [mode, selectedStore, loadStores, handleCloseModal]);
+
 
   // Filter and search operations
   const handleFilterChange = useCallback((name: string, value: string | number) => {
@@ -252,8 +251,8 @@ export const useStores = () => {
   return {
     // State
     stores,
-    categories,
-    loadingCategories,
+    companies,
+    loadingCompanies,
     loading,
     saving,
     isOpen,
