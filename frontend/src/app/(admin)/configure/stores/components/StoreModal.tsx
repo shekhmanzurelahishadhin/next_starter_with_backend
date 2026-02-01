@@ -34,10 +34,10 @@ export function StoreModal({
 }: StoreModalProps) {
   const getTitle = () => {
     switch (mode) {
-      case 'view': return 'Sub-Category Details';
-      case 'edit': return 'Edit Sub-Category';
-      case 'create': return 'Add New Sub-Category';
-      default: return 'Sub-Category';
+      case 'view': return 'Store Details';
+      case 'edit': return 'Edit Store';
+      case 'create': return 'Add New Store';
+      default: return 'Store';
     }
   };
 

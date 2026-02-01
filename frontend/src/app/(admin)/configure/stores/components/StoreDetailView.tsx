@@ -6,14 +6,14 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { SubCategory } from "@/services/storeService";
+import { Store } from "@/services/storeService";
 
-interface SubCategoryDetailViewProps {
-  store: SubCategory;
+interface StoreDetailViewProps {
+  store: Store;
   formatDate: (dateString?: string) => string;
 }
 
-export function SubCategoryDetailView({ store, formatDate }: SubCategoryDetailViewProps) {
+export function StoreDetailView({ store, formatDate }: StoreDetailViewProps) {
  
   return (
     <div className="space-y-4 py-4">
@@ -22,18 +22,34 @@ export function SubCategoryDetailView({ store, formatDate }: SubCategoryDetailVi
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Sub-Category Name
+                Store Name
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
                 {store.name}
               </TableCell>
             </TableRow>
-              <TableRow>
+               <TableRow>
               <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
-                Category Name
+                Code
               </TableCell>
               <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
-                {store.category_name}
+                {store.code}
+              </TableCell>
+            </TableRow>
+              <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Company
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {store.company_name}
+              </TableCell>
+            </TableRow>
+               <TableRow>
+              <TableCell className="px-5 py-4 text-gray-600 font-medium bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                Address
+              </TableCell>
+              <TableCell className="px-5 py-4 text-gray-800 font-semibold dark:text-white/90">
+                {store.address}
               </TableCell>
             </TableRow>
             <TableRow>

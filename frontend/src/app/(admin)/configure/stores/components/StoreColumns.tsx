@@ -63,7 +63,7 @@ export const useStoreColumns = ({
     },
     {
       accessorKey: "name",
-      header: "Sub-Category Name",
+      header: "Store Name",
       enableSorting: true,
       meta: {
         filterVariant: "text",
@@ -85,25 +85,71 @@ export const useStoreColumns = ({
       },
     },
     {
-      accessorKey: "category_name",
-      header: "Category",
+      accessorKey: "code",
+      header: "Code",
       enableSorting: true,
       meta: {
         filterVariant: "text",
-        placeholder: "Search Category",
+        placeholder: "Search codes",
         exportable: true,
-        exportHeader: "Category",
-        exportValue: (row) => row.category_name || "—",
+        exportHeader: "Code",
+        exportValue: (row) => row.code,
+        widthClass: "w-[200px]"
+      },
+      cell: ({ row }) => {
+        const code = row.getValue("code") as string;
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {code}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "company_name",
+      header: "Company",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        placeholder: "Search Company",
+        exportable: true,
+        exportHeader: "Company",
+        exportValue: (row) => row.company_name || "—",
         widthClass: "w-[160px] min-w-[140px] max-w-[200px]",
         minWidth: "140px",
         maxWidth: "200px"
       },
       cell: ({ row }) => {
-        const category = row.getValue("category_name") as string;
+        const company = row.getValue("company_name") as string;
         return (
           <div className="px-2">
             <span className="font-medium text-gray-800 dark:text-white/90 truncate block">
-              {category || "—"}
+              {company || "—"}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "address",
+      header: "Address",
+      enableSorting: true,
+      meta: {
+        filterVariant: "text",
+        placeholder: "Search addresses",
+        exportable: true,
+        exportHeader: "Address",
+        exportValue: (row) => row.address || "—",
+        widthClass: "w-[200px]"
+      },
+      cell: ({ row }) => {
+        const address = row.getValue("address") as string;
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-white/90 truncate">
+              {address}
             </span>
           </div>
         );

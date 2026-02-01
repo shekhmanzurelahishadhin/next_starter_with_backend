@@ -20,6 +20,7 @@ class StoreService
             'status',
             'created_by',
             'created_at',
+            'updated_at',
             'deleted_at'
         );
         // Restrict data if user is not superadmin and has a company_id
